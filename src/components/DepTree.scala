@@ -3,10 +3,8 @@ package components
 import input.ParseToken
 
 class DepTree(depSentence: Seq[ParseToken]) {
-  final val ROOT = 0
-
-  private var tokens: Seq[Token] = Seq(new Token(ROOT))
-  private var deps: Seq[Dep] = Seq()
+  var tokens: Seq[Token] = Seq(new RootToken())
+  var deps: Seq[Dep] = Seq()
 
   parseSentence()
 
@@ -43,5 +41,7 @@ case class Token(id: Int,
                  coarsePOS: String = "_",
                  POS: String = "_",
                  features: Seq[String] = Seq())
+
+class RootToken() extends Token(0)
 
 case class Dep(head: Token, dep: Token, relation: String)
