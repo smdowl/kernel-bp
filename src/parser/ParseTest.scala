@@ -4,8 +4,13 @@ object ParseTest extends App {
   val formatFile = "/Users/shaundowling/Google Drive/UCL/master project/code/history-gen/data/format.conll"
   val trainFile = "/Users/shaundowling/Google Drive/UCL/master project/code/history-gen/data/mini.conll"
 
-  val parser = new ConllParser(trainFile, formatFile)
+  val parser = new ConllParser(trainFile)
 
-  parser.headers.foreach(println)
-  parser.parseLines.foreach(sentence => println(sentence.printSentence))
+  parser.parseLines.foreach(sentence => {
+    val sentenceWords = sentence.map(token => token.form)
+    println(sentenceWords.mkString(" "))
+  })
+
+  val tree = new DepTree(parser.parseLines(0))
+  println(tree)
 }
