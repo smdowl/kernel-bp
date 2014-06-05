@@ -2,6 +2,7 @@ package main
 
 import components.DepTree
 import input.ConllParser
+import parser.HistoryGenerator
 
 object Main extends App {
   val formatFile = "/Users/shaundowling/Google Drive/UCL/master project/code/history-gen/data/format.conll"
@@ -15,5 +16,7 @@ object Main extends App {
   })
 
   val tree = new DepTree(parser.parseLines(0))
-  println(tree)
+
+  val historyGenerator = new HistoryGenerator()
+  historyGenerator.genHistory(tree)
 }
