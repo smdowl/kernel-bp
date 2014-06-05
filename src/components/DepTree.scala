@@ -25,13 +25,10 @@ class DepTree(depSentence: Seq[ParseToken]) {
   })
 
   def getRoot = tokens(0)
-
   def getToken(id: Int) = tokens(id)
-
   def getNonRootTokens = tokens.tail
 
   def hasEdge(from: Int, to: Int) = getEdge(from, to).isDefined
-
   def getEdge(from: Int, to: Int): Option[Dep] = {
     deps.find(dep => dep.head.id == from && dep.dep.id == to)
   }
