@@ -1,4 +1,6 @@
-package parser
+package components
+
+import input.ParseToken
 
 class DepTree(depSentence: Seq[ParseToken]) {
   final val ROOT = 0

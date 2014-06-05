@@ -1,6 +1,9 @@
-package parser
+package main
 
-object ParseTest extends App {
+import components.DepTree
+import input.ConllParser
+
+object Main extends App {
   val formatFile = "/Users/shaundowling/Google Drive/UCL/master project/code/history-gen/data/format.conll"
   val trainFile = "/Users/shaundowling/Google Drive/UCL/master project/code/history-gen/data/mini.conll"
 

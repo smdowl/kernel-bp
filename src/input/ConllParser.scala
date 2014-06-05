@@ -1,4 +1,4 @@
-package parser
+package input
 
 class ConllParser(filepath: String) extends DepParser(filepath) {
 
