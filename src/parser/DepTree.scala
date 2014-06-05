@@ -3,8 +3,8 @@ package parser
 class DepTree(depSentence: Seq[ParseToken]) {
   final val ROOT = 0
 
-  var tokens: Seq[Token] = Seq(new Token(ROOT))
-  var deps: Seq[Dep] = Seq()
+  private var tokens: Seq[Token] = Seq(new Token(ROOT))
+  private var deps: Seq[Dep] = Seq()
 
   parseSentence()
 
@@ -25,6 +25,14 @@ class DepTree(depSentence: Seq[ParseToken]) {
   })
 
   def getToken(id: Int) = tokens(id)
+
+  def hasEdge(from: Int, to: Int) = getEdge(from, to).isDefined
+
+  def getEdge(from: Int, to: Int): Option[Dep] = {
+    deps.find(dep => dep.head.id == from && dep.dep.id == to)
+  }
+
+  def iterator = tokens.iterator
 }
 
 case class Token(id: Int,
