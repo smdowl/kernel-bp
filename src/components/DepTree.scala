@@ -24,7 +24,11 @@ class DepTree(depSentence: Seq[ParseToken]) {
     deps :+= Dep(getToken(depToken.head), getToken(depToken.id), depToken.depRel)
   })
 
+  def getRoot = tokens(0)
+
   def getToken(id: Int) = tokens(id)
+
+  def getNonRootTokens = tokens.tail
 
   def hasEdge(from: Int, to: Int) = getEdge(from, to).isDefined
 
