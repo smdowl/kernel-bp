@@ -1,7 +1,7 @@
 package parser
 
 import components.{DepTree, Dep, Token}
-import scala.collection.immutable.{Stack, Queue}
+import scala.collection.immutable.{Stack}
 
 class HistoryGenerator {
   var tree: DepTree = _
