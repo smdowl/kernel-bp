@@ -62,7 +62,6 @@ class HistoryGenerator {
       assert(buffer.top.equals(root))
 
       stack = stack.pop
-
       edgeList :+= Dep(root, dep, "_")
     }
     case RightReduce(root, dep) => {
@@ -70,9 +69,7 @@ class HistoryGenerator {
       assert(buffer.top.equals(dep))
 
       stack = stack.pop
-      buffer = buffer.pop
-
-      buffer = buffer.push(root)
+      buffer = buffer.pop.push(root)
       edgeList :+= Dep(root, dep, "_")
     }
     case Shift(token) => {
