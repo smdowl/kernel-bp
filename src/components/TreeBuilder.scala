@@ -2,17 +2,17 @@ package components
 
 import input.ParseToken
 
-object DepTreeBuilder {
+object TreeBuilder {
   var depSentence: Iterable[ParseToken] = _
   var tokens: Seq[Token] = _
-  var deps: Seq[Dep] = _
+  var deps: Seq[Edge] = _
 
-  def buildTree(depSentence: Iterable[ParseToken]): DepTree = {
+  def buildTree(depSentence: Iterable[ParseToken]): Tree = {
     this.depSentence = depSentence
     init()
     parseSentence()
 
-    new DepTree(tokens, deps)
+    new Tree(tokens, deps)
   }
 
   private def init() = {
@@ -22,17 +22,17 @@ object DepTreeBuilder {
 
   private def parseSentence() = {
     // Iterate once over to create nodes
-    tokens = tokens ++ genNodes
-    parseDeps()
+    tokens = tokens ++ generateNodes
+    parseEdges()
   }
 
-  private def genNodes = depSentence.map(depToken => {
+  private def generateNodes = depSentence.map(depToken => {
     Token(depToken.id, depToken.form,
       depToken.lemma, depToken.coarsePOS,
       depToken.POS, depToken.features)
   })
 
-  private def parseDeps() = depSentence.foreach(depToken => {
-    deps :+= Dep(tokens(depToken.head), tokens(depToken.id), depToken.depRel)
+  private def parseEdges() = depSentence.foreach(depToken => {
+    deps :+= Edge(tokens(depToken.head), tokens(depToken.id), depToken.depRel)
   })
 }

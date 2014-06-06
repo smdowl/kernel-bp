@@ -1,15 +1,15 @@
 package parser
 
-import components.{DepTree, Dep, Token}
+import components.{Tree, Edge, Token}
 import scala.collection.immutable.Stack
 
 class HistoryGenerator {
-  var tree: DepTree = _
+  var tree: Tree = _
   var stack: Stack[Token] = _
   var buffer: Stack[Token] = _
-  var edgeList: Seq[Dep] = _
+  var edgeList: Seq[Edge] = _
 
-  def generateHistory(tree: DepTree): Seq[ParseDecision] = {
+  def generateHistory(tree: Tree): Seq[ParseDecision] = {
     this.tree = tree
     initConfiguration()
 
@@ -82,7 +82,7 @@ class HistoryGenerator {
       assert(buffer.top.equals(root))
 
       stack = stack.pop
-      edgeList :+= Dep(root, dep, "_")
+      edgeList :+= Edge(root, dep, "_")
 
     case RightReduce(root, dep) =>
       assert(stack.top.equals(root))
@@ -90,7 +90,7 @@ class HistoryGenerator {
 
       stack = stack.pop
       buffer = buffer.pop.push(root)
-      edgeList :+= Dep(root, dep, "_")
+      edgeList :+= Edge(root, dep, "_")
 
     case Shift(token) =>
       assert(buffer.top.equals(token))
