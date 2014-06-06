@@ -42,9 +42,9 @@ class HistoryGenerator {
    * @return a completed parse decision object
    */
   private def getParseDecision: ParseDecision =
-   if (stack.top.id != 0 && tree.hasEdge(buffer.top.id, stack.top.id))
+   if (!stack.isEmpty && stack.top.id != 0 && tree.hasEdge(buffer.top.id, stack.top.id))
      LeftReduce(buffer.top, stack.top)
-   else if (tree.hasEdge(stack.top.id, buffer.top.id))
+   else if (!stack.isEmpty && tree.hasEdge(stack.top.id, buffer.top.id))
      RightReduce(stack.top, buffer.top)
    else
      Shift(buffer.top)
