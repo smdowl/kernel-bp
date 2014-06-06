@@ -1,12 +1,15 @@
 package main
 
-import components.DepTree
+import components.{DepTreeBuilder, DepTree}
 import input.ConllParser
 import parser.HistoryGenerator
 
 object Main extends App {
-  val formatFile = "/Users/shaundowling/Google Drive/UCL/master project/code/history-gen/data/format.conll"
-  val trainFile = "/Users/shaundowling/Google Drive/UCL/master project/code/history-gen/data/mini.conll"
+  final val MINI_FILE = "/Users/shaundowling/Google Drive/UCL/master project/code/history-gen/data/mini.conll"
+  final val DEP_TEST = "/Users/shaundowling/Google Drive/UCL/master project/code/history-gen/data/test/test.conll"
+
+  val trainFile = DEP_TEST
+
 
   val parser = new ConllParser(trainFile)
 
@@ -14,9 +17,11 @@ object Main extends App {
     val sentenceWords = sentence.map(token => token.form)
     println(sentenceWords.mkString(" "))
   })
+  println()
 
-  val tree = new DepTree(parser.parseLines(0))
-
+  val trees = parser.parseLines.map(DepTreeBuilder.buildTree)
   val historyGenerator = new HistoryGenerator()
-  historyGenerator.genHistory(tree)
+
+  val parseHistories = trees.map(historyGenerator.generateHistory)
+  parseHistories(0).foreach(println)
 }

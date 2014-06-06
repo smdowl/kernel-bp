@@ -1,29 +1,6 @@
 package components
 
-import input.ParseToken
-
-class DepTree(depSentence: Seq[ParseToken]) {
-  var tokens: Seq[Token] = Seq(new RootToken())
-  var deps: Seq[Dep] = Seq()
-
-  parseSentence()
-
-  private def parseSentence() = {
-    // Iterate once over to create nodes
-    tokens = tokens ++ genNodes
-    parseDeps()
-  }
-
-  private def genNodes = depSentence.map(depToken => {
-    Token(depToken.id, depToken.form,
-      depToken.lemma, depToken.coarsePOS,
-      depToken.POS, depToken.features)
-  })
-
-  private def parseDeps() = depSentence.foreach(depToken => {
-    deps :+= Dep(getToken(depToken.head), getToken(depToken.id), depToken.depRel)
-  })
-
+class DepTree(val tokens: Seq[Token], val deps: Seq[Dep]) {
   def getRoot = tokens(0)
   def getToken(id: Int) = tokens(id)
   def getNonRootTokens = tokens.tail
@@ -37,19 +14,4 @@ class DepTree(depSentence: Seq[ParseToken]) {
   })
 
   def iterator = tokens.iterator
-}
-
-case class Token(id: Int,
-                 form: String = "_",
-                 lemma: String = "_",
-                 coarsePOS: String = "_",
-                 POS: String = "_",
-                 features: Seq[String] = Seq())
-
-class RootToken() extends Token(0, form="ROOT")
-
-case class Dep(head: Token, dep: Token, relation: String) {
-  override def toString = {
-    s"${head.form} -> ${dep.form}"
-  }
 }
