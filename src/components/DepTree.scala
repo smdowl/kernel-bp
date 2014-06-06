@@ -32,6 +32,9 @@ class DepTree(depSentence: Seq[ParseToken]) {
   def getEdge(from: Int, to: Int): Option[Dep] = {
     deps.find(dep => dep.head.id == from && dep.dep.id == to)
   }
+  def getOutputEdges(from: Int) = deps.filter(dep => {
+    dep.head.id == from
+  })
 
   def iterator = tokens.iterator
 }
@@ -43,6 +46,10 @@ case class Token(id: Int,
                  POS: String = "_",
                  features: Seq[String] = Seq())
 
-class RootToken() extends Token(0)
+class RootToken() extends Token(0, form="ROOT")
 
-case class Dep(head: Token, dep: Token, relation: String)
+case class Dep(head: Token, dep: Token, relation: String) {
+  override def toString = {
+    s"${head.form} -> ${dep.form}"
+  }
+}

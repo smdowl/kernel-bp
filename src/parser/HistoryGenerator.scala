@@ -42,12 +42,32 @@ class HistoryGenerator {
    * @return a completed parse decision object
    */
   private def getParseDecision: ParseDecision =
-   if (!stack.isEmpty && stack.top.id != 0 && tree.hasEdge(buffer.top.id, stack.top.id))
+   if (shouldLeftReduce)
      LeftReduce(buffer.top, stack.top)
-   else if (!stack.isEmpty && tree.hasEdge(stack.top.id, buffer.top.id))
+   else if (shouldRightReduce)
      RightReduce(stack.top, buffer.top)
    else
      Shift(buffer.top)
+
+  private def shouldLeftReduce = {
+    !stack.isEmpty && tree.hasEdge(buffer.top.id, stack.top.id)
+  }
+
+  private def shouldRightReduce = {
+    if (stack.isEmpty || !tree.hasEdge(stack.top.id, buffer.top.id))
+      false
+    else if (allOutputEdgesParsedForToken(buffer.top.id))
+      true
+    else
+      false
+  }
+
+  private def allOutputEdgesParsedForToken(from: Int) = {
+    val edges = tree.getOutputEdges(from)
+    edges.forall(dep => edgeList.exists(edge => {
+      edge.head.id == dep.head.id && edge.dep.id == dep.dep.id
+    }))
+  }
 
   /**
    * Apply whatever decision we are passed according to the standard rules.
