@@ -36,7 +36,7 @@ abstract class DepParser(filepath: String) {
       }
     })
 
-    sentences
+    sentences :+ tokensFromBlock(block)
   }
 
   protected def tokensFromBlock(block: Seq[Seq[String]]): DepSentence
