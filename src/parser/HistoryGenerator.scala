@@ -50,10 +50,10 @@ class HistoryGenerator {
      Shift(buffer.top)
 
   /**
-   *  Apply whatever decision we are passed according to the standard rules.
+   * Apply whatever decision we are passed according to the standard rules.
    * In doing so, assert that the state of the stack and buffer are consistent
-   * with the decision.
-   * @param decision - the decion to apply
+   * with the decision being applied.
+   * @param decision - the decision to apply
    * @return
    */
   private def applyParseDecision(decision: ParseDecision) = decision match {
