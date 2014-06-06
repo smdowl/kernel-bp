@@ -56,13 +56,13 @@ class HistoryGenerator {
   private def shouldRightReduce = {
     if (stack.isEmpty || !tree.hasEdge(stack.top.id, buffer.top.id))
       false
-    else if (allOutputEdgesParsedForToken(buffer.top.id))
+    else if (areAllOutputEdgesParsedForToken(buffer.top.id))
       true
     else
       false
   }
 
-  private def allOutputEdgesParsedForToken(from: Int) = {
+  private def areAllOutputEdgesParsedForToken(from: Int) = {
     val edges = tree.getOutputEdges(from)
     edges.forall(dep => edgeList.exists(edge => {
       edge.head.id == dep.head.id && edge.dep.id == dep.dep.id
