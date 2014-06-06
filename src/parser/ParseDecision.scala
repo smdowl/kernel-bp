@@ -21,3 +21,5 @@ case class Shift(token: Token) extends ParseDecision {
     s"Shift ${token.form}"
   }
 }
+
+class TestDecision extends ParseDecision
