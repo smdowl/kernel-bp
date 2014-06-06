@@ -77,26 +77,25 @@ class HistoryGenerator {
    * @return
    */
   private def applyParseDecision(decision: ParseDecision) = decision match {
-    case LeftReduce(root, dep) => {
+    case LeftReduce(root, dep) =>
       assert(stack.top.equals(dep))
       assert(buffer.top.equals(root))
 
       stack = stack.pop
       edgeList :+= Dep(root, dep, "_")
-    }
-    case RightReduce(root, dep) => {
+
+    case RightReduce(root, dep) =>
       assert(stack.top.equals(root))
       assert(buffer.top.equals(dep))
 
       stack = stack.pop
       buffer = buffer.pop.push(root)
       edgeList :+= Dep(root, dep, "_")
-    }
-    case Shift(token) => {
+
+    case Shift(token) =>
       assert(buffer.top.equals(token))
 
       buffer = buffer.pop
       stack = stack.push(token)
-    }
   }
 }
