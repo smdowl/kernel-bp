@@ -3,13 +3,13 @@ package parser
 import components.{Tree, Edge, Token}
 import scala.collection.immutable.Stack
 
-class HistoryGenerator {
+class DecisionGenerator {
   var tree: Tree = _
   var stack: Stack[Token] = _
   var buffer: Stack[Token] = _
   var edgeList: Seq[Edge] = _
 
-  def generateHistory(tree: Tree): Seq[ParseDecision] = {
+  def generateDecisions(tree: Tree): Seq[ParseDecision] = {
     this.tree = tree
     initConfiguration()
 
