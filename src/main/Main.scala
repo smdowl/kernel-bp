@@ -1,8 +1,8 @@
 package main
 
-import components.{TreeBuilder, Tree}
+import components.TreeBuilder
 import input.ConllParser
-import parser.{ParseDecision, HistoryParser}
+import parser.HistoryParser
 
 object Main extends App {
   val trainFile = Constants.DEP_TEST
