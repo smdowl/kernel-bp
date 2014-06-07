@@ -1,11 +1,15 @@
 package parser
 
-import components.{Tree, Edge, Token}
-import scala.collection.immutable.Stack
+import components.Tree
 import vanilla.StackParser
 
 class HistoryParser {
   var parser: StackParser = _
+
+  private def tree = parser.tree
+  private def stack = parser.stack
+  private def buffer = parser.buffer
+  private def edgeList = parser.edgeList
 
   def parseHistory(tree: Tree): ParseHistory = {
     parser = new StackParser(tree)
@@ -14,7 +18,7 @@ class HistoryParser {
     var contexts = Seq[Context]()
 
     while (parser.isNonTerminal) {
-      val context = genContext(decisions)
+      val context = generateContext(decisions)
       val decision = getParseDecision
       parser.applyParseDecision(decision)
 
@@ -25,8 +29,8 @@ class HistoryParser {
     ParseHistory(contexts, decisions)
   }
 
-  private def genContext(decisions: Seq[ParseDecision]) = {
-    Context(parser.tree, parser.stack, parser.buffer, parser.edgeList, decisions)
+  private def generateContext(decisions: Seq[ParseDecision]) = {
+    Context(tree, stack, buffer, edgeList, decisions)
   }
 
   /**
@@ -35,28 +39,28 @@ class HistoryParser {
    */
   private def getParseDecision: ParseDecision =
    if (shouldLeftReduce)
-     LeftReduce(parser.buffer.top, parser.stack.top)
+     LeftReduce(buffer.top, stack.top)
    else if (shouldRightReduce)
-     RightReduce(parser.stack.top, parser.buffer.top)
+     RightReduce(stack.top, buffer.top)
    else
-     Shift(parser.buffer.top)
+     Shift(buffer.top)
 
   private def shouldLeftReduce = {
-    !parser.stack.isEmpty && parser.tree.hasEdge(parser.buffer.top.id, parser.stack.top.id)
+    !stack.isEmpty && tree.hasEdge(buffer.top.id, stack.top.id)
   }
 
   private def shouldRightReduce = {
-    if (parser.stack.isEmpty || !parser.tree.hasEdge(parser.stack.top.id, parser.buffer.top.id))
+    if (stack.isEmpty || !tree.hasEdge(stack.top.id, buffer.top.id))
       false
-    else if (areAllOutputEdgesParsedForToken(parser.buffer.top.id))
+    else if (areAllOutputEdgesParsedForToken(buffer.top.id))
       true
     else
       false
   }
 
   private def areAllOutputEdgesParsedForToken(from: Int) = {
-    val edges = parser.tree.getOutputEdges(from)
-    edges.forall(dep => parser.edgeList.exists(edge => {
+    val edges = tree.getOutputEdges(from)
+    edges.forall(dep => edgeList.exists(edge => {
       edge.head.id == dep.head.id && edge.dep.id == dep.dep.id
     }))
   }
