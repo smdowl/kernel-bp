@@ -19,7 +19,7 @@ class HistoryParser {
     var contexts = Seq[Context]()
 
     while (parser.isNonTerminal) {
-      val context = generateContext(decisions)
+      val context = parser.generateContext(decisions)
       val decision = getParseDecision
       parser.applyParseDecision(decision)
 
@@ -28,10 +28,6 @@ class HistoryParser {
     }
 
     ParseHistory(contexts, decisions)
-  }
-
-  private def generateContext(decisions: Seq[ParseDecision]) = {
-    Context(tree, stack, buffer, edgeList, decisions)
   }
 
   /**

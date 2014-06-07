@@ -17,6 +17,10 @@ abstract class AbstractStackParser(tokens: Seq[Token]) {
 
   def isNonTerminal = !buffer.isEmpty
 
+  def generateContext(decisions: Seq[ParseDecision]) = {
+    Context(stack, buffer, edgeList, decisions)
+  }
+
   /**
    * Apply whatever decision we are passed according to the standard rules.
    * In doing so, assert that the state of the stack and buffer are consistent
