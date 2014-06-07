@@ -1,12 +1,18 @@
 package vanilla
 
-import components.{Edge, Token}
+import components._
 import scala.collection.immutable.Stack
-import parser.{Shift, RightReduce, LeftReduce, ParseDecision}
+import parser._
+import parser.classifiers.Classifier
+import parser.LeftReduce
+import parser.RightReduce
+import components.Token
+import components.Edge
+import parser.Shift
 
-class StackParser(tokens: Seq[Token]) {
+abstract class AbstractStackParser(tokens: Seq[Token]) {
   var stack: Stack[Token] = Stack(tokens(0))
-  var buffer: Stack[Token] = Stack(tokens.drop(1).reverse)
+  var buffer: Stack[Token] = Stack() ++ tokens.drop(1).reverse
   var edgeList: Seq[Edge] = Seq()
 
   def isNonTerminal = !buffer.isEmpty
@@ -40,4 +46,14 @@ class StackParser(tokens: Seq[Token]) {
       buffer = buffer.pop
       stack = stack.push(token)
   }
+}
+
+class HistoryStackParser(tokens: Seq[Token]) extends AbstractStackParser(tokens)
+
+class StackParser(tokens: Seq[Token], val classifier: Classifier) extends AbstractStackParser(tokens) {
+  var context: Context = _
+
+  def parseSentence(): Tree = ???
+
+  def getParseDecision = classifier.getParseDecision(context)
 }

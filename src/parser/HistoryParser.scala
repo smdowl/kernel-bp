@@ -1,10 +1,10 @@
 package parser
 
 import components.Tree
-import vanilla.StackParser
+import vanilla.{AbstractStackParser, HistoryStackParser}
 
 class HistoryParser {
-  var parser: StackParser = _
+  var parser: AbstractStackParser = _
   var tree: Tree = _
 
   private def stack = parser.stack
@@ -13,7 +13,7 @@ class HistoryParser {
 
   def parseHistory(tree: Tree): ParseHistory = {
     this.tree = tree
-    parser = new StackParser(tree.tokens)
+    parser = new HistoryStackParser(tree.tokens)
 
     var decisions = Seq[ParseDecision]()
     var contexts = Seq[Context]()
