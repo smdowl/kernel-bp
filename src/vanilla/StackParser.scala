@@ -6,12 +6,8 @@ import parser.{Shift, RightReduce, LeftReduce, ParseDecision}
 
 class StackParser(tokens: Seq[Token]) {
   var stack: Stack[Token] = Stack(tokens(0))
-  var buffer: Stack[Token] = initBuffer(tokens.drop(1))
+  var buffer: Stack[Token] = Stack(tokens.drop(1).reverse)
   var edgeList: Seq[Edge] = Seq()
-
-  private def initBuffer(tokens: Seq[Token]) = tokens.foldRight(Stack[Token]()) { (token, newBuffer) =>
-    newBuffer.push(token)
-  }
 
   def isNonTerminal = !buffer.isEmpty
 
