@@ -1,6 +1,6 @@
 package input
 
-class ConllParser(filepath: String) extends DepParser(filepath) {
+class ConllParser extends DepParser {
 
   def tokensFromBlock(block: Seq[TokenDef]): DepSentence = {
     block.map(comps => {

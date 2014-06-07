@@ -1,13 +1,24 @@
 package components
 
-import input.ParseToken
+import input.{DepParser, ConllParser, ParseToken}
+import main.Constants
 
-object TreeBuilder {
+class TreeBuilder(parser: DepParser) {
   private var depSentence: Iterable[ParseToken] = _
   private var tokens: Seq[Token] = _
   private var deps: Seq[Edge] = _
 
-  def buildTree(depSentence: Iterable[ParseToken]): Tree = {
+  def buildTestTree(): Tree = {
+    val parser = new ConllParser()
+    this.buildTree(parser.parseLines(Constants.MINI_FILE)(0))
+  }
+
+  def buildTreesFromFile(filepath: String): Seq[Tree] = {
+    val depSentences = parser.parseLines(filepath)
+    depSentences.map(buildTree)
+  }
+
+  private def buildTree(depSentence: Iterable[ParseToken]): Tree = {
     this.depSentence = depSentence
     init()
     parseSentence()

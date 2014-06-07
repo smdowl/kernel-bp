@@ -11,18 +11,13 @@ case class ParseToken(id: Int,
                       head: Int,
                       depRel: String)
 
-abstract class DepParser(filepath: String) {
+abstract class DepParser {
 
   type TokenDef = Seq[String]
   type DepSentence = Seq[ParseToken]
 
-  var sentences: Seq[DepSentence] = Seq()
-
-  def parseLines: Seq[DepSentence] = {
-
-    if (sentences.length > 0)
-      return sentences
-
+  def parseLines(filepath: String): Seq[DepSentence] = {
+    var sentences: Seq[DepSentence] = Seq()
     var block: Seq[TokenDef] = Seq()
 
     Source.fromFile(filepath).getLines().foreach(line => {
