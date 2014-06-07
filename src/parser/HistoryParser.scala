@@ -2,24 +2,21 @@ package parser
 
 import components.{Tree, Edge, Token}
 import scala.collection.immutable.Stack
+import vanilla.StackParser
 
 class HistoryParser {
-  var tree: Tree = _
-  var stack: Stack[Token] = _
-  var buffer: Stack[Token] = _
-  var edgeList: Seq[Edge] = _
+  var parser: StackParser = _
 
   def parseHistory(tree: Tree): ParseHistory = {
-    this.tree = tree
-    initConfiguration()
+    parser = new StackParser(tree)
 
     var decisions = Seq[ParseDecision]()
     var contexts = Seq[Context]()
 
-    while (isNonTerminal) {
+    while (parser.isNonTerminal) {
       val context = genContext(decisions)
       val decision = getParseDecision
-      applyParseDecision(decision)
+      parser.applyParseDecision(decision)
 
       decisions :+= decision
       contexts :+= context
@@ -28,20 +25,8 @@ class HistoryParser {
     ParseHistory(contexts, decisions)
   }
 
-  private def initConfiguration() = {
-    stack = Stack(tree.getRoot)
-    buffer = refreshBuffer(tree.getNonRootTokens)
-    edgeList = Seq()
-  }
-
-  private def refreshBuffer(tokens: Seq[Token]) = tokens.foldRight(Stack[Token]()) { (token, newBuffer) =>
-    newBuffer.push(token)
-  }
-
-  private def isNonTerminal = !buffer.isEmpty
-
   private def genContext(decisions: Seq[ParseDecision]) = {
-    Context(tree, stack, buffer, edgeList, decisions)
+    Context(parser.tree, parser.stack, parser.buffer, parser.edgeList, decisions)
   }
 
   /**
@@ -50,59 +35,29 @@ class HistoryParser {
    */
   private def getParseDecision: ParseDecision =
    if (shouldLeftReduce)
-     LeftReduce(buffer.top, stack.top)
+     LeftReduce(parser.buffer.top, parser.stack.top)
    else if (shouldRightReduce)
-     RightReduce(stack.top, buffer.top)
+     RightReduce(parser.stack.top, parser.buffer.top)
    else
-     Shift(buffer.top)
+     Shift(parser.buffer.top)
 
   private def shouldLeftReduce = {
-    !stack.isEmpty && tree.hasEdge(buffer.top.id, stack.top.id)
+    !parser.stack.isEmpty && parser.tree.hasEdge(parser.buffer.top.id, parser.stack.top.id)
   }
 
   private def shouldRightReduce = {
-    if (stack.isEmpty || !tree.hasEdge(stack.top.id, buffer.top.id))
+    if (parser.stack.isEmpty || !parser.tree.hasEdge(parser.stack.top.id, parser.buffer.top.id))
       false
-    else if (areAllOutputEdgesParsedForToken(buffer.top.id))
+    else if (areAllOutputEdgesParsedForToken(parser.buffer.top.id))
       true
     else
       false
   }
 
   private def areAllOutputEdgesParsedForToken(from: Int) = {
-    val edges = tree.getOutputEdges(from)
-    edges.forall(dep => edgeList.exists(edge => {
+    val edges = parser.tree.getOutputEdges(from)
+    edges.forall(dep => parser.edgeList.exists(edge => {
       edge.head.id == dep.head.id && edge.dep.id == dep.dep.id
     }))
-  }
-
-  /**
-   * Apply whatever decision we are passed according to the standard rules.
-   * In doing so, assert that the state of the stack and buffer are consistent
-   * with the decision being applied.
-   * @param decision - the decision to apply
-   * @return
-   */
-  private def applyParseDecision(decision: ParseDecision) = decision match {
-    case LeftReduce(root, dep) =>
-      assert(stack.top.equals(dep))
-      assert(buffer.top.equals(root))
-
-      stack = stack.pop
-      edgeList :+= Edge(root, dep, "_")
-
-    case RightReduce(root, dep) =>
-      assert(stack.top.equals(root))
-      assert(buffer.top.equals(dep))
-
-      stack = stack.pop
-      buffer = buffer.pop.push(root)
-      edgeList :+= Edge(root, dep, "_")
-
-    case Shift(token) =>
-      assert(buffer.top.equals(token))
-
-      buffer = buffer.pop
-      stack = stack.push(token)
   }
 }
