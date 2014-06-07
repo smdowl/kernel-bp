@@ -3,9 +3,9 @@ package components
 import input.ParseToken
 
 object TreeBuilder {
-  var depSentence: Iterable[ParseToken] = _
-  var tokens: Seq[Token] = _
-  var deps: Seq[Edge] = _
+  private var depSentence: Iterable[ParseToken] = _
+  private var tokens: Seq[Token] = _
+  private var deps: Seq[Edge] = _
 
   def buildTree(depSentence: Iterable[ParseToken]): Tree = {
     this.depSentence = depSentence
