@@ -14,4 +14,6 @@ class Tree(val tokens: Seq[Token], val edges: Seq[Edge]) {
   })
 
   def iterator = tokens.iterator
+  def size = tokens.length
+  def numEdges = edges.length
 }
