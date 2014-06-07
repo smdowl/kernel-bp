@@ -1,9 +1,7 @@
 package components
 
 class Tree(val tokens: Seq[Token], val edges: Seq[Edge]) {
-  def getRoot = tokens(0)
   def getToken(id: Int) = tokens(id)
-  def getNonRootTokens = tokens.tail
 
   def hasEdge(from: Int, to: Int) = getEdge(from, to).isDefined
   def getEdge(from: Int, to: Int): Option[Edge] = {
