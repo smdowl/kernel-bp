@@ -5,14 +5,15 @@ import vanilla.StackParser
 
 class HistoryParser {
   var parser: StackParser = _
+  var tree: Tree = _
 
-  private def tree = parser.tree
   private def stack = parser.stack
   private def buffer = parser.buffer
   private def edgeList = parser.edgeList
 
   def parseHistory(tree: Tree): ParseHistory = {
-    parser = new StackParser(tree)
+    this.tree = tree
+    parser = new StackParser(tree.tokens)
 
     var decisions = Seq[ParseDecision]()
     var contexts = Seq[Context]()

@@ -1,12 +1,12 @@
 package vanilla
 
-import components.{Edge, Token, Tree}
+import components.{Edge, Token}
 import scala.collection.immutable.Stack
 import parser.{Shift, RightReduce, LeftReduce, ParseDecision}
 
-class StackParser(val tree: Tree) {
-  var stack: Stack[Token] = Stack(tree.getRoot)
-  var buffer: Stack[Token] = initBuffer(tree.getNonRootTokens)
+class StackParser(tokens: Seq[Token]) {
+  var stack: Stack[Token] = Stack(tokens(0))
+  var buffer: Stack[Token] = initBuffer(tokens.drop(1))
   var edgeList: Seq[Edge] = Seq()
 
   private def initBuffer(tokens: Seq[Token]) = tokens.foldRight(Stack[Token]()) { (token, newBuffer) =>
