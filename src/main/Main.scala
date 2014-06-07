@@ -10,6 +10,8 @@ object Main extends App {
   val treeBuilder = new TreeBuilder(new ConllParser())
   val trees = treeBuilder.buildTreesFromFile(trainFile)
 
-  val decisionGenerator = new HistoryParser()
-  val allParseDecisions = trees.map(decisionGenerator.parseHistory)
+  val historyParser = new HistoryParser()
+  val parseHistories = trees.map(historyParser.parseHistory)
+
+  println(parseHistories)
 }
