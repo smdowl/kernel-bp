@@ -14,12 +14,17 @@ object Main extends App {
 
   val parseHistories = trees.map(historyGenerator.generateHistory)
 
-  (trees zip parseHistories).foreach {
-    case (tree: Tree, decisions: Seq[ParseDecision]) =>
-//      println(tree.size)
-//      println(decisions.length)
-      println(s"${tree.size * 2 - 2} vs ${decisions.length}")
-      println(s"${tree.numEdges * 2} vs ${decisions.length}")
-      println()
+  val tree = TreeBuilder.buildTestTree()
+  println(tree)
+
+  def printTreeSizes() = {
+    (trees zip parseHistories).foreach {
+      case (tree: Tree, decisions: Seq[ParseDecision]) =>
+        //      println(tree.size)
+        //      println(decisions.length)
+        println(s"${tree.size * 2 - 2} vs ${decisions.length}")
+        println(s"${tree.numEdges * 2} vs ${decisions.length}")
+        println()
+    }
   }
 }

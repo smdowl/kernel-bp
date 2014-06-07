@@ -3,15 +3,17 @@ package components
 import input.{DepParser, ConllParser, ParseToken}
 import main.Constants
 
+object TreeBuilder {
+  def buildTestTree(): Tree = {
+    val builder = new TreeBuilder(new ConllParser)
+    builder.buildTreesFromFile(Constants.DEP_TEST)(0)
+  }
+}
+
 class TreeBuilder(parser: DepParser) {
   private var depSentence: Iterable[ParseToken] = _
   private var tokens: Seq[Token] = _
   private var deps: Seq[Edge] = _
-
-  def buildTestTree(): Tree = {
-    val parser = new ConllParser()
-    this.buildTree(parser.parseLines(Constants.MINI_FILE)(0))
-  }
 
   def buildTreesFromFile(filepath: String): Seq[Tree] = {
     val depSentences = parser.parseLines(filepath)
