@@ -5,11 +5,7 @@ import input.ConllParser
 import parser.HistoryGenerator
 
 object Main extends App {
-  final val MINI_FILE = "/Users/shaundowling/Google Drive/UCL/master project/code/history-gen/data/mini.conll"
-  final val DEP_TEST = "/Users/shaundowling/Google Drive/UCL/master project/code/history-gen/data/test/test.conll"
-
-  val trainFile = MINI_FILE
-
+  val trainFile = Constants.MINI_FILE
 
   val parser = new ConllParser(trainFile)
 
