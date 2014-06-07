@@ -3,26 +3,29 @@ package parser
 import components.{Tree, Edge, Token}
 import scala.collection.immutable.Stack
 
-class DecisionGenerator {
+class HistoryParser {
   var tree: Tree = _
   var stack: Stack[Token] = _
   var buffer: Stack[Token] = _
   var edgeList: Seq[Edge] = _
 
-  def generateDecisions(tree: Tree): Seq[ParseDecision] = {
+  def parseHistory(tree: Tree): ParseHistory = {
     this.tree = tree
     initConfiguration()
 
     var decisions = Seq[ParseDecision]()
+    var contexts = Seq[Context]()
 
     while (isNonTerminal) {
+      val context = genContext(decisions)
       val decision = getParseDecision
       applyParseDecision(decision)
 
       decisions :+= decision
+      contexts :+= context
     }
 
-    decisions
+    ParseHistory(contexts, decisions)
   }
 
   private def initConfiguration() = {
@@ -36,6 +39,10 @@ class DecisionGenerator {
   }
 
   private def isNonTerminal = !buffer.isEmpty
+
+  private def genContext(decisions: Seq[ParseDecision]) = {
+    Context(tree, stack, buffer, edgeList, decisions)
+  }
 
   /**
    * Determine true parse decision according to page 32 of Dependency Parsing
