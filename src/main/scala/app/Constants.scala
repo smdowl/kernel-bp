@@ -1,4 +1,4 @@
-package main
+package app
 
 object Constants {
   final val MINI_FILE = "/Users/shaundowling/Google Drive/UCL/master project/code/history-gen/data/mini.conll"

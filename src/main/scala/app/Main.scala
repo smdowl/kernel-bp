@@ -1,4 +1,4 @@
-package main
+package app
 
 import components.TreeBuilder
 import input.ConllParser
