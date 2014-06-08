@@ -1,16 +1,23 @@
 package features
 
-import scala.collection.mutable
+import scala.collection.{immutable, mutable}
 
-class FeatureVector(values: Map[String, Double] = Map()) {
+class FeatureVector(values: immutable.Map[String, Double] = Map()) {
 
   def dot(other: FeatureVector) = {
-    val output = mutable.Map[String, Double]()
-    keySet.intersect(other.keySet).foreach(key => {
-      output += (key -> this(key) * other(key))
+    val keyVals = keySet.intersect(other.keySet).map(key => {
+      key -> this(key) * other(key)
     })
 
-    new FeatureVector(output.toMap)
+    new FeatureVector(keyVals.toMap)
+  }
+
+  def distance(other: FeatureVector) = {
+    var sum = 0.0
+    (keys ++ other.keys).foreach(key => {
+      sum += Math.pow(this(key) - other(key), 2)
+    })
+    Math.pow(sum, 0.5)
   }
 
   def keys = values.keys
