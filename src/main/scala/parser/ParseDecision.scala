@@ -2,7 +2,11 @@ package parser
 
 import components.Token
 
-abstract class ParseDecision
+abstract class ParseDecision extends Ordered[ParseDecision] {
+  override def compare(that: ParseDecision): Int = {
+    this.hashCode() compare that.hashCode()
+  }
+}
 
 abstract class Reduce(root: Token, dep: Token) extends ParseDecision
 
