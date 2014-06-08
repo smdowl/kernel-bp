@@ -4,10 +4,11 @@ import parser.ParseDecision
 import scala.collection.immutable.TreeSet
 
 class EdgeOnlyDataLabeller extends DataLabeller {
-  var labelSet: TreeSet[ParseDecision] = _
+
+  var labelSet: TreeSet[ParseDecision] = new TreeSet()
 
   override def initialise(decisions: Iterable[ParseDecision]): Unit = {
-    decisions.foreach(labelSet.insert)
+    decisions.foreach(labelSet += _)
   }
 
   override def label(decision: ParseDecision): Int = {
