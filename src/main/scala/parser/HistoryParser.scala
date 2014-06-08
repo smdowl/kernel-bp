@@ -27,7 +27,7 @@ class HistoryParser {
       contexts :+= context
     }
 
-    ParseHistory(contexts, decisions)
+    ParseHistory(tree.tokens, contexts, decisions)
   }
 
   /**

@@ -1,3 +1,5 @@
 package parser
 
-case class ParseHistory(contexts: Seq[Context], parseDecisions: Seq[ParseDecision])
+import components.Token
+
+case class ParseHistory(sentence: Seq[Token], contexts: Seq[Context], parseDecisions: Seq[ParseDecision])
