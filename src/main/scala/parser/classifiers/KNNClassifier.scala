@@ -12,15 +12,19 @@ class KNNClassifier(k: Int, extractor: FeatureExtractor, labeller: DataLabeller)
   {
     if (data.isEmpty)
       throw new Exception("Not been initialised with data!")
-    
+
     val features = extractor.extractFeatures(context)
 
     val best = new mutable.PriorityQueue[ScoredDataInstance]()
 
     data.foreach(point => {
-      best += ScoredDataInstance(point, features.distance(point.x))
+      val score = features.distance(point.x)
+      val scoredInstance = ScoredDataInstance(point, score)
+
+      best += scoredInstance
     })
 
+    // TODO: Currently doing 1-NN
     labeller.getInstance(best.head.vector.y)
   }
 
