@@ -10,6 +10,9 @@ class KNNClassifier(k: Int, extractor: FeatureExtractor, labeller: DataLabeller)
 
   override def getParseDecision(context: Context): ParseDecision =
   {
+    if (data.isEmpty)
+      throw new Exception("Not been initialised with data!")
+    
     val features = extractor.extractFeatures(context)
 
     val best = new mutable.PriorityQueue[ScoredDataInstance]()
