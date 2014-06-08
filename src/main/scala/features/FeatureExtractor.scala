@@ -20,7 +20,6 @@ trait FeatureExtractor {
   }
 
   def extractFeatures(context: Context): FeatureVector
-  def extractLabel(decision: ParseDecision): Int
 
   def extractLeft(root: Token, dep: Token): FeatureVector
   def extractRight(root: Token, dep: Token): FeatureVector
