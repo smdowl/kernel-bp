@@ -54,10 +54,21 @@ abstract class AbstractStackParser(tokens: Seq[Token]) {
 
 class HistoryStackParser(tokens: Seq[Token]) extends AbstractStackParser(tokens)
 
-class StackParser(tokens: Seq[Token], val classifier: Classifier) extends AbstractStackParser(tokens) {
+class StackParser(tokens: Seq[Token], classifier: Classifier) extends AbstractStackParser(tokens) {
   var context: Context = _
 
-  def parseSentence(): Tree = ???
+  def parseSentence(): Tree = {
+    // TODO: Decide whether we actually want to store the decisions in the Context
+    val decisions = Seq[ParseDecision]()
 
-  def getParseDecision = classifier.getParseDecision(context)
+    while (isNonTerminal) {
+      context = generateContext(decisions)
+      val decision = getParseDecision
+      applyParseDecision(decision)
+    }
+
+    new Tree(tokens, edgeList)
+  }
+
+  private def getParseDecision = classifier.getParseDecision(context)
 }
