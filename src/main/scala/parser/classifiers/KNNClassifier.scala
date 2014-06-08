@@ -1,8 +1,10 @@
 package parser.classifiers
 
 import parser.{ParseHistory, Trainable, ParseDecision, Context}
-import features.{DataLabeller, DataPoint, FeatureExtractor}
+import features.DataPoint
 import scala.collection.mutable
+import features.extractors.FeatureExtractor
+import features.labellers.DataLabeller
 
 class KNNClassifier(k: Int, extractor: FeatureExtractor, labeller: DataLabeller) extends Classifier with Trainable {
 

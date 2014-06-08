@@ -1,4 +1,4 @@
-package features
+package features.labellers
 
 import parser.ParseDecision
 

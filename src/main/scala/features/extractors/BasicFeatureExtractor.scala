@@ -1,10 +1,6 @@
-package features
+package features.extractors
 
-import parser.Context
-
-trait FeatureExtractor {
-  def extractFeatures(context: Context): FeatureVector
-}
+import features.FeatureVector
 
 class BasicFeatureExtractor extends FeatureExtractor {
   override def extractFeatures(context: Context): FeatureVector = {
