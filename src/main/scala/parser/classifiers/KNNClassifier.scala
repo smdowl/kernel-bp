@@ -24,6 +24,10 @@ class KNNClassifier(k: Int, extractor: FeatureExtractor, labeller: DataLabeller)
       best += scoredInstance
     })
 
+    getLabel(best)
+  }
+
+  private def getLabel(best: mutable.PriorityQueue[ScoredDataInstance]) = {
     // TODO: Currently doing 1-NN
     labeller.getInstance(best.head.vector.y)
   }
