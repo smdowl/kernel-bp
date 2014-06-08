@@ -2,9 +2,10 @@ package features
 
 import parser.{Shift, RightReduce, LeftReduce, ParseDecision}
 import components.{Edge, Token}
+import parser.Context
 
 trait FeatureExtractor {
-  def extract(decision: ParseDecision): Map[String, Int] = decision match {
+  def extract(decision: ParseDecision): FeatureVector = decision match {
     case LeftReduce(root, dep) =>
       extractLeft(root, dep)
 
@@ -15,10 +16,13 @@ trait FeatureExtractor {
       extractShift(token)
 
     case _ =>
-      Map("test" -> 1)
+      new FeatureVector(Map("test" -> 1))
   }
 
-  def extractLeft(root: Token, dep: Token): Map[String,Int]
-  def extractRight(root: Token, dep: Token): Map[String,Int]
-  def extractShift(token: Token): Map[String,Int]
+  def extractFeatures(context: Context): FeatureVector
+  def extractLabel(decision: ParseDecision): Int
+
+  def extractLeft(root: Token, dep: Token): FeatureVector
+  def extractRight(root: Token, dep: Token): FeatureVector
+  def extractShift(token: Token): FeatureVector
 }
