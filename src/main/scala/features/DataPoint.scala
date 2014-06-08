@@ -1,5 +1,3 @@
 package features
 
-case class DataPoint(x: FeatureVector, y: Int) {
-
-}
+case class DataPoint(x: FeatureVector, y: Int)
