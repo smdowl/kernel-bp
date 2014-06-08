@@ -1,15 +1,17 @@
 package features
 
-import scala.collection.{immutable, mutable}
+class FeatureVector() {
 
-class FeatureVector(values: immutable.Map[String, Double] = Map()) {
+  private var values: Map[String, Double] = Map()
 
   def dot(other: FeatureVector) = {
-    val keyVals = keySet.intersect(other.keySet).map(key => {
-      key -> this(key) * other(key)
+    val output = new FeatureVector()
+
+    keySet.intersect(other.keySet).foreach(key => {
+      output.add(key) -> this(key) * other(key)
     })
 
-    new FeatureVector(keyVals.toMap)
+    new FeatureVector
   }
 
   def distance(other: FeatureVector) = {
@@ -20,7 +22,16 @@ class FeatureVector(values: immutable.Map[String, Double] = Map()) {
     Math.pow(sum, 0.5)
   }
 
+  def add(key: String, value: Double = 1.0) = {
+    if (value == 0.0)
+      values -= key
+
+    values += (key -> value)
+  }
+
   def keys = values.keys
   def keySet = values.keySet
   def apply(key: String) = values(key)
+
+  override def toString() = values.toString()
 }

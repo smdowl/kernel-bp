@@ -5,11 +5,17 @@ import parser.Context
 
 class BasicFeatureExtractor extends FeatureExtractor {
   override def extractFeatures(context: Context): FeatureVector = {
-    var features = Map[String, Double]()
-    features += ("stack-top:" + context.stack.top.form -> 1.0)
-    features += ("buffer-top:" + context.buffer.top.form -> 1.0)
-    features += ("buffer-2nd-top:" + context.buffer(1).form -> 1.0)
+    val output = new FeatureVector()
 
-    new FeatureVector(features.toMap)
+    if (context.stack.size > 0)
+      output add ("stack-top:" + context.stack.top.form)
+
+    if (context.buffer.size > 0)
+      output add ("buffer-top:" + context.buffer.top.form)
+
+    if (context.buffer.size > 1)
+      output add ("buffer-2nd-top:" + context.buffer(1).form)
+
+    output
   }
 }
