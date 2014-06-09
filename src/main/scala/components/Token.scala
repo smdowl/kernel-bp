@@ -5,7 +5,10 @@ case class Token(id: Int,
                  lemma: String = "_",
                  coarsePOS: String = "_",
                  POS: String = "_",
-                 features: Seq[String] = Seq())
+                 features: Seq[String] = Seq()) extends Ordered[Token] {
+
+  override def compare(that: Token): Int = this.id compare that.id
+}
 
 class RootToken() extends Token(0, form="ROOT")
 
