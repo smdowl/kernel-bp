@@ -22,25 +22,33 @@ object ParseDecision {
   }
 }
 
-abstract class ParseDecision extends Ordered[ParseDecision] {
-  override def compare(that: ParseDecision): Int = {
-    this.hashCode() compare that.hashCode()
+abstract class ParseDecision
+
+abstract class Reduce(root: Token, dep: Token, direction: String) extends ParseDecision {
+
+  override def equals(that: Any) = that match {
+    case reduce: Reduce =>
+      this.direction.equals(reduce.getDirection) &&
+      this.root.equals(reduce.getRoot) &&
+      this.dep.equals(reduce.getDep)
+    case _ =>
+      false
   }
-}
 
-abstract class Reduce(root: Token, dep: Token) extends ParseDecision
+  def getRoot = root
+  def getDep = dep
+  def getDirection = direction
 
-case class LeftReduce(root: Token, dep: Token) extends Reduce(root, dep) {
+  override def hashCode = 41 * (41 + root.hashCode) + dep.hashCode + 39 * direction.hashCode
+
   override def toString = {
-    s"LeftShift to add ${root.form} -> ${dep.form}"
+    s"$direction shift to add ${root.form} -> ${dep.form}"
   }
 }
 
-case class RightReduce(root: Token, dep: Token) extends Reduce(root, dep) {
-  override def toString = {
-    s"RightShift to add ${root.form} -> ${dep.form}"
-  }
-}
+case class LeftReduce(root: Token, dep: Token) extends Reduce(root, dep, "left")
+
+case class RightReduce(root: Token, dep: Token) extends Reduce(root, dep, "right")
 
 case class Shift(token: Token) extends ParseDecision {
   override def toString = {
@@ -49,3 +57,12 @@ case class Shift(token: Token) extends ParseDecision {
 }
 
 class TestDecision extends ParseDecision
+
+object Reduce extends App {
+  val left = ParseDecision.getEmptyDecision(classOf[LeftReduce])
+  val left2 = ParseDecision.getEmptyDecision(classOf[LeftReduce])
+  val right = ParseDecision.getEmptyDecision(classOf[RightReduce])
+
+  println(left.equals(left2))
+  println(left.equals(right))
+}
