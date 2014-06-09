@@ -54,14 +54,17 @@ case class Context(stack: Stack[Token],
     fillParseDecision(emptyDecision)
   }
 
-  def fillParseDecision(decision: ParseDecision) = decision match {
-    case LeftReduce(_, _) =>
-      LeftReduce(new EmptyToken, new EmptyToken)
+  def fillParseDecision(decision: ParseDecision) =
+    if (stack.isEmpty)
+      Shift(buffer.top)
+    else decision match {
+      case LeftReduce(_, _) =>
+        LeftReduce(buffer.top, stack.top)
 
-    case RightReduce(_, _) =>
-      RightReduce(new EmptyToken, new EmptyToken)
+      case RightReduce(_, _) =>
+        RightReduce(stack.top, buffer.top)
 
-    case Shift(_) =>
-      Shift(new EmptyToken)
-  }
+      case Shift(_) =>
+        Shift(buffer.top)
+    }
 }
