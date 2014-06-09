@@ -10,6 +10,11 @@ class KNNClassifier(k: Int, extractor: FeatureExtractor, labeller: DataLabeller)
 
   var data: Seq[DataPoint] = _
 
+  private val KNNOrdering = new Ordering[ScoredDataInstance]() {
+    def compare(a: ScoredDataInstance, b: ScoredDataInstance): Int = {
+      - (a.score compareTo b.score)
+    }
+  }
   override def getParseDecision(context: Context): ParseDecision =
   {
     if (data.isEmpty)
@@ -17,7 +22,7 @@ class KNNClassifier(k: Int, extractor: FeatureExtractor, labeller: DataLabeller)
 
     val features = extractor.extractFeatures(context)
 
-    val best = new mutable.PriorityQueue[ScoredDataInstance]()
+    val best = new mutable.PriorityQueue[ScoredDataInstance]()(KNNOrdering)
 
     data.foreach(point => {
       val score = features.distance(point.x)
@@ -26,7 +31,7 @@ class KNNClassifier(k: Int, extractor: FeatureExtractor, labeller: DataLabeller)
       best += scoredInstance
     })
 
-    getLabel(best)
+    getDecision(best)
   }
 
   private def getLabel(best: mutable.PriorityQueue[ScoredDataInstance]) = {
