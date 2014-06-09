@@ -5,9 +5,10 @@ import input.ConllParser
 import parser.HistoryParser
 import features.extractors.BasicFeatureExtractor
 import features.labellers.EdgeOnlyDataLabeller
+import parser.classifiers.KNNClassifier
 
 object Main extends App {
-  val trainFile = Constants.DEP_TEST
+  val trainFile = Constants.MINI_FILE
 
   val treeBuilder = new TreeBuilder(new ConllParser())
   val trees = treeBuilder.buildTreesFromFile(trainFile)
@@ -30,6 +31,17 @@ object Main extends App {
 
   (history.contexts zip features).foreach(pair => {
     println(s"# -> ${pair._2}")
+  })
+
+  val knnClassifier = new KNNClassifier(1, featureExtractor, dataLabeller)
+  knnClassifier.train(parseHistories)
+
+  (history.contexts zip history.parseDecisions).foreach(pair => {
+    val predicted = knnClassifier.getParseDecision(pair._1)
+    val actual = pair._2
+//    assert(predicted.equals(actual), "Should return same.")
+
+    println(s"${predicted} => ${actual}")
   })
 
   println(parseHistories)
