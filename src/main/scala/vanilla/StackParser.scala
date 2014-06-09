@@ -4,16 +4,18 @@ import components._
 import scala.collection.immutable.Stack
 import parser._
 import parser.classifiers.Classifier
-import parser.LeftReduce
-import parser.RightReduce
 import components.Token
-import components.Edge
-import parser.Shift
 
 abstract class AbstractStackParser(tokens: Seq[Token]) {
-  var stack: Stack[Token] = Stack(tokens(0))
-  var buffer: Stack[Token] = Stack() ++ tokens.drop(1).reverse
-  var edgeList: Seq[Edge] = Seq()
+  protected var currentContext: Context = initContext()
+
+  private def initContext() = {
+    Context(Stack(tokens(0)), Stack() ++ tokens.drop(1).reverse, Seq(), Seq())
+  }
+
+  def stack = currentContext.stack
+  def buffer = currentContext.buffer
+  def edgeList = currentContext.edgeList
 
   def isNonTerminal = !buffer.isEmpty
 
@@ -21,48 +23,17 @@ abstract class AbstractStackParser(tokens: Seq[Token]) {
     Context(stack, buffer, edgeList, decisions)
   }
 
-  /**
-   * Apply whatever decision we are passed according to the standard rules.
-   * In doing so, assert that the state of the stack and buffer are consistent
-   * with the decision being applied.
-   * @param decision - the decision to apply
-   * @return
-   */
-  def applyParseDecision(decision: ParseDecision) = decision match {
-    case LeftReduce(root, dep) =>
-      assert(stack.top.equals(dep))
-      assert(buffer.top.equals(root))
 
-      stack = stack.pop
-      edgeList :+= Edge(root, dep, "_")
-
-    case RightReduce(root, dep) =>
-      assert(stack.top.equals(root))
-      assert(buffer.top.equals(dep))
-
-      stack = stack.pop
-      buffer = buffer.pop.push(root)
-      edgeList :+= Edge(root, dep, "_")
-
-    case Shift(token) =>
-      assert(buffer.top.equals(token))
-
-      buffer = buffer.pop
-      stack = stack.push(token)
+  def applyParseDecision(decision: ParseDecision) = {
+    currentContext = currentContext.applyParseDecision(decision)
   }
 }
 
 class HistoryStackParser(tokens: Seq[Token]) extends AbstractStackParser(tokens)
 
 class StackParser(tokens: Seq[Token], classifier: Classifier) extends AbstractStackParser(tokens) {
-  var context: Context = _
-
   def parseSentence(): Tree = {
-    // TODO: Decide whether we actually want to store the decisions in the Context
-    val decisions = Seq[ParseDecision]()
-
     while (isNonTerminal) {
-      context = generateContext(decisions)
       val decision = getParseDecision
       applyParseDecision(decision)
     }
@@ -70,5 +41,5 @@ class StackParser(tokens: Seq[Token], classifier: Classifier) extends AbstractSt
     new Tree(tokens, edgeList)
   }
 
-  private def getParseDecision = classifier.getParseDecision(context)
+  private def getParseDecision = classifier.getParseDecision(currentContext)
 }
