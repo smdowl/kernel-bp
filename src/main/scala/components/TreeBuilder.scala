@@ -1,7 +1,7 @@
 package components
 
 import input.{DepParser, ConllParser, ParseToken}
-import main.Constants
+import app.Constants
 
 object TreeBuilder {
   def buildTestTree(): Tree = {
