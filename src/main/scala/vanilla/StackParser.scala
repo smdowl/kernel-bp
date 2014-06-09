@@ -13,16 +13,9 @@ abstract class AbstractStackParser(tokens: Seq[Token]) {
     Context(Stack(tokens(0)), Stack() ++ tokens.drop(1).reverse, Seq(), Seq())
   }
 
-  def stack = currentContext.stack
-  def buffer = currentContext.buffer
-  def edgeList = currentContext.edgeList
+  def context = currentContext
 
-  def isNonTerminal = !buffer.isEmpty
-
-  def generateContext(decisions: Seq[ParseDecision]) = {
-    Context(stack, buffer, edgeList, decisions)
-  }
-
+  def isNonTerminal = !context.buffer.isEmpty
 
   def applyParseDecision(decision: ParseDecision) = {
     currentContext = currentContext.applyParseDecision(decision)
@@ -39,7 +32,7 @@ class StackParser(tokens: Seq[Token], classifier: Classifier) extends AbstractSt
       applyParseDecision(decision)
     }
 
-    new Tree(tokens, edgeList)
+    new Tree(tokens, context.edgeList)
   }
 
   private def getParseDecision = classifier.getParseDecision(currentContext)

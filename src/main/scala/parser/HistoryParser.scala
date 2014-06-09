@@ -7,9 +7,9 @@ class HistoryParser {
   var parser: AbstractStackParser = _
   var tree: Tree = _
 
-  private def stack = parser.stack
-  private def buffer = parser.buffer
-  private def edgeList = parser.edgeList
+  private def stack = parser.context.stack
+  private def buffer = parser.context.buffer
+  private def edgeList = parser.context.edgeList
 
   def parseHistory(tree: Tree): ParseHistory = {
     this.tree = tree
@@ -19,7 +19,7 @@ class HistoryParser {
     var contexts = Seq[Context]()
 
     while (parser.isNonTerminal) {
-      val context = parser.generateContext(decisions)
+      val context = parser.context
       val decision = getParseDecision
       parser.applyParseDecision(decision)
 

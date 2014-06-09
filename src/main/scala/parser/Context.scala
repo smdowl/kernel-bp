@@ -1,6 +1,6 @@
 package parser
 
-import components.{Edge, Token}
+import components.{EmptyToken, Edge, Token}
 import scala.collection.immutable.Stack
 
 case class Context(stack: Stack[Token],
@@ -47,5 +47,21 @@ case class Context(stack: Stack[Token],
         edgeList,
         decisions :+ decision
       )
+  }
+
+  def constructDecision[T <: ParseDecision](cls: Class[T]): ParseDecision = {
+    val emptyDecision = ParseDecision.getEmptyDecision(cls)
+    fillParseDecision(emptyDecision)
+  }
+
+  def fillParseDecision(decision: ParseDecision) = decision match {
+    case LeftReduce(_, _) =>
+      LeftReduce(new EmptyToken, new EmptyToken)
+
+    case RightReduce(_, _) =>
+      RightReduce(new EmptyToken, new EmptyToken)
+
+    case Shift(_) =>
+      Shift(new EmptyToken)
   }
 }
