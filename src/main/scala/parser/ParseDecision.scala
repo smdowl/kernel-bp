@@ -1,10 +1,21 @@
 package parser
 
-import components.Token
+import components.{EmptyToken, Token}
 
 abstract class ParseDecision extends Ordered[ParseDecision] {
   override def compare(that: ParseDecision): Int = {
     this.hashCode() compare that.hashCode()
+  }
+
+  def emptyDecision: ParseDecision = this match {
+    case LeftReduce(root, dep) =>
+      LeftReduce(new EmptyToken, new EmptyToken)
+
+    case RightReduce(root, dep) =>
+      RightReduce(new EmptyToken, new EmptyToken)
+
+    case Shift(token) =>
+      Shift(new EmptyToken)
   }
 }
 

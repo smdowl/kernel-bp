@@ -8,3 +8,5 @@ case class Token(id: Int,
                  features: Seq[String] = Seq())
 
 class RootToken() extends Token(0, form="ROOT")
+
+class EmptyToken() extends Token(-1, form="_")
