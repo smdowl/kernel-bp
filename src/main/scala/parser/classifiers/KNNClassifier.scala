@@ -31,16 +31,19 @@ class KNNClassifier(k: Int, extractor: FeatureExtractor, labeller: DataLabeller)
 
       best += scoredInstance
     })
+//
+//    best.take(5).foreach(println)
+//    println()
 
-    getDecision(best)
+    getDecision(context, best)
   }
 
-  private def getDecision(best: mutable.PriorityQueue[ScoredDataInstance]) = {
+  private def getDecision(context: Context, best: mutable.PriorityQueue[ScoredDataInstance]) = {
     var counts: Map[Int, Int] = Map()
     best.take(k).foreach(instance => {
       counts = count(counts, instance)
     })
-    labeller.getInstance(getHighest(counts))
+    labeller.getInstance(context, getHighest(counts))
   }
 
   private def count(counts: Map[Int, Int], toAdd: ScoredDataInstance) = {
