@@ -32,6 +32,7 @@ abstract class AbstractStackParser(tokens: Seq[Token]) {
 class HistoryStackParser(tokens: Seq[Token]) extends AbstractStackParser(tokens)
 
 class StackParser(tokens: Seq[Token], classifier: Classifier) extends AbstractStackParser(tokens) {
+
   def parseSentence(): Tree = {
     while (isNonTerminal) {
       val decision = getParseDecision
