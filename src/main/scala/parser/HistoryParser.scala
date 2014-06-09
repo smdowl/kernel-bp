@@ -36,11 +36,11 @@ class HistoryParser {
    */
   private def getParseDecision: ParseDecision =
    if (shouldLeftReduce)
-     LeftReduce(buffer.top, stack.top)
+     parser.context.constructDecision(classOf[LeftReduce])
    else if (shouldRightReduce)
-     RightReduce(stack.top, buffer.top)
+     parser.context.constructDecision(classOf[RightReduce])
    else
-     Shift(buffer.top)
+     parser.context.constructDecision(classOf[Shift])
 
   private def shouldLeftReduce = {
     !stack.isEmpty && tree.hasEdge(buffer.top.id, stack.top.id)
