@@ -5,6 +5,7 @@ import features.DataPoint
 import scala.collection.mutable
 import features.extractors.FeatureExtractor
 import features.labellers.DataLabeller
+import scala.util.Random
 
 class KNNClassifier(k: Int, extractor: FeatureExtractor, labeller: DataLabeller) extends Classifier with Trainable {
 
@@ -34,9 +35,27 @@ class KNNClassifier(k: Int, extractor: FeatureExtractor, labeller: DataLabeller)
     getDecision(best)
   }
 
-  private def getLabel(best: mutable.PriorityQueue[ScoredDataInstance]) = {
-    // TODO: Currently doing 1-NN
-    labeller.getInstance(best.head.vector.y)
+  private def getDecision(best: mutable.PriorityQueue[ScoredDataInstance]) = {
+    var counts: Map[Int, Int] = Map()
+    best.take(k).foreach(instance => {
+      counts = count(counts, instance)
+    })
+    labeller.getInstance(getHighest(counts))
+  }
+
+  private def count(counts: Map[Int, Int], toAdd: ScoredDataInstance) = {
+    val label = toAdd.vector.y
+    counts + (label -> (counts.getOrElse(label, 0) + 1))
+  }
+
+  private def getHighest(counts: Map[Int, Int]) = {
+    val sorted = counts.toSeq.sortBy(_._2)
+    val max = sorted.filter(_._2 == sorted(0)._2)
+
+    val labels = max.map(_._1)
+
+    // TODO: Not chose randomly?
+    Random.shuffle(labels).toList.head
   }
 
   override def train(histories: Seq[ParseHistory]): Unit = {
