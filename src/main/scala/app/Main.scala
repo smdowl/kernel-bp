@@ -13,10 +13,12 @@ object Main extends App {
   val featureExtractor = new DPPaperFeatureExtractor()
   val dataLabeller = new EdgeOnlyDataLabeller()
 
-  testFeatures()
+//  testFeatures()
+
+  runTest()
 
   def testFeatures() = {
-    val file = Constants.MINI_FILE
+    val file = Constants.MINI_TRAIN_FILE
     val parseHistories = getHistories(file)
     val history = parseHistories(0)
 
@@ -35,7 +37,7 @@ object Main extends App {
   }
 
   def runTest() = {
-    val trainFile = Constants.MINI_FILE
+    val trainFile = Constants.TRAIN_FILE
     val testFile = Constants.MINI_TEST_FILE
 
     val parseHistories = getHistories(trainFile)
