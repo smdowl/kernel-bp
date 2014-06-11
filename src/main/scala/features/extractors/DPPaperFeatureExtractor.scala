@@ -42,13 +42,4 @@ class DPPaperFeatureExtractor extends FeatureExtractor {
 
     output
   }
-
-  private def addFeatures(output: FeatureVector, key: String, tokens: Iterable[Token], limit: Int) = {
-    var index = 0
-    tokens.take(limit+1).foreach(token => {
-      output.add(s"$key-$index:")
-
-      index += 1
-    })
-  }
 }
