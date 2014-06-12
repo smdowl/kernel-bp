@@ -24,13 +24,14 @@ object ParseDecision {
 
 abstract class ParseDecision
 
-abstract class Reduce(root: Token, dep: Token, direction: String) extends ParseDecision {
+abstract class Reduce(root: Token, dep: Token, relation: String, direction: String) extends ParseDecision {
 
   override def equals(that: Any) = that match {
     case reduce: Reduce =>
       this.direction.equals(reduce.getDirection) &&
       this.root.equals(reduce.getRoot) &&
-      this.dep.equals(reduce.getDep)
+      this.dep.equals(reduce.getDep) &&
+      this.relation.equals(reduce.getRelation)
     case _ =>
       false
   }
@@ -38,17 +39,18 @@ abstract class Reduce(root: Token, dep: Token, direction: String) extends ParseD
   def getRoot = root
   def getDep = dep
   def getDirection = direction
+  def getRelation = relation
 
-  override def hashCode = 41 * (41 + root.hashCode) + dep.hashCode + 39 * direction.hashCode
+  override def hashCode = (17 * (41 + root.hashCode) * (dep.hashCode + 39 * direction.hashCode)) * relation.hashCode
 
   override def toString = {
-    s"$direction shift to add ${root.form} -> ${dep.form}"
+    s"$direction shift to add ${root.form} -$relation-> ${dep.form}"
   }
 }
 
-case class LeftReduce(root: Token, dep: Token) extends Reduce(root, dep, "left")
+case class LeftReduce(root: Token, dep: Token, relation: String = "_") extends Reduce(root, dep, relation, "left")
 
-case class RightReduce(root: Token, dep: Token) extends Reduce(root, dep, "right")
+case class RightReduce(root: Token, dep: Token, relation: String = "_") extends Reduce(root, dep, relation, "right")
 
 case class Shift(token: Token) extends ParseDecision {
   override def toString = {

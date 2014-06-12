@@ -20,7 +20,7 @@ class HistoryParser {
 
     while (parser.isNonTerminal) {
       val context = parser.context
-      val decision = getParseDecision
+      val decision = addEdgeType(getParseDecision)
       parser.applyParseDecision(decision)
 
       decisions :+= decision
@@ -28,6 +28,12 @@ class HistoryParser {
     }
 
     ParseHistory(tree.tokens, contexts, decisions)
+  }
+
+  private def addEdgeType(decision: ParseDecision): ParseDecision = decision match {
+    case reduce: LeftReduce => new LeftReduce(reduce.getRoot, reduce.getDep, reduce.getRelation)
+    case reduce: RightReduce => new RightReduce(reduce.getRoot, reduce.getDep, reduce.getRelation)
+    case a: Any => a
   }
 
   /**

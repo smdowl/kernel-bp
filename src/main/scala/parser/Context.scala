@@ -16,25 +16,25 @@ case class Context(stack: Stack[Token],
    * @return
    */
   def applyParseDecision(decision: ParseDecision) = decision match {
-    case LeftReduce(root, dep) =>
+    case LeftReduce(root, dep, relation) =>
       assert(stack.top.equals(dep))
       assert(buffer.top.equals(root))
 
       Context(
         stack.pop,
         buffer,
-        edgeList :+ Edge(root, dep, "_"),
+        edgeList :+ Edge(root, dep, relation),
         decisions :+ decision
       )
 
-    case RightReduce(root, dep) =>
+    case RightReduce(root, dep, relation) =>
       assert(stack.top.equals(root))
       assert(buffer.top.equals(dep))
 
       Context(
         stack.pop,
         buffer.pop.push(root),
-        edgeList :+ Edge(root, dep, "_"),
+        edgeList :+ Edge(root, dep, relation),
         decisions :+ decision
       )
 
@@ -58,10 +58,10 @@ case class Context(stack: Stack[Token],
     if (stack.isEmpty)
       Shift(buffer.top)
     else decision match {
-      case LeftReduce(_, _) =>
+      case LeftReduce(_, _, _) =>
         LeftReduce(buffer.top, stack.top)
 
-      case RightReduce(_, _) =>
+      case RightReduce(_, _, _) =>
         RightReduce(stack.top, buffer.top)
 
       case Shift(_) =>
