@@ -10,7 +10,7 @@ abstract class AbstractStackParser(tokens: Seq[Token]) {
   protected var currentContext: Context = initContext()
 
   private def initContext() = {
-    Context(Stack(tokens(0)), Stack() ++ tokens.drop(1).reverse, Seq(), Seq())
+    Context(Stack(tokens(0)), Stack() ++ tokens.drop(1), Seq(), Seq())
   }
 
   def context = currentContext
