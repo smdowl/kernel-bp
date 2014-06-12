@@ -1,6 +1,6 @@
 package parser
 
-import components.Tree
+import components.{Token, Tree}
 import vanilla.{AbstractStackParser, HistoryStackParser}
 
 class HistoryParser {
@@ -31,9 +31,19 @@ class HistoryParser {
   }
 
   private def addEdgeType(decision: ParseDecision): ParseDecision = decision match {
-    case reduce: LeftReduce => new LeftReduce(reduce.getRoot, reduce.getDep, reduce.getRelation)
-    case reduce: RightReduce => new RightReduce(reduce.getRoot, reduce.getDep, reduce.getRelation)
+    case reduce: LeftReduce => new LeftReduce(reduce.getRoot, reduce.getDep, getTrueEdgeLabel(reduce))
+    case reduce: RightReduce => new RightReduce(reduce.getRoot, reduce.getDep, getTrueEdgeLabel(reduce))
     case a: Any => a
+  }
+
+  private def getTrueEdgeLabel(reduce: Reduce): String = {
+    val root = reduce.getRoot
+    val dep = reduce.getDep
+
+    val matchedEdges = tree.getOutputEdges(root.id).filter(_.dep.id == dep.id)
+
+    assert(matchedEdges.size == 1, "Should be exactly one edge.")
+    matchedEdges(0).relation
   }
 
   /**
