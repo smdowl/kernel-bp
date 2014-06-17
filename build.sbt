@@ -6,6 +6,8 @@ libraryDependencies  ++= Seq(
   "org.scalanlp" %% "breeze-natives" % "0.8.1"
 )
 
+libraryDependencies += "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.2"
+
 resolvers ++= Seq(
   // other resolvers here
   // if you want to use snapshot builds (currently 0.8-SNAPSHOT), use this.
