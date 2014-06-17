@@ -3,17 +3,6 @@ package word2vec
 import scala.io.Source
 import breeze.linalg._
 
-case class VectorDef(vec: List[Double])
-
-object VectorLoader extends App {
-  val loader = new VectorLoader()
-
-  loader.findVector("test")
-  loader.findVector("apple")
-  loader.findVector("word")
-  loader.findVector("beast")
-}
-
 class VectorLoader {
   private val mapPath = "/Users/shaundowling/dev/word2vec/out-file-2"
 
@@ -41,6 +30,4 @@ class VectorLoader {
   }
 
   private def parseDouble(string: String) = try { string.toDouble } catch { case _: Throwable => 0.0 }
-
-
 }
