@@ -13,7 +13,15 @@ class VectorLoader {
   val MONGO_DB = "word2vec"
   val MONGO_COLL = "vectors"
 
+  val mongoConn = MongoConnection()
+  val vectorsColl = mongoConn(MONGO_DB)(MONGO_COLL)
+
+  var open = true
+
   def findVector(queryString: String): Vector[Double] = {
+    if (!open)
+      throw new Exception("Connection has been closed.")
+    
     val result = makeQuery(queryString)
 
     if (result.isDefined) {
@@ -21,18 +29,13 @@ class VectorLoader {
       return parseVector(vectorString)
     }
 
-    println("Couldn't find " + queryString)
+//    println("Couldn't find " + queryString)
     returnErrorVector()
   }
 
   private def makeQuery(queryString: String) = {
-    val mongoConn = MongoConnection()
-    val vectorsColl = mongoConn(MONGO_DB)(MONGO_COLL)
-
     val query = MongoDBObject("word" -> queryString)
     val result = vectorsColl.findOne(query)
-
-    mongoConn.close()
 
     result
   }
@@ -47,5 +50,10 @@ class VectorLoader {
 
   private def returnErrorVector(): Vector[Double] = {
     DenseVector.zeros(300)
+  }
+
+  def close() = {
+    mongoConn.close()
+    open = false
   }
 }

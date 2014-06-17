@@ -5,7 +5,7 @@ import scalax.io._
 import breeze.linalg._
 
 object VectorAppender extends App {
-  val dataRoot = "/Users/shaundowling/Google Drive/UCL/master project/code/history-gen/data/parse-test"
+  val dataRoot = "/Users/shaundowling/Google Drive/UCL/master project/code/history-gen/data/orig"
   val outputDir = "/Users/shaundowling/Google Drive/UCL/master project/code/history-gen/data/vector-appended"
 
   val dataFiles = new File(dataRoot).listFiles.filter(_.getName.endsWith(".conll"))
@@ -13,8 +13,13 @@ object VectorAppender extends App {
 
   dataFiles.foreach(appendVectorsForFile)
 
+  vectorLoader.close()
+
   private def appendVectorsForFile(file: File) {
     val output: Output = Resource.fromFile(new File(outputDir, file.getName))
+
+    println(s"Starting ${file.getName}")
+
     scala.io.Source.fromFile(file).getLines().foreach(line => {
       val split = line.split('\t')
 
