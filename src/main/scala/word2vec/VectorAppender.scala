@@ -20,14 +20,13 @@ object VectorAppender extends App {
 
       val outString = if (split.length > 1) {
         val word = split(1)
-        println("Starting " + word)
         val vector = vectorLoader.findVector(word)
         line + '\t' + getVectorString(vector)
       } else {
         line
       }
 
-      output.write(outString)
+      output.write(outString + '\n')
     })
   }
 
