@@ -8,6 +8,8 @@ libraryDependencies  ++= Seq(
 
 libraryDependencies += "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.2"
 
+libraryDependencies += "org.mongodb" %% "casbah" % "2.5.0"
+
 resolvers ++= Seq(
   // other resolvers here
   // if you want to use snapshot builds (currently 0.8-SNAPSHOT), use this.

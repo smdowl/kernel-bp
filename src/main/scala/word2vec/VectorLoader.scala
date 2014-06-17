@@ -1,26 +1,32 @@
 package word2vec
 
-import scala.io.Source
 import breeze.linalg._
+import com.mongodb.casbah.Imports._
+
+object VectorLoader extends App {
+  val loader = new VectorLoader
+  val res = loader.findVector("of")
+  println(res)
+}
 
 class VectorLoader {
-  private val mapPath = "/Users/shaundowling/dev/word2vec/out-file-2"
+  val MONGO_DB = "word2vec"
+  val MONGO_COLL = "vectors"
 
-  def findVector(search: String): Vector[Double] = {
-    for (line <- Source.fromFile(mapPath).getLines()) {
+  def findVector(queryString: String): Vector[Double] = {
+    val mongoConn = MongoConnection()
+    val vectorsColl = mongoConn(MONGO_DB)(MONGO_COLL)
 
-      val split = line.split('\t')
+    val query = MongoDBObject("word" -> queryString)
+    val result = vectorsColl.findOne(query)
 
-      val word = split(0)
-
-      if (word.equals(search)) {
-        val vector = parseVector(split(1))
-        println(word)
-        return vector
-      }
+    if (result.isDefined) {
+      val vectorString = result.get("vector").asInstanceOf[String]
+      return parseVector(vectorString)
     }
 
-    throw new Exception("No Vector found")
+    println("Couldn't find " + queryString)
+    returnErrorVector()
   }
 
   private def parseVector(vecString: String) = {
@@ -30,4 +36,8 @@ class VectorLoader {
   }
 
   private def parseDouble(string: String) = try { string.toDouble } catch { case _: Throwable => 0.0 }
+
+  private def returnErrorVector(): Vector[Double] = {
+    DenseVector.zeros(300)
+  }
 }
