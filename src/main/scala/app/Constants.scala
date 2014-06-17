@@ -1,10 +1,11 @@
 package app
 
 object Constants {
-  final val MINI_TRAIN_FILE = "/Users/shaundowling/Google Drive/UCL/master project/code/history-gen/data/mini.conll"
-  final val MINI_TEST_FILE = "/Users/shaundowling/Google Drive/UCL/master project/code/history-gen/data/mini-test.conll"
+  private final val BASE_DIR = "/Users/shaundowling/Google Drive/UCL/master project/code/history-gen/data/orig/"
 
-  final val DEP_TEST = "/Users/shaundowling/Google Drive/UCL/master project/code/history-gen/data/test/test.conll"
+  final val MINI_TRAIN_FILE = BASE_DIR + "mini.conll"
+  final val MINI_TEST_FILE = BASE_DIR + "mini-test.conll"
 
-  final val TRAIN_FILE = "/Users/shaundowling/Google Drive/UCL/master project/code/history-gen/data/train.conll"
+  final val DEP_TEST = BASE_DIR + "dep-test.conll"
+  final val TRAIN_FILE = BASE_DIR + "train.conll"
 }
