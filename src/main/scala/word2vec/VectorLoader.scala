@@ -14,11 +14,7 @@ class VectorLoader {
   val MONGO_COLL = "vectors"
 
   def findVector(queryString: String): Vector[Double] = {
-    val mongoConn = MongoConnection()
-    val vectorsColl = mongoConn(MONGO_DB)(MONGO_COLL)
-
-    val query = MongoDBObject("word" -> queryString)
-    val result = vectorsColl.findOne(query)
+    val result = makeQuery(queryString)
 
     if (result.isDefined) {
       val vectorString = result.get("vector").asInstanceOf[String]
@@ -27,6 +23,18 @@ class VectorLoader {
 
     println("Couldn't find " + queryString)
     returnErrorVector()
+  }
+
+  private def makeQuery(queryString: String) = {
+    val mongoConn = MongoConnection()
+    val vectorsColl = mongoConn(MONGO_DB)(MONGO_COLL)
+
+    val query = MongoDBObject("word" -> queryString)
+    val result = vectorsColl.findOne(query)
+
+    mongoConn.close()
+
+    result
   }
 
   private def parseVector(vecString: String) = {
