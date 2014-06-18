@@ -1,11 +1,12 @@
-package app
+package dependencies
 
 import dependencies.components.TreeBuilder
 import input.ConllParser
 import dependencies.parser.HistoryParser
-import dependencies.features.extractors.{DPPaperFeatureExtractor, BasicFeatureExtractor}
+import dependencies.features.extractors.DPPaperFeatureExtractor
 import dependencies.features.labellers.EdgeOnlyDataLabeller
 import dependencies.parser.classifiers.KNNClassifier
+import app.Constants
 
 object Main extends App {
   val treeBuilder = new TreeBuilder(new ConllParser())
