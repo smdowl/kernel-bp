@@ -8,7 +8,7 @@ class BasicFeatureExtractor extends FeatureExtractor {
     val output = new FeatureVector()
 
     if (context.history.size > 0)
-      output add ("stack-top:" + context.history.last)
+      output add ("prev-pos:" + context.history.last.POS)
 
     output
   }
