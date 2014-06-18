@@ -1,5 +1,7 @@
 package pos.parser
 
-class Context(val history: Seq[String] = Seq[String]()) {
-  def add(pos: String) = new Context(history :+ pos)
+import pos.components.Token
+
+class Context(val history: Seq[Token] = Seq[Token]()) {
+  def add(token: Token) = new Context(history :+ token)
 }
