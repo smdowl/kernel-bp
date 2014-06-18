@@ -12,7 +12,7 @@ class HistoryParser {
 
     sentence.foreach(token => {
       tags :+= token.POS
-      contexts :+= contexts.head.add(token.POS)
+      contexts :+= contexts.last.add(token.POS)
     })
 
     ParseHistory(sentence, contexts, tags)
