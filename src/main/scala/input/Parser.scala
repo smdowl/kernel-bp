@@ -2,7 +2,7 @@ package input
 
 import scala.io.Source
 
-case class ParseToken(id: Int,
+case class ParsedToken(id: Int,
                       form: String,
                       lemma: String,
                       coarsePOS: String,
@@ -14,7 +14,7 @@ case class ParseToken(id: Int,
 abstract class Parser {
 
   type TokenDef = Seq[String]
-  type Sentence = Seq[ParseToken]
+  type Sentence = Seq[ParsedToken]
 
   def parseLines(filepath: String): Seq[Sentence] = {
     var sentences: Seq[Sentence] = Seq()

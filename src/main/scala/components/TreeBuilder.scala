@@ -1,6 +1,6 @@
 package components
 
-import input.{Parser, ConllParser, ParseToken}
+import input.{Parser, ConllParser, ParsedToken}
 import app.Constants
 
 object TreeBuilder {
@@ -11,17 +11,17 @@ object TreeBuilder {
 }
 
 class TreeBuilder(parser: Parser) {
-  private var depSentence: Iterable[ParseToken] = _
+  private var sentence: Iterable[ParsedToken] = _
   private var tokens: Seq[Token] = _
   private var deps: Seq[Edge] = _
 
   def buildTreesFromFile(filepath: String): Seq[Tree] = {
-    val depSentences = parser.parseLines(filepath)
-    depSentences.map(buildTree)
+    val sentences = parser.parseLines(filepath)
+    sentences.map(buildTree)
   }
 
-  private def buildTree(depSentence: Iterable[ParseToken]): Tree = {
-    this.depSentence = depSentence
+  private def buildTree(sentence: Iterable[ParsedToken]): Tree = {
+    this.sentence = sentence
     init()
     parseSentence()
 
@@ -39,13 +39,13 @@ class TreeBuilder(parser: Parser) {
     parseEdges()
   }
 
-  private def generateNodes = depSentence.map(depToken => {
+  private def generateNodes = sentence.map(depToken => {
     Token(depToken.id, depToken.form,
       depToken.lemma, depToken.coarsePOS,
       depToken.POS, depToken.features)
   })
 
-  private def parseEdges() = depSentence.foreach(depToken => {
-    deps :+= Edge(tokens(depToken.head), tokens(depToken.id), depToken.depRel)
+  private def parseEdges() = sentence.foreach(token => {
+    deps :+= Edge(tokens(token.head), tokens(token.id), token.depRel)
   })
 }
