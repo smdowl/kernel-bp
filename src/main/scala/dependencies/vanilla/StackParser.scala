@@ -1,4 +1,4 @@
-package vanilla
+package dependencies.vanilla
 
 import dependencies.components._
 import scala.collection.immutable.Stack

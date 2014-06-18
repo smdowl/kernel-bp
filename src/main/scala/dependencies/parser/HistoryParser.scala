@@ -1,7 +1,7 @@
 package dependencies.parser
 
 import dependencies.components.{Token, Tree}
-import vanilla.{AbstractStackParser, HistoryStackParser}
+import dependencies.vanilla.{AbstractStackParser, HistoryStackParser}
 
 class HistoryParser {
   var parser: AbstractStackParser = _
