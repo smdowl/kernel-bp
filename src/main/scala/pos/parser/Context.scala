@@ -1,7 +1,5 @@
 package pos.parser
 
-import scala.collection.immutable.Stack
-
-class Context(val history: Stack[String] = new Stack[String]()) {
+class Context(val history: Seq[String] = Seq[String]()) {
   def add(pos: String) = new Context(history :+ pos)
 }
