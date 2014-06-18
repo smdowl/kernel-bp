@@ -1,6 +1,6 @@
 package components
 
-import input.{DepParser, ConllParser, ParseToken}
+import input.{Parser, ConllParser, ParseToken}
 import app.Constants
 
 object TreeBuilder {
@@ -10,7 +10,7 @@ object TreeBuilder {
   }
 }
 
-class TreeBuilder(parser: DepParser) {
+class TreeBuilder(parser: Parser) {
   private var depSentence: Iterable[ParseToken] = _
   private var tokens: Seq[Token] = _
   private var deps: Seq[Edge] = _

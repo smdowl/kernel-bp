@@ -11,13 +11,13 @@ case class ParseToken(id: Int,
                       head: Int,
                       depRel: String)
 
-abstract class DepParser {
+abstract class Parser {
 
   type TokenDef = Seq[String]
-  type DepSentence = Seq[ParseToken]
+  type Sentence = Seq[ParseToken]
 
-  def parseLines(filepath: String): Seq[DepSentence] = {
-    var sentences: Seq[DepSentence] = Seq()
+  def parseLines(filepath: String): Seq[Sentence] = {
+    var sentences: Seq[Sentence] = Seq()
     var block: Seq[TokenDef] = Seq()
 
     Source.fromFile(filepath).getLines().foreach(line => {
@@ -34,5 +34,5 @@ abstract class DepParser {
     sentences :+ tokensFromBlock(block)
   }
 
-  protected def tokensFromBlock(block: Seq[Seq[String]]): DepSentence
+  protected def tokensFromBlock(block: Seq[Seq[String]]): Sentence
 }
