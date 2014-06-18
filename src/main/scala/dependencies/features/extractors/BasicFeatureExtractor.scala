@@ -1,7 +1,7 @@
 package dependencies.features.extractors
 
-import dependencies.features.FeatureVector
 import dependencies.parser.Context
+import computation.FeatureVector
 
 class BasicFeatureExtractor extends FeatureExtractor {
   override def extractFeatures(context: Context): FeatureVector = {
