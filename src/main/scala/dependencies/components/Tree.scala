@@ -1,4 +1,4 @@
-package components
+package dependencies.components
 
 class Tree(val tokens: Seq[Token], val edges: Seq[Edge]) {
   def getToken(id: Int) = tokens(id)

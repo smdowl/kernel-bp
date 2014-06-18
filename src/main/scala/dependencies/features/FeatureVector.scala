@@ -1,4 +1,4 @@
-package features
+package dependencies.features
 
 class FeatureVector() {
 

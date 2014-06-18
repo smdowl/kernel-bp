@@ -1,8 +1,8 @@
-package features.extractors
+package dependencies.features.extractors
 
-import parser.Context
-import features.FeatureVector
-import components.Token
+import dependencies.parser.Context
+import dependencies.features.FeatureVector
+import dependencies.components.Token
 
 class DPPaperFeatureExtractor extends FeatureExtractor {
   override def extractFeatures(context: Context): FeatureVector = {

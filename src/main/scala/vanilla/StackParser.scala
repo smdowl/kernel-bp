@@ -1,10 +1,10 @@
 package vanilla
 
-import components._
+import dependencies.components._
 import scala.collection.immutable.Stack
-import parser._
-import parser.classifiers.Classifier
-import components.Token
+import dependencies.parser._
+import dependencies.parser.classifiers.Classifier
+import dependencies.components.Token
 
 abstract class AbstractStackParser(tokens: Seq[Token]) {
   protected var currentContext: Context = initContext()

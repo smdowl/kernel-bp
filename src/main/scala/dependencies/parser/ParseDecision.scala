@@ -1,6 +1,6 @@
-package parser
+package dependencies.parser
 
-import components.{EmptyToken, Token}
+import dependencies.components.{EmptyToken, Token}
 
 object ParseDecision {
   def getEmptyDecision[T <: ParseDecision](cls: Class[T]): ParseDecision = {

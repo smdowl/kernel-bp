@@ -1,11 +1,11 @@
 package app
 
-import components.TreeBuilder
+import dependencies.components.TreeBuilder
 import input.ConllParser
-import parser.HistoryParser
-import features.extractors.{DPPaperFeatureExtractor, BasicFeatureExtractor}
-import features.labellers.EdgeOnlyDataLabeller
-import parser.classifiers.KNNClassifier
+import dependencies.parser.HistoryParser
+import dependencies.features.extractors.{DPPaperFeatureExtractor, BasicFeatureExtractor}
+import dependencies.features.labellers.EdgeOnlyDataLabeller
+import dependencies.parser.classifiers.KNNClassifier
 
 object Main extends App {
   val treeBuilder = new TreeBuilder(new ConllParser())
@@ -13,12 +13,12 @@ object Main extends App {
   val featureExtractor = new DPPaperFeatureExtractor()
   val dataLabeller = new EdgeOnlyDataLabeller()
 
-//  testFeatures()
+  testFeatures()
 
-  runTest()
+//  runTest()
 
   def testFeatures() = {
-    val file = Constants.MINI_TRAIN_FILE
+    val file = Constants.DEP_TEST
     val parseHistories = getHistories(file)
     val history = parseHistories(0)
 

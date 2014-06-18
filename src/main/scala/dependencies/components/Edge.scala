@@ -1,4 +1,4 @@
-package components
+package dependencies.components
 
 case class Edge(head: Token, dep: Token, relation: String) {
   override def toString = {

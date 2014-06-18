@@ -1,8 +1,8 @@
-package features.labellers
+package dependencies.features.labellers
 
-import parser.{Shift, RightReduce, LeftReduce, ParseDecision, Context}
+import dependencies.parser.{Shift, RightReduce, LeftReduce, ParseDecision, Context}
 import scala.collection.immutable.TreeSet
-import components.EmptyToken
+import dependencies.components.EmptyToken
 
 class EdgeOnlyDataLabeller extends DataLabeller {
 

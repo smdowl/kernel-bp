@@ -1,6 +1,6 @@
-package parser
+package dependencies.parser
 
-import components.{EmptyToken, Edge, Token}
+import dependencies.components.{EmptyToken, Edge, Token}
 import scala.collection.immutable.Stack
 
 case class Context(stack: Stack[Token],

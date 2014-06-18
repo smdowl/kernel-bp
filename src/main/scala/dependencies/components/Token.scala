@@ -1,4 +1,4 @@
-package components
+package dependencies.components
 
 case class Token(id: Int,
                  form: String = "_",

@@ -1,10 +1,10 @@
-package parser.classifiers
+package dependencies.parser.classifiers
 
-import parser.{ParseHistory, Trainable, ParseDecision, Context}
-import features.DataPoint
+import dependencies.parser.{ParseHistory, Trainable, ParseDecision, Context}
+import dependencies.features.DataPoint
 import scala.collection.mutable
-import features.extractors.FeatureExtractor
-import features.labellers.DataLabeller
+import dependencies.features.extractors.FeatureExtractor
+import dependencies.features.labellers.DataLabeller
 import scala.util.Random
 
 class KNNClassifier(k: Int, extractor: FeatureExtractor, labeller: DataLabeller) extends Classifier with Trainable {

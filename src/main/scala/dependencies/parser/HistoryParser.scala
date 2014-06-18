@@ -1,6 +1,6 @@
-package parser
+package dependencies.parser
 
-import components.{Token, Tree}
+import dependencies.components.{Token, Tree}
 import vanilla.{AbstractStackParser, HistoryStackParser}
 
 class HistoryParser {

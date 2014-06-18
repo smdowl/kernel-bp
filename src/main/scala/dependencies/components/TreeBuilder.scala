@@ -1,4 +1,4 @@
-package components
+package dependencies.components
 
 import input.{Parser, ConllParser, ParsedToken}
 import app.Constants

@@ -1,6 +1,6 @@
-package features.labellers
+package dependencies.features.labellers
 
-import parser.{ParseDecision, Context}
+import dependencies.parser.{ParseDecision, Context}
 
 trait DataLabeller {
   def initialise(decisions: Iterable[ParseDecision])
