@@ -1,8 +1,16 @@
 package pos.components
 
-import input.{Parser, ParsedToken}
+import input.{ConllParser, Parser, ParsedToken}
+import app.Constants
 
-class SentenceBulider(parser: Parser) {
+object SentenceBuilder extends App {
+  def buildTest(): Seq[Token] = {
+    val builder = new SentenceBuilder(new ConllParser)
+    builder.buildSentenceFromFile(Constants.DEP_TEST)(0)
+  }
+}
+
+class SentenceBuilder(parser: Parser) {
   def buildSentenceFromFile(filepath: String): Seq[Seq[Token]] = {
     val sentences = parser.parse(filepath)
     sentences.map(buildSentence)
