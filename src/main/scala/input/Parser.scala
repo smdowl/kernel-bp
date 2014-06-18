@@ -16,7 +16,7 @@ abstract class Parser {
   type TokenDef = Seq[String]
   type Sentence = Seq[ParsedToken]
 
-  def parseLines(filepath: String): Seq[Sentence] = {
+  def parse(filepath: String): Seq[Sentence] = {
     var sentences: Seq[Sentence] = Seq()
     var block: Seq[TokenDef] = Seq()
 

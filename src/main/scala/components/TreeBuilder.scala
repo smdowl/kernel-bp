@@ -16,7 +16,7 @@ class TreeBuilder(parser: Parser) {
   private var deps: Seq[Edge] = _
 
   def buildTreesFromFile(filepath: String): Seq[Tree] = {
-    val sentences = parser.parseLines(filepath)
+    val sentences = parser.parse(filepath)
     sentences.map(buildTree)
   }
 
