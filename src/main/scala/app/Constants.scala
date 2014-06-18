@@ -1,10 +1,11 @@
 package app
 
 object Constants {
-  private final val ORIG_DIR = "/Users/shaundowling/Google Drive/UCL/master project/code/history-gen/data/orig/"
-  private final val VECTOR_DIR = "/Users/shaundowling/Google Drive/UCL/master project/code/history-gen/data/vector-appended/"
+  
+  val orig = true
+  val SUBDIR: String = if (orig) "orig/" else "vector-appended/"
 
-  private final val BASE_DIR = ORIG_DIR
+  private final val BASE_DIR = "/Users/shaundowling/Google Drive/UCL/master project/code/kernel-bp/data/" + SUBDIR
 
   final val MINI_TRAIN_FILE = BASE_DIR + "mini.conll"
   final val MINI_TEST_FILE = BASE_DIR + "mini-test.conll"
