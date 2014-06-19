@@ -86,6 +86,6 @@ object SimpleDemo extends App {
     sampArr
   }
 
-  def getParents(A: DenseMatrix[Int], idx: Int) = A(::, idx).toArray.filter(_ > 0)
-  def getChildren(A: DenseMatrix[Int], idx: Int) = A(idx, ::).t.toArray.filter(_ > 0)
+  def getParents(A: DenseMatrix[Int], idx: Int): Seq[Int] = A(::, idx).findAll(_ > 0)
+  def getChildren(A: DenseMatrix[Int], idx: Int): Seq[Int] = A(idx, ::).t.findAll(_ > 0)
 }
