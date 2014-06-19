@@ -1,4 +1,4 @@
-package pos.ngram
+package pos.taggers
 
 import pos.components.{SentenceBuilder, Token}
 
