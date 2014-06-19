@@ -32,7 +32,7 @@ object SimpleDemo extends App {
   // Parzen window parameter at root
   val sigRoot = 0.1
 
-  val cache = buildCache(A, sampleArr)
+  val cache = buildCache(A, sampleArr, msgParam)
   println()
 
   def generateData(A: DenseMatrix[Int], n: Int): DenseMatrix[Double] = {
@@ -100,7 +100,9 @@ object SimpleDemo extends App {
     }
   }
 
-  def buildCache(A: DenseMatrix[Int], sampleArr: DenseMatrix[Double]): Cache = {
+  def buildCache(A: DenseMatrix[Int], sampleArr: DenseMatrix[Double], msgParam: MessageParam): Cache = {
+    val numNodes = A.rows
+
     val kArr = Array.ofDim[DenseMatrix[Double]](numNodes, numNodes)
     val leafArr = Array.ofDim[Vector[Double]](numNodes)
 
@@ -130,5 +132,23 @@ object SimpleDemo extends App {
         out(i, j) = Math.exp(- Math.pow(p1(i) - p2(j), 2) / (2 * Math.pow(deg, 2)))
 
     out
+  }
+
+  def other = {
+    //  val betaArr = Array.ofDim[Vector[Double]](numNodes - observedList.length)
+
+    //  for ((leafInd, observation) <- observedList zip observations) {
+    //    val parentInd = getParents(A, leafInd)(0)
+    //
+    //    val Kt = cache.kArr(leafInd)(leafInd)
+    //    val Ks = cache.kArr(leafInd)(parentInd)
+    //    val I = DenseMatrix.eye[Double](Kt.rows)
+    //
+    //    val kt = rbfDot(cache.leafArr(leafInd), DenseVector(observation), msgParam.sig)
+    //    println()
+    ////    val obj = (Kt :+ I * msgParam.lambda)
+    ////    obj
+    ////    betaArr(leafInd) = (obj * (Ks + I * msgParam.lambda)) \ kt
+    //  }
   }
 }
