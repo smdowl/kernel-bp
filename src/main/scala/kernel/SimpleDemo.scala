@@ -4,7 +4,7 @@ import breeze.linalg._
 import breeze.plot._
 
 case class MessageParam(lambda: Double, sig: Double)
-case class Cache(kArr: Array[Array[Matrix[Double]]], leafArr: Array[Vector[Double]])
+case class Cache(kArr: Array[Array[DenseMatrix[Double]]], leafArr: Array[Vector[Double]])
 
 object SimpleDemo extends App {
 
@@ -101,7 +101,7 @@ object SimpleDemo extends App {
   }
 
   def buildCache(A: DenseMatrix[Int], sampleArr: DenseMatrix[Double]): Cache = {
-    val kArr = Array.ofDim[Matrix[Double]](numNodes, numNodes)
+    val kArr = Array.ofDim[DenseMatrix[Double]](numNodes, numNodes)
     val leafArr = Array.ofDim[Vector[Double]](numNodes)
 
     for (nodeInd <- 0 until numNodes) {
@@ -121,9 +121,9 @@ object SimpleDemo extends App {
     Cache(kArr, leafArr)
   }
 
-  def rbfDot(p1: Vector[Double], p2: Vector[Double], deg: Double = 1.0): Matrix[Double] = {
+  def rbfDot(p1: Vector[Double], p2: Vector[Double], deg: Double = 1.0): DenseMatrix[Double] = {
     // TODO: Currently slow version, but fast version is in MATLAB code
-    val out = Matrix.zeros[Double](p1.length, p2.length)
+    val out = DenseMatrix.zeros[Double](p1.length, p2.length)
 
     for (i <- 0 until p1.length)
       for (j <- 0 until p2.length)
