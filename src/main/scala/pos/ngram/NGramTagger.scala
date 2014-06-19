@@ -11,7 +11,7 @@ object NGramTagger extends App {
 
 class NGramTagger(n: Int) extends Tagger {
   var count: Int = 0
-  var model: Map[String, Int] = Map()
+  var model: Map[String, Double] = Map()
   var uniqueTags: Set[String] = Set()
 
   def train(sentences: Seq[Seq[Token]]) = {
@@ -39,7 +39,7 @@ class NGramTagger(n: Int) extends Tagger {
   private def learn(hist: Seq[String], tag: String): Seq[String] = {
     val str = hist.mkString(",")
 
-    model += str -> (model.getOrElse(str, 0) + 1)
+    model += str -> (model.getOrElse(str, 0.0) + 1.0)
     count += 1
 
     hist.drop(1) :+ tag
