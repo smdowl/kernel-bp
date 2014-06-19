@@ -14,28 +14,24 @@ object SimpleDemo extends App {
     (0,0,0,0,0),
     (0,0,0,0,0) )
 
+  val rootNode = 0
   val numNodes = A.rows
-  val rootNode = 1
+  val numSamples = 2000
 
-  val sigRoot = 0.1
+  val sampleArr = generateData(A, numSamples)
 
-  val n = 2000
+  plotData(sampleArr)
 
+  // Other params
   val observedList = DenseVector(4)
   val observations = DenseVector(0)
 
   val msgParam = MessageParam(0.1, 0.3)
 
-  val sampleArr = generateData(A, n)
+  // Parzen window parameter at root
+  val sigRoot = 0.1
 
-  val f = Figure()
-  for (i <- 0 until numNodes) {
-    val p = f.subplot(3, 2, i)
-    p += hist(sampleArr(::, i))
-    p.title = s"Node $i"
-  }
 
-  //  println(sampleArr)
 
   def generateData(A: DenseMatrix[Int], n: Int): DenseMatrix[Double] = {
 
@@ -90,4 +86,15 @@ object SimpleDemo extends App {
 
   def getParents(A: DenseMatrix[Int], idx: Int): Seq[Int] = A(::, idx).findAll(_ > 0)
   def getChildren(A: DenseMatrix[Int], idx: Int): Seq[Int] = A(idx, ::).t.findAll(_ > 0)
+
+  def plotData(data: DenseMatrix[Double]) = {
+    val numNodes = data.cols
+
+    val f = Figure()
+    for (i <- 0 until numNodes) {
+      val p = f.subplot(3, 2, i)
+      p += hist(data(::, i))
+      p.title = s"Node $i"
+    }
+  }
 }
