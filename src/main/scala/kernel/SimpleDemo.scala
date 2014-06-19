@@ -17,7 +17,7 @@ object SimpleDemo extends App {
 
   val rootNode = 0
   val numNodes = A.rows
-  val numSamples = 2000
+  val numSamples = 200
 
   val sampleArr = generateData(A, numSamples)
 
@@ -107,15 +107,15 @@ object SimpleDemo extends App {
     for (nodeInd <- 0 until numNodes) {
       val children = getChildren(A, nodeInd)
       for (childInd <- children)
-        kArr(nodeInd)(childInd) = DenseMatrix.zeros[Double](1,1)
+        kArr(nodeInd)(childInd) = rbfDot(sampleArr(::, nodeInd), sampleArr(::, nodeInd), msgParam.sig)
 
       if (children.length == 0) {
-        kArr(nodeInd)(nodeInd) = DenseMatrix.zeros[Double](1,1)
+        kArr(nodeInd)(nodeInd) = rbfDot(sampleArr(::, nodeInd), sampleArr(::, nodeInd), msgParam.sig)
         leafArr(nodeInd) = sampleArr(::, nodeInd)
       }
 
       for (parentInd <- getParents(A, nodeInd))
-        kArr(nodeInd)(parentInd) = DenseMatrix.zeros[Double](1,1)
+        kArr(nodeInd)(parentInd) = rbfDot(sampleArr(::, parentInd), sampleArr(::, parentInd), msgParam.sig)
     }
 
     Cache(kArr, leafArr)
