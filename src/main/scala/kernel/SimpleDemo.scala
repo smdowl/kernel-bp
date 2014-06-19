@@ -35,7 +35,6 @@ object SimpleDemo extends App {
   val cache = buildCache(A, sampleArr)
   println()
 
-
   def generateData(A: DenseMatrix[Int], n: Int): DenseMatrix[Double] = {
 
     // Model parameters
@@ -120,5 +119,16 @@ object SimpleDemo extends App {
     }
 
     Cache(kArr, leafArr)
+  }
+
+  def rbfDot(p1: Vector[Double], p2: Vector[Double], deg: Double = 1.0): Matrix[Double] = {
+    // TODO: Currently slow version, but fast version is in MATLAB code
+    val out = Matrix.zeros[Double](p1.length, p2.length)
+
+    for (i <- 0 until p1.length)
+      for (j <- 0 until p2.length)
+        out(i, j) = Math.exp(- Math.pow(p1(i) - p2(j), 2) / (2 * Math.pow(deg, 2)))
+
+    out
   }
 }
