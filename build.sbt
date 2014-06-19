@@ -6,6 +6,8 @@ libraryDependencies  ++= Seq(
   "org.scalanlp" %% "breeze-natives" % "0.8.1"
 )
 
+libraryDependencies += "org.scalanlp" % "breeze-viz_2.10" % "0.3"
+
 libraryDependencies += "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.2"
 
 libraryDependencies += "org.mongodb" %% "casbah" % "2.5.0"
