@@ -35,7 +35,7 @@ object SimpleDemo extends App {
     p.title = s"Node $i"
   }
 
-//  println(sampleArr)
+  //  println(sampleArr)
 
   def generateData(A: DenseMatrix[Int], n: Int): DenseMatrix[Double] = {
 
@@ -76,7 +76,7 @@ object SimpleDemo extends App {
               outputArray(sampleInd, whichNode) = 0 + leafStd * randn()
           }
         } else { // ROOT node
-          val c = rand()
+        val c = rand()
           if (c <= p1Root)
             outputArray(sampleInd, whichNode) = rootMeans(0) + rootStd * randn()
           else
@@ -87,6 +87,7 @@ object SimpleDemo extends App {
 
     outputArray
   }
+
   def getParents(A: DenseMatrix[Int], idx: Int): Seq[Int] = A(::, idx).findAll(_ > 0)
   def getChildren(A: DenseMatrix[Int], idx: Int): Seq[Int] = A(idx, ::).t.findAll(_ > 0)
 }
