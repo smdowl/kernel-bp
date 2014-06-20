@@ -3,8 +3,7 @@ package kernel
 import breeze.linalg._
 
 abstract class Model(val n: Int) {
-  protected val A: DenseMatrix[Int]
-  val sampleArr: DenseMatrix[Double] = generateData()
+  def A: DenseMatrix[Int]
 
   def numNodes: Int = A.rows
 
