@@ -6,7 +6,7 @@ object DemoModel extends App {
   val model = new DemoModel(10)
   println(model.generateData())
 
-  val pruned = model.getPrunedTree(Set(4))
+  val (pruned, _) = model.getPrunedTree(Set(4))
   assert(pruned.equals(DenseMatrix(
     (0,1,0,0,0),
     (0,0,0,1,0),
@@ -41,7 +41,7 @@ class DemoModel(n: Int) extends Model(n) {
   var outputArray: DenseMatrix[Double] = _
   var sampleInd = 0
 
-  override def getPrunedTree(observedNodes: Set[Int]): DenseMatrix[Int] = {
+  override def getPrunedTree(observedNodes: Set[Int]): (DenseMatrix[Int], Set[Int]) = {
     val prunedA = DenseMatrix.zeros[Int](A.rows, A.cols)
     prunedA += A
     var prunedNodes = Set[Int]()
@@ -59,7 +59,7 @@ class DemoModel(n: Int) extends Model(n) {
       }
     }
 
-    prunedA
+    (prunedA, prunedNodes)
   }
 
   private def shouldCut(observedNodes: Set[Int], nodeId: Int): Boolean = {

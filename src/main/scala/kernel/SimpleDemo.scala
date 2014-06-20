@@ -7,7 +7,7 @@ case class MessageParam(lambda: Double, sig: Double)
 case class Cache(kArr: Array[Array[DenseMatrix[Double]]], leafArr: Array[Vector[Double]])
 
 object SimpleDemo {
-  def main(args: Array[String]) = {
+  def main(args: Array[String]): Unit = {
 
     val numSamples = 200
     val model: Model = new DemoModel(numSamples)
@@ -25,6 +25,7 @@ object SimpleDemo {
     val kernel = new RBFKernel()
 
     val passer = new MessagePasser(model, kernel)
+    passer.passMessages(sampleArr, observations)
   }
 
   def plotData(data: DenseMatrix[Double]) = {

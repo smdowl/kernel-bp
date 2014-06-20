@@ -9,10 +9,9 @@ class MessagePasser(model: Model, kernel: Kernel) {
   def passMessages(sampleArr: DenseMatrix[Double], observations: Map[Int, Double]) = {
 
     cache = buildCache(sampleArr)
-
-    // Observed leaf messages
     val betaArr = Array.ofDim[Matrix[Double]](model.numNodes - observations.size)
 
+    // Observed leaf messages
     for ((leafId, idx) <- observations.keys.zipWithIndex) {
       val parentId = model.getParents(leafId)(0)
 
@@ -28,7 +27,7 @@ class MessagePasser(model: Model, kernel: Kernel) {
       betaArr(idx) = left * right \ kt
     }
 
-    val prunedA = model.getPrunedTree(observations.keySet)
+    val (prunedA, prunedNodes) = model.getPrunedTree(observations.keySet)
     var computedList = observations.keySet
 
     var numUpdates = 1
@@ -38,6 +37,8 @@ class MessagePasser(model: Model, kernel: Kernel) {
 //      for ()
     }
     println()
+
+    betaArr
   }
 
   def buildCache(sampleArr: DenseMatrix[Double]): Cache = {
