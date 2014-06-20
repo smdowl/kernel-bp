@@ -4,9 +4,11 @@ import breeze.linalg.{Vector, DenseVector, DenseMatrix, Matrix}
 
 class MessagePasser(model: Model, kernel: Kernel) {
 
+  var cache: Cache = _
+
   def passMessages(sampleArr: DenseMatrix[Double], observations: Map[Int, Double]) = {
 
-    val cache = buildCache(sampleArr)
+    cache = buildCache(sampleArr)
 
     // Observed leaf messages
     val betaArr = Array.ofDim[Matrix[Double]](model.numNodes - observations.size)
