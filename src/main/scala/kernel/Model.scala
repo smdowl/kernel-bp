@@ -7,6 +7,7 @@ abstract class Model(val n: Int) {
   val msgParam: MessageParam
 
   def numNodes: Int = A.rows
+  def getPrunedTree(observedList: Seq[Int]): DenseMatrix[Int]
 
   def getParents(nodeId: Int): Seq[Int] = A(::, nodeId).findAll(_ > 0)
   def getChildren(nodeId: Int): Seq[Int] = try {A(nodeId, ::).t.findAll(_ > 0)} catch {case _ => Seq[Int]()}

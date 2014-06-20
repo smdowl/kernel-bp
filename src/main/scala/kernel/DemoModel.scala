@@ -32,7 +32,7 @@ class DemoModel(n: Int) extends Model(n) {
   var outputArray: DenseMatrix[Double] = _
   var sampleInd = 0
 
-  def prunedTree(observedList: Seq[Int]): DenseMatrix[Int] = {
+  def getPrunedTree(observedList: Seq[Int]): DenseMatrix[Int] = {
     val prunedA = DenseMatrix.zeros[Int](A.rows, A.cols)
     prunedA += A
     var prunedNodes = Set[Int]()
