@@ -2,9 +2,12 @@ package kernel
 
 import breeze.linalg.{Vector, DenseVector, DenseMatrix, Matrix}
 
-class MessagePasser {
+class MessagePasser(model: Model, kernel: Kernel) {
 
-  def passMessages(model: Model, cache: Cache, observations: Map[Int, Double]) = {
+  def passMessages(sampleArr: DenseMatrix[Double], observations: Map[Int, Double]) = {
+
+    val cache = buildCache(sampleArr)
+
     // Observed leaf messages
     val betaArr = Array.ofDim[Matrix[Double]](model.numNodes - observations.size)
 
@@ -15,7 +18,7 @@ class MessagePasser {
       val Ks = cache.kArr(leafId)(parentId)
       val I = DenseMatrix.eye[Double](Kt.rows)
 
-      val kt = rbfDot(cache.leafArr(leafId), DenseVector(observations(leafId)), model.msgParam.sig)
+      val kt = kernel(cache.leafArr(leafId), DenseVector(observations(leafId)), model.msgParam.sig)
 
       // Have to split because type seems not to be infered otherwise
       val left: DenseMatrix[Double] = Kt :+ I * model.msgParam.lambda
@@ -35,14 +38,28 @@ class MessagePasser {
     println()
   }
 
-  def rbfDot(p1: Vector[Double], p2: Vector[Double], deg: Double = 1.0): DenseMatrix[Double] = {
-    // TODO: Currently slow version, but fast version is in MATLAB code
-    val out = DenseMatrix.zeros[Double](p1.length, p2.length)
+  def buildCache(sampleArr: DenseMatrix[Double]): Cache = {
 
-    for (i <- 0 until p1.length)
-      for (j <- 0 until p2.length)
-        out(i, j) = Math.exp(- Math.pow(p1(i) - p2(j), 2) / (2 * Math.pow(deg, 2)))
+    val numNodes = model.numNodes
+    val sig = model.msgParam.sig
 
-    out
+    val kArr = Array.ofDim[DenseMatrix[Double]](numNodes, numNodes)
+    val leafArr = Array.ofDim[Vector[Double]](numNodes)
+
+    for (nodeInd <- 0 until numNodes) {
+      val children = model.getChildren(nodeInd)
+      for (childInd <- children)
+        kArr(nodeInd)(childInd) = kernel(sampleArr(::, nodeInd), sampleArr(::, nodeInd), sig)
+
+      if (children.length == 0) {
+        kArr(nodeInd)(nodeInd) = kernel(sampleArr(::, nodeInd), sampleArr(::, nodeInd), sig)
+        leafArr(nodeInd) = sampleArr(::, nodeInd)
+      }
+
+      for (parentInd <- model.getParents(nodeInd))
+        kArr(nodeInd)(parentInd) = kernel(sampleArr(::, parentInd), sampleArr(::, parentInd), sig)
+    }
+
+    Cache(kArr, leafArr)
   }
 }
