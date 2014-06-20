@@ -27,19 +27,24 @@ class DemoModel(n: Int) extends Model(n) {
 
   val sampleOrder = 0 until numNodes
 
+  var outputArray: DenseMatrix[Double] = _
+  var sampleInd = 0
+
   def generateData(): DenseMatrix[Double] = {
 
     // Sampling step
-    val outputArray: DenseMatrix[Double] = DenseMatrix.zeros[Double](n, numNodes)
+    outputArray = DenseMatrix.zeros[Double](n, numNodes)
 
-    for (sampleInd <- 0 until n) {
-      generateSample(outputArray, sampleInd)
+    sampleInd = 0
+    while (sampleInd < n) {
+      generateSample()
+      sampleInd += 1
     }
 
     outputArray
   }
 
-  private def generateSample(outputArray: DenseMatrix[Double], sampleInd: Int) = {
+  private def generateSample() = {
 
     for (nodeInd <- 0 until numNodes) {
 
@@ -47,30 +52,34 @@ class DemoModel(n: Int) extends Model(n) {
       val parents = getParents(whichNode)
 
       // Middle or leaf node
-      if (parents.length >= 1) {
-
-        if (getChildren(whichNode).length >= 1) {
-          val mu = outputArray(sampleInd, parents(0)) // Only one parent in this graph
-          outputArray(sampleInd, whichNode) = mu + middleStd * randn()
-        } else {
-          val mu = outputArray(sampleInd, parents(0))
-          val c = rand()
-          if (c <= p1Leaf)
-            outputArray(sampleInd, whichNode) = mu + leafStd * randn()
-          else
-            outputArray(sampleInd, whichNode) = 0 + leafStd * randn()
-        }
+      if (parents.length >= 1)
+        sampleNonRootNode(whichNode, parents)
 
       // ROOT node
-      } else {
-
-        val c = rand()
-        if (c <= p1Root)
-          outputArray(sampleInd, whichNode) = rootMeans(0) + rootStd * randn()
-        else
-          outputArray(sampleInd, whichNode) = rootMeans(1) + rootStd * randn()
-
-      }
+      else
+        sampleRootNode(whichNode)
     }
+  }
+
+  private def sampleNonRootNode(whichNode: Int, parents: Seq[Int]) = {
+    if (getChildren(whichNode).length >= 1) {
+      val mu = outputArray(sampleInd, parents(0)) // Only one parent in this graph
+      outputArray(sampleInd, whichNode) = mu + middleStd * randn()
+    } else {
+      val mu = outputArray(sampleInd, parents(0))
+      val c = rand()
+      if (c <= p1Leaf)
+        outputArray(sampleInd, whichNode) = mu + leafStd * randn()
+      else
+        outputArray(sampleInd, whichNode) = 0 + leafStd * randn()
+    }
+  }
+
+  private def sampleRootNode(whichNode: Int) = {
+    val c = rand()
+    if (c <= p1Root)
+      outputArray(sampleInd, whichNode) = rootMeans(0) + rootStd * randn()
+    else
+      outputArray(sampleInd, whichNode) = rootMeans(1) + rootStd * randn()
   }
 }
