@@ -17,7 +17,7 @@ object SimpleDemo {
 //    plotData(sampleArr)
 
     // Other params
-    val observations = Map(4 -> 0.0)
+    val observations = Map(3 -> 0.0)
 
     // Parzen window parameter at root
     val sigRoot = 0.1
