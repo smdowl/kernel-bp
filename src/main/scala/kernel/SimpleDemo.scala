@@ -25,7 +25,28 @@ object SimpleDemo {
     val kernel = new RBFKernel()
 
     val passer = new MessagePasser(model, kernel)
+
     val betaArr = passer.passMessages(sampleArr, observations)
+    val cache = passer.cache
+
+    val threshold = 0.01
+
+    var condIndices = Seq[Int]()
+    observations.keys.foreach(nodeId => {
+      condIndices ++= sampleArr(::, nodeId).findAll(sample =>
+        sample > observations(nodeId) - threshold && sample < observations(nodeId) + threshold
+      )
+    })
+
+    val axisBelief = linspace(-5, 5, 200)
+
+    val condNodes: DenseVector[Double] = DenseVector.tabulate[Double](condIndices.size){i => sampleArr(condIndices(i), model.rootNode)}
+
+    val beliefRootEmp = kernel(axisBelief, condNodes, sigRoot)
+    val belief = sum(beliefRootEmp)
+
+    println(belief)
+
   }
 
   def plotData(data: DenseMatrix[Double]) = {
