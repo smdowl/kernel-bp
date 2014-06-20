@@ -8,33 +8,6 @@ case class Cache(kArr: Array[Array[DenseMatrix[Double]]], leafArr: Array[Vector[
 
 object SimpleDemo extends App {
 
-  val A = DenseMatrix(
-    (0,1,1,0,0),
-    (0,0,0,1,1),
-    (0,0,0,0,0),
-    (0,0,0,0,0),
-    (0,0,0,0,0) )
-
-  val rootNode = 0
-  val numNodes = A.rows
-  val numSamples = 200
-
-  val sampleArr = generateData(A, numSamples)
-
-//  plotData(sampleArr)
-
-  // Other params
-  val observedList = DenseVector(4)
-  val observations = DenseVector(0)
-
-  val msgParam = MessageParam(0.1, 0.3)
-
-  // Parzen window parameter at root
-  val sigRoot = 0.1
-
-  val cache = buildCache(A, sampleArr, msgParam)
-  println()
-
   def generateData(A: DenseMatrix[Int], n: Int): DenseMatrix[Double] = {
 
     // Model parameters
@@ -52,7 +25,7 @@ object SimpleDemo extends App {
     val sampleOrder = 0 until numNodes
 
     // Sampling step
-    val outputArray = DenseMatrix.zeros[Double](n, numNodes)
+    val outputArray: DenseMatrix[Double] = DenseMatrix.zeros[Double](n, numNodes)
 
     for (sampleInd <- 0 until n) {
       for (nodeInd <- 0 until numNodes) {
@@ -123,6 +96,35 @@ object SimpleDemo extends App {
     Cache(kArr, leafArr)
   }
 
+  def test() = {
+    val A = DenseMatrix(
+      (0,1,1,0,0),
+      (0,0,0,1,1),
+      (0,0,0,0,0),
+      (0,0,0,0,0),
+      (0,0,0,0,0) )
+
+    val rootNode = 0
+    val numNodes = A.rows
+    val numSamples = 200
+
+    val sampleArr = generateData(A, numSamples)
+
+    //  plotData(sampleArr)
+
+    // Other params
+    val observedList = DenseVector(4)
+    val observations = DenseVector(0)
+
+    val msgParam = MessageParam(0.1, 0.3)
+
+    // Parzen window parameter at root
+    val sigRoot = 0.1
+
+    val cache = buildCache(A, sampleArr, msgParam)
+    println()
+  }
+
   def rbfDot(p1: Vector[Double], p2: Vector[Double], deg: Double = 1.0): DenseMatrix[Double] = {
     // TODO: Currently slow version, but fast version is in MATLAB code
     val out = DenseMatrix.zeros[Double](p1.length, p2.length)
@@ -134,7 +136,7 @@ object SimpleDemo extends App {
     out
   }
 
-  def other = {
+  def other() = {
     //  val betaArr = Array.ofDim[Vector[Double]](numNodes - observedList.length)
 
     //  for ((leafInd, observation) <- observedList zip observations) {
