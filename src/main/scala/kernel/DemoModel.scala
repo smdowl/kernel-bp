@@ -40,30 +40,36 @@ class DemoModel(n: Int) extends Model(n) {
   }
 
   private def generateSample(outputArray: DenseMatrix[Double], sampleInd: Int) = {
+
     for (nodeInd <- 0 until numNodes) {
 
       val whichNode = sampleOrder(nodeInd)
-      val parentInd = getParents(whichNode)
+      val parents = getParents(whichNode)
 
-      if (parentInd.length >= 1) { // Middle or leaf
+      // Middle or leaf node
+      if (parents.length >= 1) {
 
         if (getChildren(whichNode).length >= 1) {
-          val mu = outputArray(sampleInd, parentInd(0)) // Only one parent in this graph
+          val mu = outputArray(sampleInd, parents(0)) // Only one parent in this graph
           outputArray(sampleInd, whichNode) = mu + middleStd * randn()
         } else {
-          val mu = outputArray(sampleInd, parentInd(0))
+          val mu = outputArray(sampleInd, parents(0))
           val c = rand()
           if (c <= p1Leaf)
             outputArray(sampleInd, whichNode) = mu + leafStd * randn()
           else
             outputArray(sampleInd, whichNode) = 0 + leafStd * randn()
         }
-      } else { // ROOT node
-      val c = rand()
+
+      // ROOT node
+      } else {
+
+        val c = rand()
         if (c <= p1Root)
           outputArray(sampleInd, whichNode) = rootMeans(0) + rootStd * randn()
         else
           outputArray(sampleInd, whichNode) = rootMeans(1) + rootStd * randn()
+
       }
     }
   }
