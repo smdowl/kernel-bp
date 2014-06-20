@@ -1,0 +1,15 @@
+package kernel
+
+import breeze.linalg._
+
+abstract class Model(val n: Int) {
+  protected val A: DenseMatrix[Int]
+  val sampleArr: DenseMatrix[Double] = generateData()
+
+  def numNodes: Int = A.rows
+
+  def getParents(nodeId: Int): Seq[Int] = A(::, nodeId).findAll(_ > 0)
+  def getChildren(nodeId: Int): Seq[Int] = try {A(nodeId, ::).t.findAll(_ > 0)} catch {case _ => Seq[Int]()}
+
+  def generateData(): DenseMatrix[Double]
+}
