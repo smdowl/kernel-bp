@@ -32,7 +32,7 @@ class DemoModel(n: Int) extends Model(n) {
   var outputArray: DenseMatrix[Double] = _
   var sampleInd = 0
 
-  def getPrunedTree(observedList: Seq[Int]): DenseMatrix[Int] = {
+  override def getPrunedTree(observedList: Iterable[Int]): DenseMatrix[Int] = {
     val prunedA = DenseMatrix.zeros[Int](A.rows, A.cols)
     prunedA += A
     var prunedNodes = Set[Int]()
@@ -57,10 +57,10 @@ class DemoModel(n: Int) extends Model(n) {
     !prunedNodes.contains(nodeId) && isLeaf(nodeId) && hasParents(nodeId)
   }
 
-  def isLeaf(nodeId: Int) = getChildren(nodeId).length == 0
-  def hasParents(nodeId: Int) = getParents(nodeId).length > 0
+  private def isLeaf(nodeId: Int) = getChildren(nodeId).length == 0
+  private def hasParents(nodeId: Int) = getParents(nodeId).length > 0
 
-  def generateData(): DenseMatrix[Double] = {
+  override def generateData(): DenseMatrix[Double] = {
 
     // Sampling step
     outputArray = DenseMatrix.zeros[Double](n, numNodes)
