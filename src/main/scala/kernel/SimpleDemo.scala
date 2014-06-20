@@ -6,61 +6,29 @@ import breeze.plot._
 case class MessageParam(lambda: Double, sig: Double)
 case class Cache(kArr: Array[Array[DenseMatrix[Double]]], leafArr: Array[Vector[Double]])
 
-object SimpleDemo extends App {
+object SimpleDemo {
 
-  def generateData(A: DenseMatrix[Int], n: Int): DenseMatrix[Double] = {
+  def main(args: Array[String]) = {
 
-    // Model parameters
-    val rootMeans = DenseVector(0,2)
-    val rootStd = 0.2
-    val p1Root = 0.5
+    val numSamples = 200
+    val model: Model = new DemoModel(numSamples)
 
-    val middleStd = 0.2
+    val sampleArr = model.generateData()
 
-    val leafStd = 0.2
-    val p1Leaf = 0.5
+    plotData(sampleArr)
 
-    val numNodes = A.rows
+    // Other params
+    val observedList = DenseVector(4)
+    val observations = DenseVector(0)
 
-    val sampleOrder = 0 until numNodes
+    val msgParam = MessageParam(0.1, 0.3)
 
-    // Sampling step
-    val outputArray: DenseMatrix[Double] = DenseMatrix.zeros[Double](n, numNodes)
+    // Parzen window parameter at root
+    val sigRoot = 0.1
 
-    for (sampleInd <- 0 until n) {
-      for (nodeInd <- 0 until numNodes) {
-
-        val whichNode = sampleOrder(nodeInd)
-        val parentInd = getParents(A, whichNode)
-
-        if (parentInd.length >= 1) { // Middle or leaf
-
-          if (getChildren(A, whichNode).length >= 1) {
-            val mu = outputArray(sampleInd, parentInd(0)) // Only one parent in this graph
-            outputArray(sampleInd, whichNode) = mu + middleStd * randn()
-          } else {
-            val mu = outputArray(sampleInd, parentInd(0))
-            val c = rand()
-            if (c <= p1Leaf)
-              outputArray(sampleInd, whichNode) = mu + leafStd * randn()
-            else
-              outputArray(sampleInd, whichNode) = 0 + leafStd * randn()
-          }
-        } else { // ROOT node
-        val c = rand()
-          if (c <= p1Root)
-            outputArray(sampleInd, whichNode) = rootMeans(0) + rootStd * randn()
-          else
-            outputArray(sampleInd, whichNode) = rootMeans(1) + rootStd * randn()
-        }
-      }
-    }
-
-    outputArray
+//    val cache = buildCache(A, sampleArr, msgParam)
+    println()
   }
-
-  def getParents(A: DenseMatrix[Int], idx: Int): Seq[Int] = A(::, idx).findAll(_ > 0)
-  def getChildren(A: DenseMatrix[Int], idx: Int): Seq[Int] = try {A(idx, ::).t.findAll(_ > 0)} catch {case _ => Seq[Int]()}
 
   def plotData(data: DenseMatrix[Double]) = {
     val numNodes = data.cols
@@ -73,14 +41,12 @@ object SimpleDemo extends App {
     }
   }
 
-  def buildCache(A: DenseMatrix[Int], sampleArr: DenseMatrix[Double], msgParam: MessageParam): Cache = {
-    val numNodes = A.rows
+  def buildCache(model: Model, sampleArr: DenseMatrix[Double], msgParam: MessageParam): Cache = {
+    val kArr = Array.ofDim[DenseMatrix[Double]](model.numNodes, model.numNodes)
+    val leafArr = Array.ofDim[Vector[Double]](model.numNodes)
 
-    val kArr = Array.ofDim[DenseMatrix[Double]](numNodes, numNodes)
-    val leafArr = Array.ofDim[Vector[Double]](numNodes)
-
-    for (nodeInd <- 0 until numNodes) {
-      val children = getChildren(A, nodeInd)
+    for (nodeInd <- 0 until model.numNodes) {
+      val children = model.getChildren(nodeInd)
       for (childInd <- children)
         kArr(nodeInd)(childInd) = rbfDot(sampleArr(::, nodeInd), sampleArr(::, nodeInd), msgParam.sig)
 
@@ -89,40 +55,11 @@ object SimpleDemo extends App {
         leafArr(nodeInd) = sampleArr(::, nodeInd)
       }
 
-      for (parentInd <- getParents(A, nodeInd))
+      for (parentInd <- model.getParents(nodeInd))
         kArr(nodeInd)(parentInd) = rbfDot(sampleArr(::, parentInd), sampleArr(::, parentInd), msgParam.sig)
     }
 
     Cache(kArr, leafArr)
-  }
-
-  def test() = {
-    val A = DenseMatrix(
-      (0,1,1,0,0),
-      (0,0,0,1,1),
-      (0,0,0,0,0),
-      (0,0,0,0,0),
-      (0,0,0,0,0) )
-
-    val rootNode = 0
-    val numNodes = A.rows
-    val numSamples = 200
-
-    val sampleArr = generateData(A, numSamples)
-
-    //  plotData(sampleArr)
-
-    // Other params
-    val observedList = DenseVector(4)
-    val observations = DenseVector(0)
-
-    val msgParam = MessageParam(0.1, 0.3)
-
-    // Parzen window parameter at root
-    val sigRoot = 0.1
-
-    val cache = buildCache(A, sampleArr, msgParam)
-    println()
   }
 
   def rbfDot(p1: Vector[Double], p2: Vector[Double], deg: Double = 1.0): DenseMatrix[Double] = {
