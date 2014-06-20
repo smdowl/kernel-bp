@@ -4,6 +4,7 @@ import breeze.linalg._
 
 abstract class Model(val n: Int) {
   val A: DenseMatrix[Int]
+  val msgParam: MessageParam
 
   def numNodes: Int = A.rows
 

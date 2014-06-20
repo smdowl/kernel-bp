@@ -21,8 +21,6 @@ object SimpleDemo {
     val observedList = DenseVector(4)
     val observations = DenseVector(0)
 
-    val msgParam = MessageParam(0.1, 0.3)
-
     // Parzen window parameter at root
     val sigRoot = 0.1
 
@@ -41,22 +39,26 @@ object SimpleDemo {
     }
   }
 
-  def buildCache(model: Model, sampleArr: DenseMatrix[Double], msgParam: MessageParam): Cache = {
-    val kArr = Array.ofDim[DenseMatrix[Double]](model.numNodes, model.numNodes)
-    val leafArr = Array.ofDim[Vector[Double]](model.numNodes)
+  def buildCache(model: Model, sampleArr: DenseMatrix[Double]): Cache = {
 
-    for (nodeInd <- 0 until model.numNodes) {
+    val numNodes = model.numNodes
+    val sig = model.msgParam.sig
+
+    val kArr = Array.ofDim[DenseMatrix[Double]](numNodes, numNodes)
+    val leafArr = Array.ofDim[Vector[Double]](numNodes)
+
+    for (nodeInd <- 0 until numNodes) {
       val children = model.getChildren(nodeInd)
       for (childInd <- children)
-        kArr(nodeInd)(childInd) = rbfDot(sampleArr(::, nodeInd), sampleArr(::, nodeInd), msgParam.sig)
+        kArr(nodeInd)(childInd) = rbfDot(sampleArr(::, nodeInd), sampleArr(::, nodeInd), sig)
 
       if (children.length == 0) {
-        kArr(nodeInd)(nodeInd) = rbfDot(sampleArr(::, nodeInd), sampleArr(::, nodeInd), msgParam.sig)
+        kArr(nodeInd)(nodeInd) = rbfDot(sampleArr(::, nodeInd), sampleArr(::, nodeInd), sig)
         leafArr(nodeInd) = sampleArr(::, nodeInd)
       }
 
       for (parentInd <- model.getParents(nodeInd))
-        kArr(nodeInd)(parentInd) = rbfDot(sampleArr(::, parentInd), sampleArr(::, parentInd), msgParam.sig)
+        kArr(nodeInd)(parentInd) = rbfDot(sampleArr(::, parentInd), sampleArr(::, parentInd), sig)
     }
 
     Cache(kArr, leafArr)

@@ -15,6 +15,8 @@ class DemoModel(n: Int) extends Model(n) {
     (0,0,0,0,0),
     (0,0,0,0,0) )
 
+  override val msgParam = MessageParam(0.1, 0.3)
+
   // Model parameters
   val rootMeans = DenseVector(0,2)
   val rootStd = 0.2
