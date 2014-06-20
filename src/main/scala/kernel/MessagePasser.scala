@@ -28,7 +28,7 @@ class MessagePasser(model: Model, kernel: Kernel) {
       betaArr(idx) = left * right \ kt
     }
 
-    val prunedA = model.getPrunedTree(observations.keys)
+    val prunedA = model.getPrunedTree(observations.keySet)
     var computedList = observations.keySet
 
     var numUpdates = 1

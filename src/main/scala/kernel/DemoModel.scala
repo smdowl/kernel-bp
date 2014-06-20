@@ -6,7 +6,8 @@ object DemoModel extends App {
   val model = new DemoModel(10)
   println(model.generateData())
 
-  assert(model.getPrunedTree(Seq(4)).equals(DenseMatrix(
+  val pruned = model.getPrunedTree(Set(4))
+  assert(pruned.equals(DenseMatrix(
     (0,1,0,0,0),
     (0,0,0,1,0),
     (0,0,0,0,0),
@@ -40,7 +41,7 @@ class DemoModel(n: Int) extends Model(n) {
   var outputArray: DenseMatrix[Double] = _
   var sampleInd = 0
 
-  override def getPrunedTree(observedList: Iterable[Int]): DenseMatrix[Int] = {
+  override def getPrunedTree(observedNodes: Set[Int]): DenseMatrix[Int] = {
     val prunedA = DenseMatrix.zeros[Int](A.rows, A.cols)
     prunedA += A
     var prunedNodes = Set[Int]()
@@ -50,8 +51,8 @@ class DemoModel(n: Int) extends Model(n) {
     while (numCuts > 0) {
       numCuts = 0
       for (nodeId <- 0 until numNodes) {
-        if (shouldCut(prunedNodes, nodeId)) {
-          prunedA(::, nodeId) := DenseVector.zeros[Int](A.cols)
+        if (shouldCut(observedNodes, nodeId)) {
+          prunedA(::, nodeId) := 0
           prunedNodes += nodeId
           numCuts += 1
         }
@@ -61,8 +62,8 @@ class DemoModel(n: Int) extends Model(n) {
     prunedA
   }
 
-  private def shouldCut(prunedNodes: Set[Int], nodeId: Int): Boolean = {
-    !prunedNodes.contains(nodeId) && isLeaf(nodeId) && hasParents(nodeId)
+  private def shouldCut(observedNodes: Set[Int], nodeId: Int): Boolean = {
+    !observedNodes.contains(nodeId) && isLeaf(nodeId) && hasParents(nodeId)
   }
 
   private def isLeaf(nodeId: Int) = getChildren(nodeId).length == 0
