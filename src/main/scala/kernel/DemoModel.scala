@@ -8,7 +8,7 @@ object DemoModel extends App {
 }
 
 class DemoModel(n: Int) extends Model(n) {
-  override def A: DenseMatrix[Int] = DenseMatrix(
+  override val A: DenseMatrix[Int] = DenseMatrix(
     (0,1,1,0,0),
     (0,0,0,1,1),
     (0,0,0,0,0),

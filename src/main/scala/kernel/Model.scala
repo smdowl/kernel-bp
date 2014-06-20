@@ -3,7 +3,7 @@ package kernel
 import breeze.linalg._
 
 abstract class Model(val n: Int) {
-  def A: DenseMatrix[Int]
+  val A: DenseMatrix[Int]
 
   def numNodes: Int = A.rows
 
