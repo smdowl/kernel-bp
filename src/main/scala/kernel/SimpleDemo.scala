@@ -27,9 +27,14 @@ object SimpleDemo {
 
     // INFERENCE START
 
-    val betaArr = Array.ofDim[Vector[Double]](model.numNodes - observedList.length)
+    // Observed leaf messages
+    val betaArr = Array.ofDim[Matrix[Double]](model.numNodes - observedList.length)
 
-    for ((leafId, observation) <- observedList zip observations) {
+    val it = (0 until observedList.length).map(i => {
+      (i, observedList(i), observations(i))
+    })
+
+    for ((idx, leafId, observation) <- it) {
       val parentId = model.getParents(leafId)(0)
 
       val Kt = cache.kArr(leafId)(leafId)
@@ -40,8 +45,13 @@ object SimpleDemo {
 
       // Have to split because type seems not to be infered otherwise
       val left: DenseMatrix[Double] = Kt :+ I * model.msgParam.lambda
-      betaArr(leafId) = (left * (Ks + I * model.msgParam.lambda)) \ kt
+      val right: DenseMatrix[Double] = Ks + I * model.msgParam.lambda
+      betaArr(idx) = left * right \ kt
     }
+
+    println()
+
+    // Internal messages
   }
 
   def plotData(data: DenseMatrix[Double]) = {
