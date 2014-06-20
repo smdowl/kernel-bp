@@ -5,6 +5,14 @@ import breeze.linalg._
 object DemoModel extends App {
   val model = new DemoModel(10)
   println(model.generateData())
+
+  assert(model.getPrunedTree(Seq(4)).equals(DenseMatrix(
+    (0,1,0,0,0),
+    (0,0,0,1,0),
+    (0,0,0,0,0),
+    (0,0,0,0,0),
+    (0,0,0,0,0)
+  )), "Should match according to MATLAB implementation2")
 }
 
 class DemoModel(n: Int) extends Model(n) {
