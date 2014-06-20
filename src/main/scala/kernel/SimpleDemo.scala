@@ -25,7 +25,7 @@ object SimpleDemo {
     val kernel = new RBFKernel()
 
     val passer = new MessagePasser(model, kernel)
-    passer.passMessages(sampleArr, observations)
+    val betaArr = passer.passMessages(sampleArr, observations)
   }
 
   def plotData(data: DenseMatrix[Double]) = {
