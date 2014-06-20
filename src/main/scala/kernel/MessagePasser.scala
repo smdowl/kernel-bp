@@ -9,7 +9,7 @@ class MessagePasser(model: Model, kernel: Kernel) {
   def passMessages(sampleArr: DenseMatrix[Double], observations: Map[Int, Double]) = {
 
     cache = buildCache(sampleArr)
-    val betaArr = Array.ofDim[Matrix[Double]](model.numNodes - observations.size)
+    val betaArr = Array.ofDim[DenseMatrix[Double]](model.numNodes - observations.size)
 
     // Observed leaf messages
     for ((leafId, idx) <- observations.keys.zipWithIndex) {
@@ -24,7 +24,7 @@ class MessagePasser(model: Model, kernel: Kernel) {
       // Have to split because type seems not to be infered otherwise
       val left: DenseMatrix[Double] = Kt :+ I * model.msgParam.lambda
       val right: DenseMatrix[Double] = Ks + I * model.msgParam.lambda
-      betaArr(idx) = left * right \ kt
+      betaArr(leafId) = left * right \ kt
     }
 
     val (prunedA, prunedNodes) = model.getPrunedTree(observations.keySet)
@@ -34,7 +34,30 @@ class MessagePasser(model: Model, kernel: Kernel) {
     while (numUpdates > 0) {
       numUpdates = 0
 
-//      for ()
+      val updateNodes = (0 until model.numNodes).filter(n =>
+        !computedList.contains(n) && !prunedNodes.contains(n) && n != model.rootNode
+      )
+
+      updateNodes.foreach(nodeId => {
+        val childInds = model.getChildren(nodeId, prunedA)
+
+        // We know there is a parent since we have excluded the root
+        val parentId = model.getParents(nodeId, prunedA)(0)
+
+        if (childInds.forall(computedList.contains)) {
+          val Ks = cache.kArr(nodeId)(parentId)
+          val nts = Ks.rows
+          val Ktu_beta: DenseMatrix[Double] = DenseMatrix.ones[Double](nts, 1)
+
+          for (childId <- childInds)
+            Ktu_beta :*= (cache.kArr(nodeId)(childId) * betaArr(childId))
+
+          betaArr(nodeId) = (Ks + DenseMatrix.eye[Double](nts) * model.msgParam.lambda) \ Ktu_beta
+          computedList += nodeId
+          numUpdates += 1
+        }
+
+      })
     }
     println()
 
