@@ -32,6 +32,34 @@ class DemoModel(n: Int) extends Model(n) {
   var outputArray: DenseMatrix[Double] = _
   var sampleInd = 0
 
+  def prunedTree(observedList: Seq[Int]): DenseMatrix[Int] = {
+    val prunedA = DenseMatrix.zeros[Int](A.rows, A.cols)
+    prunedA += A
+    var prunedNodes = Set[Int]()
+
+    var numCuts = 1
+
+    while (numCuts > 0) {
+      numCuts = 0
+      for (nodeId <- 0 until numNodes) {
+        if (shouldCut(prunedNodes, nodeId)) {
+          prunedA(::, nodeId) := DenseVector.zeros[Int](A.cols)
+          prunedNodes += nodeId
+          numCuts += 1
+        }
+      }
+    }
+
+    prunedA
+  }
+
+  private def shouldCut(prunedNodes: Set[Int], nodeId: Int): Boolean = {
+    !prunedNodes.contains(nodeId) && isLeaf(nodeId) && hasParents(nodeId)
+  }
+
+  def isLeaf(nodeId: Int) = getChildren(nodeId).length == 0
+  def hasParents(nodeId: Int) = getParents(nodeId).length > 0
+
   def generateData(): DenseMatrix[Double] = {
 
     // Sampling step
