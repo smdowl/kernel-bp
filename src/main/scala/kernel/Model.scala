@@ -14,4 +14,6 @@ abstract class Model(val n: Int) {
   def getChildren(nodeId: Int, A: DenseMatrix[Int] = this.A): Seq[Int] = try {A(nodeId, ::).t.findAll(_ > 0)} catch {case _ => Seq[Int]()}
 
   def generateData(): DenseMatrix[Double]
+
+  def loadCorrect(): Array[DenseMatrix[Double]]
 }

@@ -2,6 +2,7 @@ package kernel
 
 import breeze.linalg._
 import scala.io.Source
+import app.Constants
 
 object DemoModel extends App {
   val model = new DemoModel(10)
@@ -18,6 +19,9 @@ object DemoModel extends App {
 
   val readModel = new DemoModel(1000, "/Users/shaundowling/Google Drive/UCL/master project/code/kernelBP_source/kernelBP/sampArr")
   readModel.generateData()
+
+  val correct = readModel.loadCorrect()
+  println(correct)
 }
 
 class DemoModel(n: Int, dataFile: String = "") extends Model(n) {
@@ -92,24 +96,10 @@ class DemoModel(n: Int, dataFile: String = "") extends Model(n) {
   def shouldReadFromFile = !dataFile.equals("")
 
   def readFromFile() = {
-    var data = Seq[Array[Double]]()
-    var rows = 0
-    var cols = 0
-    Source.fromFile(dataFile).getLines().foreach(line => {
-      val row = line.split(",").map(_.toDouble)
-      data :+= row
+    outputArray = loadMatrixFromFile(dataFile)
 
-      rows += 1
-      if (cols != 0)
-        assert(cols == row.length)
-      else
-        cols = row.length
-    })
-
-    assert(rows == n)
-    assert(cols == numNodes)
-
-    outputArray = DenseMatrix(data: _*)
+    assert(outputArray.rows == n)
+    assert(outputArray.cols == numNodes)
   }
 
   def generateRandomData() = {
@@ -161,5 +151,29 @@ class DemoModel(n: Int, dataFile: String = "") extends Model(n) {
       outputArray(sampleInd, whichNode) = rootMeans(0) + rootStd * randn()
     else
       outputArray(sampleInd, whichNode) = rootMeans(1) + rootStd * randn()
+  }
+
+  override def loadCorrect(): Array[DenseMatrix[Double]] = {
+    var output = Seq[DenseMatrix[Double]]()
+
+    for (i <- 1 to numNodes-1) {
+      val filepath = Constants.CORRECT_DIR + s"betaArr$i"
+      output :+= loadMatrixFromFile(filepath)
+    }
+
+    output.toArray
+  }
+
+  private def loadMatrixFromFile(filepath: String): DenseMatrix[Double] = {
+    var data = Seq[Array[Double]]()
+    Source.fromFile(filepath).getLines().foreach(line => {
+      val row = line.split(",").map(_.toDouble)
+      data :+= row
+    })
+
+    if (data.length > 0)
+      DenseMatrix(data: _*)
+    else
+      DenseMatrix.zeros[Double](0,0)
   }
 }
