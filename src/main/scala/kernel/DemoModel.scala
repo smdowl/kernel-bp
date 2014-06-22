@@ -1,8 +1,8 @@
 package kernel
 
 import breeze.linalg._
-import scala.io.Source
 import app.Constants
+import io.MatrixReader
 
 object DemoModel extends App {
   val model = new DemoModel(10)
@@ -96,7 +96,7 @@ class DemoModel(n: Int, dataFile: String = "") extends Model(n) {
   def shouldReadFromFile = !dataFile.equals("")
 
   def readFromFile() = {
-    outputArray = loadMatrixFromFile(dataFile)
+    outputArray = MatrixReader.loadMatrixFromFile(dataFile)
 
     assert(outputArray.rows == n)
     assert(outputArray.cols == numNodes)
@@ -158,22 +158,9 @@ class DemoModel(n: Int, dataFile: String = "") extends Model(n) {
 
     for (i <- 1 to numNodes-1) {
       val filepath = Constants.CORRECT_DIR + s"betaArr$i"
-      output :+= loadMatrixFromFile(filepath)
+      output :+= MatrixReader.loadMatrixFromFile(filepath)
     }
 
     output.toArray
-  }
-
-  private def loadMatrixFromFile(filepath: String): DenseMatrix[Double] = {
-    var data = Seq[Array[Double]]()
-    Source.fromFile(filepath).getLines().foreach(line => {
-      val row = line.split(",").map(_.toDouble)
-      data :+= row
-    })
-
-    if (data.length > 0)
-      DenseMatrix(data: _*)
-    else
-      null
   }
 }
