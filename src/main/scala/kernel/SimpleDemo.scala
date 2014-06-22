@@ -5,7 +5,7 @@ import breeze.plot._
 
 case class MessageParam(lambda: Double, sig: Double)
 
-case class Output(model: Model,
+case class Result(model: Model,
                   kernel: Kernel,
                   sampleArr: DenseMatrix[Double],
                   observations: Map[Int, DenseVector[Double]],
@@ -37,13 +37,13 @@ object SimpleDemo {
     // Parzen window parameter at root
     val sigRoot = 0.1
 
-    val output = new Output(model, kernel, sampleArr, observations, betaArr, sigRoot, axisBelief)
+    val result = new Result(model, kernel, sampleArr, observations, betaArr, sigRoot, axisBelief)
 
-    val belief = calculateEmpiricalBelief(output)
+    val belief = calculateEmpiricalBelief(result)
 
-    val rootMarginal: DenseVector[Double] = calculateKernelRootMarginal(output)
+    val rootMarginal: DenseVector[Double] = calculateKernelRootMarginal(result)
 
-    val condRootMarginal = calculateKernelCondRootMarginal(rootMarginal, output)
+    val condRootMarginal = calculateKernelCondRootMarginal(rootMarginal, result)
 
     val f = Figure()
     val p = f.subplot(0)
@@ -53,7 +53,7 @@ object SimpleDemo {
     p += plot(axisBelief, rootMarginal / sum(rootMarginal), colorcode = "g")
   }
 
-  def calculateEmpiricalBelief(output: Output) = {
+  def calculateEmpiricalBelief(output: Result) = {
     // Empirical root belief
     val threshold = 0.01
 
@@ -72,15 +72,19 @@ object SimpleDemo {
     sum(beliefRootEmp.t(::, *)).asInstanceOf[DenseMatrix[Double]].toDenseVector
   }
 
-  def calculateKernelRootMarginal(output: Output) = sum(output.kernel(output.axisBelief, output.sampleArr(::, output.model.rootNode), output.sigRoot), Axis._1)
+  def calculateKernelRootMarginal(r: Result) = sum(r.kernel(r.axisBelief, r.sampleArr(::, r.model.rootNode), r.sigRoot), Axis._1)
 
-  def calculateKernelCondRootMarginal(rootMarginal: DenseVector[Double], output: Output) = {
+  def calculateKernelCondRootMarginal(rootMarginal: DenseVector[Double], r: Result) = {
     var condRootMarginal: DenseVector[Double] = rootMarginal.copy
-    val (prunedA, prunedNodes) = output.model.getPrunedTree(output.observations.keySet)
+    val (prunedA, _) = r.model.getPrunedTree(r.observations.keySet)
 
-    for (childId <- output.model.getChildren(output.model.rootNode, prunedA)) {
-      val multFactor = output.kernel(output.axisBelief, output.sampleArr(::, output.model.rootNode), output.model.msgParam.sig) * output.betaArr(childId)
-      condRootMarginal :*= multFactor.asInstanceOf[DenseMatrix[Double]].toDenseVector
+    for (childId <- r.model.getChildren(r.model.rootNode, prunedA)) {
+
+      val dotLeft = r.axisBelief
+      val dotRight = r.sampleArr(::, r.model.rootNode)
+      val multFactor: DenseMatrix[Double] = (r.kernel(dotLeft, dotRight, r.model.msgParam.sig) * r.betaArr(childId)).asInstanceOf[DenseMatrix[Double]]
+
+      condRootMarginal :*= multFactor.toDenseVector
     }
 
     condRootMarginal
