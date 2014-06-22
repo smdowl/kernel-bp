@@ -20,29 +20,21 @@ object SimpleDemo {
     val model: Model = new DemoModel(numSamples)
 
     val sampleArr = model.generateData()
-
+    val observations = Map(3 -> DenseVector(0.0))
 //    plotData(sampleArr)
 
-    // Other params
-    val observations = Map(3 -> DenseVector(0.0))
-
     val kernel = new RBFKernel()
-
     val passer = new MessagePasser(model, kernel)
 
     val betaArr = passer.passMessages(sampleArr, observations)
 
     val axisBelief = linspace(-5, 5, 200)
-
-    // Parzen window parameter at root
-    val sigRoot = 0.1
+    val sigRoot = 0.1     // Parzen window parameter at root
 
     val result = new Result(model, kernel, sampleArr, observations, betaArr, sigRoot, axisBelief)
 
     val belief = calculateEmpiricalBelief(result)
-
     val rootMarginal: DenseVector[Double] = calculateKernelRootMarginal(result)
-
     val condRootMarginal = calculateKernelCondRootMarginal(rootMarginal, result)
 
     val f = Figure()
