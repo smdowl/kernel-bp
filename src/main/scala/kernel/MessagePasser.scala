@@ -1,6 +1,6 @@
 package kernel
 
-import breeze.linalg.{Vector, DenseVector, DenseMatrix, Matrix}
+import breeze.linalg.{DenseVector, DenseMatrix}
 
 class MessagePasser(model: Model, kernel: Kernel) {
   private var cache: Cache = _
