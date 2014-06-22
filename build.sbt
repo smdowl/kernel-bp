@@ -10,6 +10,8 @@ libraryDependencies += "org.scalanlp" % "breeze-viz_2.10" % "0.3"
 
 libraryDependencies += "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.2"
 
+libraryDependencies += "org.scalatest" % "scalatest_2.10" % "2.2.0" % "test"
+
 libraryDependencies += "org.mongodb" %% "casbah" % "2.5.0"
 
 resolvers ++= Seq(
