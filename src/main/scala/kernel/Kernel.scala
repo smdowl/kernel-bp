@@ -7,13 +7,6 @@ trait Kernel {
   def apply(p1: DenseVector[Double], p2: DenseVector[Double], deg: Double = 1.0): DenseMatrix[Double]
 }
 
-object RBFKernel extends App {
-  val kernel = new RBFKernel
-
-  val p1 = DenseVector(1.0, 1.0)
-  assert(kernel(p1, p1, 0.5).equals(DenseMatrix((1.0, 1.0),(1.0, 1.0))))
-}
-
 class RBFKernel extends Kernel {
   override def apply(p1Vec: DenseVector[Double], p2Vec: DenseVector[Double], deg: Double = 1.0): DenseMatrix[Double] = {
 
