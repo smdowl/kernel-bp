@@ -6,7 +6,7 @@ class MessagePasser(model: Model, kernel: Kernel) {
 
   var cache: Cache = _
 
-  def passMessages(sampleArr: DenseMatrix[Double], observations: Map[Int, Double]) = {
+  def passMessages(sampleArr: DenseMatrix[Double], observations: Map[Int, Double]): Array[DenseMatrix[Double]] = {
 
     cache = buildCache(sampleArr)
     val betaArr = Array.ofDim[DenseMatrix[Double]](model.numNodes - observations.size)
