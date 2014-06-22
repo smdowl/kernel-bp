@@ -32,7 +32,10 @@ object SimpleDemo {
     val sigRoot = 0.1     // Parzen window parameter at root
 
     val result = new Result(model, kernel, sampleArr, observations, betaArr, sigRoot, axisBelief)
+    plotResults(result)
+  }
 
+  def plotResults(result: Result) = {
     val belief = calculateEmpiricalBelief(result)
     val rootMarginal: DenseVector[Double] = calculateKernelRootMarginal(result)
     val condRootMarginal = calculateKernelCondRootMarginal(rootMarginal, result)
@@ -40,9 +43,9 @@ object SimpleDemo {
     val f = Figure()
     val p = f.subplot(0)
 
-    p += plot(axisBelief, belief / sum(belief), colorcode = "b")
-    p += plot(axisBelief, condRootMarginal / sum(condRootMarginal), colorcode = "r")
-    p += plot(axisBelief, rootMarginal / sum(rootMarginal), colorcode = "g")
+    p += plot(result.axisBelief, belief / sum(belief), colorcode = "b")
+    p += plot(result.axisBelief, condRootMarginal / sum(condRootMarginal), colorcode = "r")
+    p += plot(result.axisBelief, rootMarginal / sum(rootMarginal), colorcode = "g")
   }
 
   def calculateEmpiricalBelief(output: Result) = {
