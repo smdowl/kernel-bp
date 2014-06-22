@@ -1,7 +1,6 @@
 import app.Constants
 import breeze.linalg
 import breeze.linalg.DenseVector
-import kernel.plotting.Plotter
 import kernel.{MessagePasser, RBFKernel, DemoModel, Model}
 import org.scalatest.{FunSuite, Matchers}
 

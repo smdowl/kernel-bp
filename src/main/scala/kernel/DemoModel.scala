@@ -17,7 +17,7 @@ object DemoModel extends App {
     (0,0,0,0,0)
   )), "Should match according to MATLAB implementation2")
 
-  val readModel = new DemoModel(1000, "/Users/shaundowling/Google Drive/UCL/master project/code/kernelBP_source/kernelBP/sampArr")
+  val readModel = new DemoModel(400, Constants.SAMPLE_DATA)
   readModel.generateData()
 
   val correct = readModel.loadCorrect()
