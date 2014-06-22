@@ -2,6 +2,7 @@ package kernel
 
 import breeze.linalg._
 import breeze.plot._
+import kernel.plotting.Plotter
 
 case class MessageParam(lambda: Double, sig: Double)
 
@@ -14,14 +15,13 @@ case class Result(model: Model,
                   axisBelief: DenseVector[Double])
 
 object SimpleDemo {
-  def main(args: Array[String]): Unit = {
-
+  def runDemo() = {
     val numSamples = 1000
-    val model: Model = new DemoModel(numSamples, "/Users/shaundowling/Google Drive/UCL/master project/code/kernelBP_source/kernelBP/sampArr")
+    val model: Model = new DemoModel(numSamples)
 
     val sampleArr = model.generateData()
     val observations = Map(3 -> DenseVector(2.0))
-//    plotData(sampleArr)
+    Plotter.plotData(sampleArr)
 
     val kernel = new RBFKernel()
     val passer = new MessagePasser(model, kernel)
@@ -31,9 +31,11 @@ object SimpleDemo {
     val axisBelief = linspace(-5, 5, 200)
     val sigRoot = 0.1     // Parzen window parameter at root
 
-//    testBetaSimilarity(model, betaArr)
-//    val result = new Result(model, kernel, sampleArr, observations, betaArr, sigRoot, axisBelief)
+    val result = new Result(model, kernel, sampleArr, observations, betaArr, sigRoot, axisBelief)
+    Plotter.plotResults(result)
   }
 
-
+  def main(args: Array[String]): Unit = {
+    runDemo()
+  }
 }
