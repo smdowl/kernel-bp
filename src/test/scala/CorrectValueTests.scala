@@ -7,7 +7,7 @@ import org.scalatest.{FunSuite, Matchers}
 class CorrectValueTests extends FunSuite with Matchers {
 
   test("Betas match") {
-    val numSamples = 200
+    val numSamples = 400
     val model: Model = new DemoModel(numSamples, Constants.SAMPLE_DATA)
 
     val sampleArr = model.generateData()
@@ -23,11 +23,13 @@ class CorrectValueTests extends FunSuite with Matchers {
   def testBetaSimilarity(model: Model, betaArr: Array[linalg.DenseMatrix[Double]]) = {
     val trueArr = model.loadCorrect()
 
+    trueArr.length shouldEqual betaArr.length
+
     for ((trueBeta, calcBeta) <- trueArr zip betaArr) {
       if (trueBeta == null || calcBeta == null)
-        assert(trueBeta == calcBeta)
+        trueBeta shouldEqual calcBeta
       else
-        assert(nearlyEqual(trueBeta, calcBeta))
+        nearlyEqual(trueBeta, calcBeta) shouldBe true
     }
   }
 
