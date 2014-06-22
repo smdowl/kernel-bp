@@ -29,6 +29,7 @@ object SimpleDemo {
     val betaArr = passer.passMessages(sampleArr, observations)
     val cache = passer.cache
 
+    // Empirical root belief
     val threshold = 0.01
 
     var condIndices = Seq[Int]()
@@ -43,10 +44,23 @@ object SimpleDemo {
     val condNodes: DenseVector[Double] = DenseVector.tabulate[Double](condIndices.size){i => sampleArr(condIndices(i), model.rootNode)}
 
     val beliefRootEmp = kernel(axisBelief, condNodes, sigRoot)
-    val belief = sum(beliefRootEmp)
+    val belief = sum(beliefRootEmp.t(::, *)).asInstanceOf[DenseMatrix[Double]].toDenseVector
 
-    println(belief)
+    // Kernel root belief
+    val rootMarginal: DenseVector[Double] = sum(kernel(axisBelief, sampleArr(::, model.rootNode), sigRoot), Axis._1)
 
+    var condRootMarginal: DenseVector[Double] = rootMarginal.copy
+    val (prunedA, prunedNodes) = model.getPrunedTree(observations.keySet)
+
+    for (childId <- model.getChildren(model.rootNode, prunedA))
+      condRootMarginal :*= (kernel(axisBelief, sampleArr(::, model.rootNode), model.msgParam.sig) * betaArr(childId)).toDenseVector
+
+    val f = Figure()
+    val p = f.subplot(0)
+
+    p += plot(axisBelief, belief / sum(belief), colorcode = "b")
+    p += plot(axisBelief, condRootMarginal / sum(condRootMarginal), colorcode = "r")
+    p += plot(axisBelief, rootMarginal / sum(rootMarginal), colorcode = "g")
   }
 
   def plotData(data: DenseMatrix[Double]) = {
