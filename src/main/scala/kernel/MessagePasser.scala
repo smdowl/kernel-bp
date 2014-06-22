@@ -17,6 +17,8 @@ class MessagePasser(model: Model, kernel: Kernel) {
     betaArr
   }
 
+  def getCache = this.cache
+
   private def calculateObservedMessages(observations: Map[Int, DenseVector[Double]]): Unit = {
     for ((leafId, idx) <- observations.keys.zipWithIndex) {
       val parentId = model.getParents(leafId)(0)
