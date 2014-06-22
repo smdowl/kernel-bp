@@ -1,7 +1,6 @@
 package kernel
 
 import breeze.linalg._
-import breeze.plot._
 import kernel.plotting.Plotter
 
 case class MessageParam(lambda: Double, sig: Double)
