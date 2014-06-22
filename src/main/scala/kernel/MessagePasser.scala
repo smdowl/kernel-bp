@@ -3,14 +3,46 @@ package kernel
 import breeze.linalg.{Vector, DenseVector, DenseMatrix, Matrix}
 
 class MessagePasser(model: Model, kernel: Kernel) {
-
+  private var cache: Cache = _
+  private var betaArr: Array[DenseMatrix[Double]] = _
 
   def passMessages(sampleArr: DenseMatrix[Double], observations: Map[Int, Double]): Array[DenseMatrix[Double]] = {
 
-    val cache = buildCache(sampleArr)
-    val betaArr = Array.ofDim[DenseMatrix[Double]](model.numNodes - observations.size)
+    cache = buildCache(sampleArr)
+    betaArr = Array.ofDim[DenseMatrix[Double]](model.numNodes - observations.size)
 
-    // Observed leaf messages
+    calculateObservedMessages(observations)
+    calculateInternalMessages(observations)
+
+    betaArr
+  }
+
+  private def buildCache(sampleArr: DenseMatrix[Double]): Cache = {
+
+    val numNodes = model.numNodes
+    val sig = model.msgParam.sig
+
+    val kArr = Array.ofDim[DenseMatrix[Double]](numNodes, numNodes)
+    val leafArr = Array.ofDim[Vector[Double]](numNodes)
+
+    for (nodeInd <- 0 until numNodes) {
+      val children = model.getChildren(nodeInd)
+      for (childInd <- children)
+        kArr(nodeInd)(childInd) = kernel(sampleArr(::, nodeInd), sampleArr(::, nodeInd), sig)
+
+      if (children.length == 0) {
+        kArr(nodeInd)(nodeInd) = kernel(sampleArr(::, nodeInd), sampleArr(::, nodeInd), sig)
+        leafArr(nodeInd) = sampleArr(::, nodeInd)
+      }
+
+      for (parentInd <- model.getParents(nodeInd))
+        kArr(nodeInd)(parentInd) = kernel(sampleArr(::, parentInd), sampleArr(::, parentInd), sig)
+    }
+
+    Cache(kArr, leafArr)
+  }
+
+  private def calculateObservedMessages(observations: Map[Int, Double]): Unit = {
     for ((leafId, idx) <- observations.keys.zipWithIndex) {
       val parentId = model.getParents(leafId)(0)
 
@@ -25,7 +57,9 @@ class MessagePasser(model: Model, kernel: Kernel) {
       val right: DenseMatrix[Double] = Ks + I * model.msgParam.lambda
       betaArr(leafId) = left * right \ kt
     }
+  }
 
+  private def calculateInternalMessages(observations: Map[Int, Double]): Unit = {
     val (prunedA, prunedNodes) = model.getPrunedTree(observations.keySet)
     var computedList = observations.keySet
 
@@ -58,33 +92,5 @@ class MessagePasser(model: Model, kernel: Kernel) {
 
       })
     }
-    println()
-
-    betaArr
-  }
-
-  def buildCache(sampleArr: DenseMatrix[Double]): Cache = {
-
-    val numNodes = model.numNodes
-    val sig = model.msgParam.sig
-
-    val kArr = Array.ofDim[DenseMatrix[Double]](numNodes, numNodes)
-    val leafArr = Array.ofDim[Vector[Double]](numNodes)
-
-    for (nodeInd <- 0 until numNodes) {
-      val children = model.getChildren(nodeInd)
-      for (childInd <- children)
-        kArr(nodeInd)(childInd) = kernel(sampleArr(::, nodeInd), sampleArr(::, nodeInd), sig)
-
-      if (children.length == 0) {
-        kArr(nodeInd)(nodeInd) = kernel(sampleArr(::, nodeInd), sampleArr(::, nodeInd), sig)
-        leafArr(nodeInd) = sampleArr(::, nodeInd)
-      }
-
-      for (parentInd <- model.getParents(nodeInd))
-        kArr(nodeInd)(parentInd) = kernel(sampleArr(::, parentInd), sampleArr(::, parentInd), sig)
-    }
-
-    Cache(kArr, leafArr)
   }
 }
