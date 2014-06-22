@@ -1,6 +1,7 @@
 package kernel
 
 import breeze.linalg._
+import scala.io.Source
 
 object DemoModel extends App {
   val model = new DemoModel(10)
@@ -14,9 +15,12 @@ object DemoModel extends App {
     (0,0,0,0,0),
     (0,0,0,0,0)
   )), "Should match according to MATLAB implementation2")
+
+  val readModel = new DemoModel(1000, "/Users/shaundowling/Google Drive/UCL/master project/code/kernelBP_source/kernelBP/sampArr")
+  readModel.generateData()
 }
 
-class DemoModel(n: Int) extends Model(n) {
+class DemoModel(n: Int, dataFile: String = "") extends Model(n) {
   override var A: DenseMatrix[Int] = DenseMatrix(
     (0,1,1,0,0),
     (0,0,0,1,1),
@@ -77,7 +81,38 @@ class DemoModel(n: Int) extends Model(n) {
 
   override def generateData(): DenseMatrix[Double] = {
 
-    // Sampling step
+    if (shouldReadFromFile)
+      readFromFile()
+    else
+      generateRandomData()
+
+    outputArray
+  }
+
+  def shouldReadFromFile = !dataFile.equals("")
+
+  def readFromFile() = {
+    var data = Seq[Array[Double]]()
+    var rows = 0
+    var cols = 0
+    Source.fromFile(dataFile).getLines().foreach(line => {
+      val row = line.split(",").map(_.toDouble)
+      data :+= row
+
+      rows += 1
+      if (cols != 0)
+        assert(cols == row.length)
+      else
+        cols = row.length
+    })
+
+    assert(rows == n)
+    assert(cols == numNodes)
+
+    outputArray = DenseMatrix(data: _*)
+  }
+
+  def generateRandomData() = {
     outputArray = DenseMatrix.zeros[Double](n, numNodes)
 
     sampleInd = 0
