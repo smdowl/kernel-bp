@@ -42,25 +42,27 @@ class MessagePasser(model: Model, kernel: Kernel) {
     while (numUpdates > 0) {
       numUpdates = 0
 
-      val updateNodes = (0 until model.numNodes).filter(n =>
+      val nodesToUpdate = (0 until model.numNodes).filter(n =>
         !computedList.contains(n) && !prunedNodes.contains(n) && n != model.rootNode
       )
 
-      updateNodes.foreach(nodeId => {
-        val childInds = model.getChildren(nodeId, prunedA)
+      nodesToUpdate.foreach(nodeId => {
+        val childIds = model.getChildren(nodeId, prunedA)
 
         // We know there is a parent since we have excluded the root
         val parentId = model.getParents(nodeId, prunedA)(0)
 
-        if (childInds.forall(computedList.contains)) {
+        if (childIds.forall(computedList.contains)) {
           val Ks = cache.kArr(nodeId)(parentId)
           val nts = Ks.rows
-          val Ktu_beta: DenseMatrix[Double] = DenseMatrix.ones[Double](nts, 1)
+          val Ktu_beta = DenseMatrix.ones[Double](nts, 1)
 
-          for (childId <- childInds)
-            Ktu_beta :*= (cache.kArr(nodeId)(childId) * betaArr(childId))
+          // Calculate product of all incoming messages
+          for (childId <- childIds)
+            Ktu_beta :*= cache.kArr(nodeId)(childId) * betaArr(childId)
 
           betaArr(nodeId) = (Ks + DenseMatrix.eye[Double](nts) * model.msgParam.lambda) \ Ktu_beta
+          
           computedList += nodeId
           numUpdates += 1
         }
