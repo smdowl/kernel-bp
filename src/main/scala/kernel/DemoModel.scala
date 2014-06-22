@@ -174,6 +174,6 @@ class DemoModel(n: Int, dataFile: String = "") extends Model(n) {
     if (data.length > 0)
       DenseMatrix(data: _*)
     else
-      DenseMatrix.zeros[Double](0,0)
+      null
   }
 }
