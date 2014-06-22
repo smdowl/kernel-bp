@@ -62,7 +62,7 @@ class MessagePasser(model: Model, kernel: Kernel) {
             Ktu_beta :*= cache.kArr(nodeId)(childId) * betaArr(childId)
 
           betaArr(nodeId) = (Ks + DenseMatrix.eye[Double](nts) * model.msgParam.lambda) \ Ktu_beta
-          
+
           computedList += nodeId
           numUpdates += 1
         }
