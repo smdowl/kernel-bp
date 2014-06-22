@@ -27,7 +27,6 @@ object SimpleDemo {
     val passer = new MessagePasser(model, kernel)
 
     val betaArr = passer.passMessages(sampleArr, observations)
-    val cache = passer.cache
 
     // Empirical root belief
     val threshold = 0.01
