@@ -17,7 +17,7 @@ object SimpleDemo {
 //    plotData(sampleArr)
 
     // Other params
-    val observations = Map(3 -> 0.0)
+    val observations = Map(3 -> DenseVector(0.0))
 
     // Parzen window parameter at root
     val sigRoot = 0.1
@@ -31,10 +31,12 @@ object SimpleDemo {
     // Empirical root belief
     val threshold = 0.01
 
+    // TODO: sums don't make any sense with higher dim data
     var condIndices = Seq[Int]()
     observations.keys.foreach(nodeId => {
       condIndices ++= sampleArr(::, nodeId).findAll(sample =>
-        sample > observations(nodeId) - threshold && sample < observations(nodeId) + threshold
+        sample > sum(observations(nodeId)).asInstanceOf[Double] - threshold &&
+          sample < sum(observations(nodeId)).asInstanceOf[Double] + threshold
       )
     })
 

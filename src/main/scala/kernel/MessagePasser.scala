@@ -6,7 +6,7 @@ class MessagePasser(model: Model, kernel: Kernel) {
   private var cache: Cache = _
   private var betaArr: Array[DenseMatrix[Double]] = _
 
-  def passMessages(sampleArr: DenseMatrix[Double], observations: Map[Int, Double]): Array[DenseMatrix[Double]] = {
+  def passMessages(sampleArr: DenseMatrix[Double], observations: Map[Int, DenseVector[Double]]): Array[DenseMatrix[Double]] = {
 
     cache = Cache.buildCache(sampleArr, kernel, model)
     betaArr = Array.ofDim[DenseMatrix[Double]](model.numNodes - observations.size)
@@ -17,7 +17,7 @@ class MessagePasser(model: Model, kernel: Kernel) {
     betaArr
   }
 
-  private def calculateObservedMessages(observations: Map[Int, Double]): Unit = {
+  private def calculateObservedMessages(observations: Map[Int, DenseVector[Double]]): Unit = {
     for ((leafId, idx) <- observations.keys.zipWithIndex) {
       val parentId = model.getParents(leafId)(0)
 
@@ -25,7 +25,7 @@ class MessagePasser(model: Model, kernel: Kernel) {
       val Ks = cache.kArr(leafId)(parentId)
       val I = DenseMatrix.eye[Double](Kt.rows)
 
-      val kt = kernel(cache.leafArr(leafId), DenseVector(observations(leafId)), model.msgParam.sig)
+      val kt = kernel(cache.leafArr(leafId), observations(leafId), model.msgParam.sig)
 
       // Have to split because type seems not to be infered otherwise
       val left: DenseMatrix[Double] = Kt :+ I * model.msgParam.lambda
@@ -34,7 +34,7 @@ class MessagePasser(model: Model, kernel: Kernel) {
     }
   }
 
-  private def calculateInternalMessages(observations: Map[Int, Double]): Unit = {
+  private def calculateInternalMessages(observations: Map[Int, DenseVector[Double]]): Unit = {
     val (prunedA, prunedNodes) = model.getPrunedTree(observations.keySet)
     var computedList = observations.keySet
 
