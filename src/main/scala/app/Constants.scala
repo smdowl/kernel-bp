@@ -13,5 +13,6 @@ object Constants {
   final val DEP_TEST = BASE_DIR + "dep-test.conll"
   final val TRAIN_FILE = BASE_DIR + "train.conll"
 
-  final val CORRECT_DIR = "/Users/shaundowling/Google Drive/UCL/master project/code/kernelBP_source/kernelBP/"
+  final val SAMPLE_DATA = "/Users/shaundowling/Google Drive/UCL/master project/code/kernelBP_source/kernelBP/sampArr"
+  final val CORRECT_DIR = "/Users/shaundowling/Google Drive/UCL/master project/code/kernelBP_source/kernelBP/betaTest/"
 }

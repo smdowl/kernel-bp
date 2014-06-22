@@ -1,15 +1,24 @@
+import app.Constants
 import breeze.linalg
-import kernel.Model
+import breeze.linalg.DenseVector
+import kernel.plotting.Plotter
+import kernel.{MessagePasser, RBFKernel, DemoModel, Model}
 import org.scalatest.{FunSuite, Matchers}
 
 class CorrectValueTests extends FunSuite with Matchers {
 
-  test("Should pass") {
-    1 shouldEqual 1
-  }
+  test("Betas match") {
+    val numSamples = 200
+    val model: Model = new DemoModel(numSamples, Constants.SAMPLE_DATA)
 
-  test("Beta Test") {
+    val sampleArr = model.generateData()
+    val observations = Map(3 -> DenseVector(2.0))
 
+    val kernel = new RBFKernel()
+    val passer = new MessagePasser(model, kernel)
+
+    val betaArr = passer.passMessages(sampleArr, observations)
+    testBetaSimilarity(model, betaArr)
   }
 
   def testBetaSimilarity(model: Model, betaArr: Array[linalg.DenseMatrix[Double]]) = {
