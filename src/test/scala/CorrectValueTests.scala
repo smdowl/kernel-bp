@@ -1,8 +1,8 @@
 import app.Constants
-import breeze.linalg
 import breeze.linalg.{DenseMatrix, DenseVector}
 import io.MatrixReader
 import kernel._
+import kernel.linalg.{vec2mat, nearlyEqual}
 import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
 
 class CorrectValueTests extends FunSuite with Matchers with BeforeAndAfter {
@@ -24,11 +24,15 @@ class CorrectValueTests extends FunSuite with Matchers with BeforeAndAfter {
   }
 
   test("Cache test") {
-    testCacheSimilarity(passer.getCache, loadTestCache())
+    val realCache = loadTestCache()
+    testCacheSimilarity(passer.getCache, realCache)
   }
 
   def testCacheSimilarity(c1: Cache, c2: Cache) = {
+    nearlyEqualArrays(c1.leafArr.map(vec2mat), c2.leafArr.map(vec2mat))
 
+    for ((row1, row2) <- c1.kArr zip c2.kArr)
+      nearlyEqualArrays(row2, row2)
   }
 
   def loadTestCache(): Cache = {
@@ -70,19 +74,17 @@ class CorrectValueTests extends FunSuite with Matchers with BeforeAndAfter {
 
   def testBetaSimilarity(model: Model, betaArr: Array[DenseMatrix[Double]]) = {
     val trueArr = model.loadCorrect()
-
-    trueArr.length shouldEqual betaArr.length
-
-    for ((trueBeta, calcBeta) <- trueArr zip betaArr) {
-      if (trueBeta == null || calcBeta == null)
-        trueBeta shouldEqual calcBeta
-      else
-        nearlyEqual(trueBeta, calcBeta) shouldBe true
-    }
+    nearlyEqualArrays(trueArr, betaArr)
   }
 
-  def nearlyEqual(m1: DenseMatrix[Double], m2: DenseMatrix[Double]): Boolean = {
-    val bound = 1.0e-5
-    linalg.all(m1 :< m2 + bound) && linalg.all(m1 :> m2 - bound)
+  def nearlyEqualArrays(a1: Array[DenseMatrix[Double]], a2: Array[DenseMatrix[Double]]) = {
+    a1.length shouldEqual a2.length
+
+    for ((m1, m2) <- a1 zip a2) {
+      if (m1 == null || m2 == null)
+        m1 shouldEqual m2
+      else
+        nearlyEqual(m1, m2) shouldBe true
+    }
   }
 }
