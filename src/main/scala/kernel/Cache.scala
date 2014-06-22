@@ -1,6 +1,6 @@
 package kernel
 
-import breeze.linalg.{Vector, DenseMatrix}
+import breeze.linalg.{DenseVector, Vector, DenseMatrix}
 
 object Cache {
   def buildCache(sampleArr: DenseMatrix[Double], kernel: Kernel, model: Model): Cache = {
@@ -9,7 +9,7 @@ object Cache {
     val sig = model.msgParam.sig
 
     val kArr = Array.ofDim[DenseMatrix[Double]](numNodes, numNodes)
-    val leafArr = Array.ofDim[Vector[Double]](numNodes)
+    val leafArr = Array.ofDim[DenseVector[Double]](numNodes)
 
     for (nodeInd <- 0 until numNodes) {
       val children = model.getChildren(nodeInd)
@@ -29,4 +29,4 @@ object Cache {
   }
 }
 
-case class Cache(kArr: Array[Array[DenseMatrix[Double]]], leafArr: Array[Vector[Double]])
+case class Cache(kArr: Array[Array[DenseMatrix[Double]]], leafArr: Array[DenseVector[Double]])
