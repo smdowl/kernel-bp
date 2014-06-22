@@ -4,7 +4,7 @@ import breeze.linalg._
 import breeze.plot._
 
 case class MessageParam(lambda: Double, sig: Double)
-case class Cache(kArr: Array[Array[DenseMatrix[Double]]], leafArr: Array[Vector[Double]])
+
 
 object SimpleDemo {
   def main(args: Array[String]): Unit = {
