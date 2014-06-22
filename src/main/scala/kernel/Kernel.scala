@@ -1,6 +1,7 @@
 package kernel
 
 import breeze.linalg._
+import breeze.numerics._
 
 trait Kernel {
   def apply(p1: DenseVector[Double], p2: DenseVector[Double], deg: Double = 1.0): DenseMatrix[Double]
@@ -9,8 +10,8 @@ trait Kernel {
 object RBFKernel extends App {
   val kernel = new RBFKernel
 
-  val p1 = DenseVector(1.0, 2.0, 3.0)
-  kernel(p1, p1, 0.5)
+  val p1 = DenseVector(1.0, 1.0)
+  assert(kernel(p1, p1, 0.5).equals(DenseMatrix((1.0, 1.0),(1.0, 1.0))))
 }
 
 class RBFKernel extends Kernel {
@@ -22,18 +23,17 @@ class RBFKernel extends Kernel {
     val p1 = DenseMatrix(p1Vec.toArray)
     val p2 = DenseMatrix(p2Vec.toArray)
 
-    val p1Sq = p1 :* p1
-
-    val G: DenseMatrix[Double] = sum(p1 :* p1, Axis._0).asInstanceOf[DenseVector[Double]].asDenseMatrix.t
-    val H: DenseMatrix[Double] = sum(p2 :* p2, Axis._0).asInstanceOf[DenseVector[Double]].asDenseMatrix.t
+    val G: DenseMatrix[Double] = sum(p1 :* p1, Axis._0).asInstanceOf[DenseMatrix[Double]].t
+    val H: DenseMatrix[Double] = sum(p2 :* p2, Axis._0).asInstanceOf[DenseMatrix[Double]].t
 
     val Q = repmat(G, 1, n2)
     val R = repmat(H.t, n1, 1)
 
     val T: DenseMatrix[Double] = Q + R
-    val r: DenseMatrix[Double] = p1 * p2.t
+    val r: DenseMatrix[Double] = (p1.t * p2).asInstanceOf[DenseMatrix[Double]]
 
-    T - r * 2.0
+    val out: DenseMatrix[Double] = -(T - r * 2.0).asInstanceOf[DenseMatrix[Double]] / (2 * Math.pow(deg, 2))
+    exp(out)
   }
 
   private def repmat(A: DenseMatrix[Double], m: Int, n: Int): DenseMatrix[Double] = {
