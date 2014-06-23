@@ -4,26 +4,6 @@ import breeze.linalg._
 import app.Constants
 import io.MatrixReader
 
-object DemoModel extends App {
-  val model = new DemoModel(10)
-  println(model.generateData())
-
-  val (pruned, _) = model.getPrunedTree(Set(3))
-  assert(pruned.equals(DenseMatrix(
-    (0,1,0,0,0),
-    (0,0,0,1,0),
-    (0,0,0,0,0),
-    (0,0,0,0,0),
-    (0,0,0,0,0)
-  )), "Should match according to MATLAB implementation2")
-
-  val readModel = new DemoModel(400, Constants.SAMPLE_DATA)
-  readModel.generateData()
-
-  val correct = readModel.loadCorrect()
-  println(correct)
-}
-
 class DemoModel(n: Int, dataFile: String = "") extends Model(n) {
   override var A: DenseMatrix[Int] = DenseMatrix(
     (0,1,1,0,0),
