@@ -12,7 +12,7 @@ class CorrectValueTests extends FunSuite with Matchers with BeforeAndAfter {
   var betaArr: Array[DenseMatrix[Double]] = _
 
   before {
-    val numSamples = 400
+    val numSamples = 20
     model = new DemoModel(numSamples, Constants.SAMPLE_DATA)
 
     val sampleArr = model.generateData()
