@@ -1,5 +1,6 @@
 package kernel
 
+import app.Constants
 import breeze.linalg.{DenseVector, DenseMatrix}
 import io.MatrixWriter
 
@@ -34,10 +35,10 @@ class MessagePasser(model: Model, kernel: Kernel) {
       val left: DenseMatrix[Double] = Kt :+ I * model.msgParam.lambda
       val right: DenseMatrix[Double] = Ks + I * model.msgParam.lambda
       val lr = left * right
-      MatrixWriter.writeMatrixToFile("/Users/shaundowling/Google Drive/UCL/master project/code/kernelBP_source/KernelBP/scalaleft.csv", left)
-      MatrixWriter.writeMatrixToFile("/Users/shaundowling/Google Drive/UCL/master project/code/kernelBP_source/KernelBP/scalaright.csv", right)
-      MatrixWriter.writeMatrixToFile("/Users/shaundowling/Google Drive/UCL/master project/code/kernelBP_source/KernelBP/scalakt.csv", kt)
-      MatrixWriter.writeMatrixToFile("/Users/shaundowling/Google Drive/UCL/master project/code/kernelBP_source/KernelBP/scalalr.csv", lr)
+      MatrixWriter.writeMatrixToFile(Constants.OUTPUT_FILES_DIR + "scalaleft.csv", left)
+      MatrixWriter.writeMatrixToFile(Constants.OUTPUT_FILES_DIR + "scalaright.csv", right)
+      MatrixWriter.writeMatrixToFile(Constants.OUTPUT_FILES_DIR + "scalakt.csv", kt)
+      MatrixWriter.writeMatrixToFile(Constants.OUTPUT_FILES_DIR + "scalalr.csv", lr)
       val sol = left * right \ kt
       betaArr(leafId) = left * right \ kt
     }
