@@ -36,7 +36,7 @@ object SimpleDemo {
   }
 
   def test() = {
-    val numSamples = 400
+    val numSamples = 20
     val model: Model = new DemoModel(numSamples, Constants.SAMPLE_DATA)
 
     val sampleArr = model.generateData()
