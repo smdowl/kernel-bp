@@ -1,6 +1,7 @@
 package kernel
 
 import breeze.linalg.{DenseVector, DenseMatrix}
+import io.MatrixWriter
 
 class MessagePasser(model: Model, kernel: Kernel) {
   private var cache: Cache = _
@@ -32,6 +33,12 @@ class MessagePasser(model: Model, kernel: Kernel) {
       // Have to split because type seems not to be infered otherwise
       val left: DenseMatrix[Double] = Kt :+ I * model.msgParam.lambda
       val right: DenseMatrix[Double] = Ks + I * model.msgParam.lambda
+      val lr = left * right
+      MatrixWriter.writeMatrixToFile("/Users/shaundowling/Google Drive/UCL/master project/code/kernelBP_source/KernelBP/scalaleft.csv", left)
+      MatrixWriter.writeMatrixToFile("/Users/shaundowling/Google Drive/UCL/master project/code/kernelBP_source/KernelBP/scalaright.csv", right)
+      MatrixWriter.writeMatrixToFile("/Users/shaundowling/Google Drive/UCL/master project/code/kernelBP_source/KernelBP/scalakt.csv", kt)
+      MatrixWriter.writeMatrixToFile("/Users/shaundowling/Google Drive/UCL/master project/code/kernelBP_source/KernelBP/scalalr.csv", lr)
+      val sol = left * right \ kt
       betaArr(leafId) = left * right \ kt
     }
   }
@@ -60,8 +67,11 @@ class MessagePasser(model: Model, kernel: Kernel) {
           val Ktu_beta = DenseMatrix.ones[Double](nts, 1)
 
           // Calculate product of all incoming messages
-          for (childId <- childIds)
+          for (childId <- childIds) {
+            val left = cache.kArr(nodeId)(childId)
+            val right = betaArr(childId)
             Ktu_beta :*= cache.kArr(nodeId)(childId) * betaArr(childId)
+          }
 
           betaArr(nodeId) = (Ks + DenseMatrix.eye[Double](nts) * model.msgParam.lambda) \ Ktu_beta
 
