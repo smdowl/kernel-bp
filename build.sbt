@@ -14,6 +14,8 @@ libraryDependencies += "org.scalatest" % "scalatest_2.10" % "2.2.0" % "test"
 
 libraryDependencies += "org.mongodb" %% "casbah" % "2.5.0"
 
+libraryDependencies += "com.github.tototoshi" %% "scala-csv" % "1.0.0"
+
 resolvers ++= Seq(
   // other resolvers here
   // if you want to use snapshot builds (currently 0.8-SNAPSHOT), use this.
