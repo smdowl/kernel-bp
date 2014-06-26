@@ -30,39 +30,6 @@ class DemoModel(n: Int, dataFile: String = "") extends Model(n) {
   var outputArray: DenseMatrix[Double] = _
   var sampleInd = 0
 
-  override def getPrunedTree(observedNodes: Set[Int]): (DenseMatrix[Int], Set[Int]) = {
-    val prunedA = DenseMatrix.zeros[Int](A.rows, A.cols)
-    prunedA += A
-    val temp = A
-    A = prunedA
-
-    var prunedNodes = Set[Int]()
-
-    var numCuts = 1
-
-    while (numCuts > 0) {
-      numCuts = 0
-      for (nodeId <- 0 until numNodes) {
-        if (shouldCut(observedNodes, nodeId)) {
-          prunedA(::, nodeId) := 0
-          prunedNodes += nodeId
-          numCuts += 1
-        }
-      }
-    }
-
-    A = temp
-
-    (prunedA, prunedNodes)
-  }
-
-  private def shouldCut(observedNodes: Set[Int], nodeId: Int): Boolean = {
-    !observedNodes.contains(nodeId) && isLeaf(nodeId) && hasParents(nodeId)
-  }
-
-  private def isLeaf(nodeId: Int) = getChildren(nodeId).length == 0
-  private def hasParents(nodeId: Int) = getParents(nodeId).length > 0
-
   override def generateData(): DenseMatrix[Double] = {
 
     if (shouldReadFromFile)
