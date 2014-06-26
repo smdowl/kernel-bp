@@ -34,11 +34,13 @@ class ExtendedModel(n: Int) extends Model(n) {
   var sampleCount = 0
 
   override def generateData(): DenseMatrix[Double] = {
-    outputArray = Array.ofDim[DenseMatrix[Double]](n)
+    outputArray = Array.ofDim[DenseMatrix[Double]](numNodes)
+
+    for (i <- 0 until numNodes)
+      outputArray(i) = DenseMatrix.zeros[Double](n, d)
 
     sampleCount = 0
     while (sampleCount < n) {
-      outputArray(sampleCount) = DenseMatrix.zeros[Double](numNodes, d)
       generateSample()
       sampleCount += 1
     }
@@ -66,16 +68,16 @@ class ExtendedModel(n: Int) extends Model(n) {
   private def sampleNonRootNode(whichNode: Int, parents: Seq[Int]) = {
     // Inner node
     if (getChildren(whichNode).length >= 1) {
-      val mu = outputArray(sampleCount)(parents(0), ::) // Only one parent in this graph
-      outputArray(sampleCount)(whichNode, ::) := mu + middleStd * randn()
+      val mu = outputArray(parents(0))(sampleCount, ::) // Only one parent in this graph
+      outputArray(whichNode)(sampleCount, ::) := mu + middleStd * randn()
     // Outer node
     } else {
-      val mu = outputArray(sampleCount)(parents(0), ::)
+      val mu = outputArray(parents(0))(sampleCount, ::)
       val c = rand()
       if (c <= p1Leaf)
-        outputArray(sampleCount)(whichNode, ::) := mu + leafStd * randn()
+        outputArray(whichNode)(sampleCount, ::) := mu + leafStd * randn()
       else
-        outputArray(sampleCount)(whichNode, ::) := 0 + leafStd * randn()
+        outputArray(whichNode)(sampleCount, ::) := 0 + leafStd * randn()
     }
   }
 
@@ -89,6 +91,6 @@ class ExtendedModel(n: Int) extends Model(n) {
     else
       rootMeans(1, ::)
 
-    outputArray(sampleCount)(whichNode, ::) := mean + randomComponent
+    outputArray(whichNode)(sampleCount, ::) := mean + randomComponent
   }
 }
