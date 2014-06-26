@@ -16,7 +16,7 @@ case class Result(model: Model,
 
 object SimpleDemo {
   def runDemo() = {
-    val numSamples = 1000
+    val numSamples = 100
     val model: Model = new DemoModel(numSamples)
 
     val sampleArr = model.generateData()
@@ -36,7 +36,7 @@ object SimpleDemo {
   }
 
   def test() = {
-    val numSamples = 20
+    val numSamples = 400
     val model: Model = new DemoModel(numSamples, Constants.SAMPLE_DATA)
 
     val sampleArr = model.generateData()
@@ -48,10 +48,11 @@ object SimpleDemo {
 
     val betaArr = passer.passMessages(sampleArr, observations)
 
-//    val axisBelief = linspace(-5, 5, 200)
-//    val sigRoot = 0.1     // Parzen window parameter at root
-//
-//    val result = new Result(model, kernel, sampleArr, observations, betaArr, sigRoot, axisBelief)
+    val axisBelief = linspace(-5, 5, 200)
+    val sigRoot = 0.1     // Parzen window parameter at root
+
+    val result = new Result(model, kernel, sampleArr, observations, betaArr, sigRoot, axisBelief)
+    Plotter.plotResults(result)
   }
 
   def main(args: Array[String]): Unit = {

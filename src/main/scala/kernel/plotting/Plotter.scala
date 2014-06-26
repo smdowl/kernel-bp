@@ -29,7 +29,7 @@ object Plotter {
     p += plot(result.axisBelief, rootMarginal / sum(rootMarginal), colorcode = "g")
   }
 
-  def calculateEmpiricalBelief(output: Result) = {
+  def calculateEmpiricalBelief(output: Result): DenseVector[Double] = {
     // Empirical root belief
     val threshold = 0.01
 
@@ -42,10 +42,12 @@ object Plotter {
       )
     })
 
-    val condNodes: DenseVector[Double] = DenseVector.tabulate[Double](condIndices.size){i => output.sampleArr(condIndices(i), output.model.rootNode)}
+    if (condIndices.length > 0) {
+      val condNodes: DenseVector[Double] = DenseVector.tabulate[Double](condIndices.size) { i => output.sampleArr(condIndices(i), output.model.rootNode)}
 
-    val beliefRootEmp = output.kernel(output.axisBelief, condNodes, output.sigRoot)
-    sum(beliefRootEmp.t(::, *)).asInstanceOf[DenseMatrix[Double]].toDenseVector
+      val beliefRootEmp = output.kernel(output.axisBelief, condNodes, output.sigRoot)
+      sum(beliefRootEmp.t(::, *)).asInstanceOf[DenseMatrix[Double]].toDenseVector
+    } else DenseVector.zeros[Double](output.axisBelief.length)
   }
 
   def calculateKernelRootMarginal(r: Result) = sum(r.kernel(r.axisBelief, r.sampleArr(::, r.model.rootNode), r.sigRoot), Axis._1)
