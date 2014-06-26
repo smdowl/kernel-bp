@@ -31,17 +31,18 @@ class MessagePasser(model: Model, kernel: Kernel) {
 
       val kt = kernel(cache.leafArr(leafId), observations(leafId), model.msgParam.sig)
 
-      // Have to split because type seems not to be infered otherwise
-      val left: DenseMatrix[Double] = Kt :+ I * model.msgParam.lambda
-      val right: DenseMatrix[Double] = Ks + I * model.msgParam.lambda
-      val lr = left * right
-      MatrixWriter.writeMatrixToFile(Constants.OUTPUT_FILES_DIR + "scalaleft.csv", left)
-      MatrixWriter.writeMatrixToFile(Constants.OUTPUT_FILES_DIR + "scalaright.csv", right)
-      MatrixWriter.writeMatrixToFile(Constants.OUTPUT_FILES_DIR + "scalakt.csv", kt)
-      MatrixWriter.writeMatrixToFile(Constants.OUTPUT_FILES_DIR + "scalalr.csv", lr)
-      val sol = left * right \ kt
-      betaArr(leafId) = left * right \ kt
+      betaArr(leafId) = observedMessage(Kt, Ks, kt, I, model.msgParam.lambda)
     }
+  }
+
+  def observedMessage(Kt: DenseMatrix[Double], Ks: DenseMatrix[Double],
+                      kt: DenseMatrix[Double], I: DenseMatrix[Double], lambda: Double) = {
+    // Have to split because type seems not to be infered otherwise
+    val left: DenseMatrix[Double] = Kt :+ I * lambda
+    val right: DenseMatrix[Double] = Ks + I * lambda
+    val lr = left * right
+    val sol = lr \ kt
+    sol
   }
 
   private def calculateInternalMessages(observations: Map[Int, DenseVector[Double]]): Unit = {
