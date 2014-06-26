@@ -13,6 +13,8 @@ class ExtendedModel(n: Int) extends Model(n) {
     (0,0,0,0,0),
     (0,0,0,0,0) )
 
+  val d = 2
+
   override val msgParam = MessageParam(0.1, 0.3)
 
   // Model parameters
@@ -36,6 +38,7 @@ class ExtendedModel(n: Int) extends Model(n) {
 
     sampleCount = 0
     while (sampleCount < n) {
+      outputArray(sampleCount) = DenseMatrix.zeros[Double](numNodes, d)
       generateSample()
       sampleCount += 1
     }
