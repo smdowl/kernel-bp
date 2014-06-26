@@ -1,5 +1,4 @@
 import breeze.linalg.DenseMatrix
-import kernel.DemoModel
 import kernel.models.{DemoModel, Model}
 import org.scalatest.{BeforeAndAfter, Matchers, FunSuite}
 
