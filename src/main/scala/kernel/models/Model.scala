@@ -1,6 +1,7 @@
-package kernel
+package kernel.models
 
 import breeze.linalg._
+import kernel.MessageParam
 
 abstract class Model(val n: Int) {
   var A: DenseMatrix[Int]

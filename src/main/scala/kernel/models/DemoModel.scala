@@ -1,8 +1,9 @@
-package kernel
+package kernel.models
 
-import breeze.linalg._
 import app.Constants
+import breeze.linalg._
 import io.MatrixReader
+import kernel.MessageParam
 
 class DemoModel(n: Int, dataFile: String = "") extends Model(n) {
   override var A: DenseMatrix[Int] = DenseMatrix(

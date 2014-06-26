@@ -1,6 +1,7 @@
 package kernel
 
 import breeze.linalg.{DenseVector, Vector, DenseMatrix}
+import kernel.models.Model
 
 object Cache {
   def buildCache(sampleArr: DenseMatrix[Double], kernel: Kernel, model: Model): Cache = {

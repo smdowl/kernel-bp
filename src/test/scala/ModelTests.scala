@@ -1,5 +1,6 @@
 import breeze.linalg.DenseMatrix
-import kernel.{Model, DemoModel}
+import kernel.DemoModel
+import kernel.models.{DemoModel, Model}
 import org.scalatest.{BeforeAndAfter, Matchers, FunSuite}
 
 class ModelTests extends Test {

@@ -1,6 +1,7 @@
 package kernel
 
 import breeze.linalg._
+import kernel.models.{DemoModel, Model}
 import kernel.plotting.Plotter
 import app.Constants
 
@@ -16,7 +17,7 @@ case class Result(model: Model,
 
 object SimpleDemo {
   def runDemo() = {
-    val numSamples = 100
+    val numSamples = 400
     val model: Model = new DemoModel(numSamples)
 
     val sampleArr = model.generateData()
@@ -36,7 +37,7 @@ object SimpleDemo {
   }
 
   def test() = {
-    val numSamples = 400
+    val numSamples = 700
     val model: Model = new DemoModel(numSamples, Constants.SAMPLE_DATA)
 
     val sampleArr = model.generateData()

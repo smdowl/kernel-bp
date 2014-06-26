@@ -3,6 +3,7 @@ import breeze.linalg.{DenseMatrix, DenseVector}
 import io.MatrixReader
 import kernel._
 import kernel.linalg.{vec2mat, nearlyEqual}
+import kernel.models.DemoModel
 import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
 import scala.util.Random
 

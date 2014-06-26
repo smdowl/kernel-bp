@@ -3,6 +3,7 @@ package kernel
 import app.Constants
 import breeze.linalg.{DenseVector, DenseMatrix}
 import io.MatrixWriter
+import kernel.models.Model
 
 class MessagePasser(model: Model, kernel: Kernel) {
   private var cache: Cache = _
