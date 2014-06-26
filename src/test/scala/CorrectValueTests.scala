@@ -7,7 +7,7 @@ import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
 import scala.util.Random
 
 class CorrectValueTests extends Test {
-  var model: Model = _
+  var model: DemoModel = _
   var passer: MessagePasser = _
   var betaArr: Array[DenseMatrix[Double]] = _
 

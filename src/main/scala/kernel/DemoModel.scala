@@ -100,7 +100,7 @@ class DemoModel(n: Int, dataFile: String = "") extends Model(n) {
       outputArray(sampleInd, whichNode) = rootMeans(1) + rootStd * randn()
   }
 
-  override def loadCorrect(): Array[DenseMatrix[Double]] = {
+  def loadCorrect(): Array[DenseMatrix[Double]] = {
     var output = Seq[DenseMatrix[Double]]()
 
     for (i <- 1 to numNodes-1) {
