@@ -6,7 +6,7 @@ import kernel.linalg.{vec2mat, nearlyEqual}
 import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
 import scala.util.Random
 
-class CorrectValueTests extends FunSuite with Matchers with BeforeAndAfter {
+class CorrectValueTests extends Test {
   var model: Model = _
   var passer: MessagePasser = _
   var betaArr: Array[DenseMatrix[Double]] = _

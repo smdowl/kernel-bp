@@ -2,7 +2,7 @@ import breeze.linalg.{DenseMatrix, DenseVector}
 import kernel.RBFKernel
 import org.scalatest._
 
-class KernelTests extends FunSuite with Matchers with BeforeAndAfter {
+class KernelTests extends Test {
   val kernel = new RBFKernel
 
   test("Simple test") {

@@ -2,7 +2,7 @@ import breeze.linalg.DenseMatrix
 import kernel.{Model, DemoModel}
 import org.scalatest.{BeforeAndAfter, Matchers, FunSuite}
 
-class ModelTests extends FunSuite with Matchers with BeforeAndAfter {
+class ModelTests extends Test {
   var model: Model = _
 
   before {
