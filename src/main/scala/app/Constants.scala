@@ -18,4 +18,6 @@ object Constants {
   final val SAMPLE_DATA = CORRECT_DIR + "sampArr"
 
   final val OUTPUT_FILES_DIR = MATLAB_DIR + "scala-out/"
+
+  final val INTER_MATRICES_DIR = MATLAB_DIR + "inter-out/"
 }
