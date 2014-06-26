@@ -44,7 +44,7 @@ abstract class Model(val n: Int) {
   private def hasParents(nodeId: Int) = getParents(nodeId).length > 0
 
   def getParents(nodeId: Int, A: DenseMatrix[Int] = this.A): Seq[Int] = A(::, nodeId).findAll(_ > 0)
-  def getChildren(nodeId: Int, A: DenseMatrix[Int] = this.A): Seq[Int] = try {A(nodeId, ::).t.findAll(_ > 0)} catch {case _ => Seq[Int]()}
+  def getChildren(nodeId: Int, A: DenseMatrix[Int] = this.A): Seq[Int] = try {A(nodeId, ::).t.findAll(_ > 0)} catch {case _: Throwable => Seq[Int]()}
 
   def generateData(): DenseMatrix[Double]
 }
