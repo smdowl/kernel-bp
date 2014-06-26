@@ -23,9 +23,9 @@ class RBFKernel extends Kernel {
     val R = repmat(H.t, n1, 1)
 
     val T: DenseMatrix[Double] = Q + R
-    val r: DenseMatrix[Double] = (p1.t * p2).asInstanceOf[DenseMatrix[Double]]
+    val r: DenseMatrix[Double] = p1.t * p2
 
-    val out: DenseMatrix[Double] = -(T - r * 2.0).asInstanceOf[DenseMatrix[Double]] / (2 * Math.pow(deg, 2))
+    val out: DenseMatrix[Double] = -(T - r * 2.0) / (2 * Math.pow(deg, 2))
     exp(out)
   }
 
