@@ -2,6 +2,7 @@ import app.Constants
 import breeze.linalg.{DenseMatrix, DenseVector}
 import io.MatrixReader
 import kernel._
+import kernel.caches.Cache
 import kernel.kernels.RBFKernel
 import kernel.linalg.{vec2mat, nearlyEqual}
 import kernel.models.DemoModel

@@ -1,7 +1,7 @@
 package kernel.propagation
 
 import breeze.linalg.DenseMatrix
-import kernel.Cache
+import kernel.caches.Cache
 import kernel.kernels.Kernel
 import kernel.models.Model
 
