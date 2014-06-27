@@ -9,11 +9,11 @@ case class MessageParam(lambda: Double, sig: Double)
 
 case class Result(model: Model,
                   kernel: Kernel,
-                  sampleArr: DenseMatrix[Double],
-                  observations: Map[Int, DenseVector[Double]],
+                  sampleArr: Array[DenseMatrix[Double]],
+                  observations: Map[Int, DenseMatrix[Double]],
                   betaArr: Array[DenseMatrix[Double]],
                   sigRoot: Double,
-                  axisBelief: DenseVector[Double])
+                  axisBelief: DenseMatrix[Double])
 
 object SimpleDemo {
   def runDemo() = {
@@ -21,7 +21,7 @@ object SimpleDemo {
     val model: Model = new DemoModel(numSamples)
 
     val sampleArr = model.generateData()
-    val observations = Map(3 -> DenseVector(2.0))
+    val observations = Map(3 -> DenseMatrix(2.0))
     Plotter.plotData(sampleArr)
 
     val kernel = new RBFKernel()
@@ -29,7 +29,7 @@ object SimpleDemo {
 
     val betaArr = passer.passMessages(sampleArr, observations)
 
-    val axisBelief = linspace(-5, 5, 200)
+    val axisBelief = DenseMatrix(linspace(-5, 5, 200).toArray)
     val sigRoot = 0.1     // Parzen window parameter at root
 
     val result = new Result(model, kernel, sampleArr, observations, betaArr, sigRoot, axisBelief)
@@ -37,11 +37,11 @@ object SimpleDemo {
   }
 
   def test() = {
-    val numSamples = 700
+    val numSamples = 20
     val model: Model = new DemoModel(numSamples, Constants.SAMPLE_DATA)
 
     val sampleArr = model.generateData()
-    val observations = Map(3 -> DenseVector(2.0))
+    val observations = Map(3 -> DenseMatrix(2.0))
     Plotter.plotData(sampleArr)
 
     val kernel = new RBFKernel()
@@ -49,7 +49,7 @@ object SimpleDemo {
 
     val betaArr = passer.passMessages(sampleArr, observations)
 
-    val axisBelief = linspace(-5, 5, 200)
+    val axisBelief = DenseMatrix(linspace(-5, 5, 200).toArray)
     val sigRoot = 0.1     // Parzen window parameter at root
 
     val result = new Result(model, kernel, sampleArr, observations, betaArr, sigRoot, axisBelief)
@@ -62,7 +62,9 @@ object SimpleDemo {
 
     val sampleArr = model.generateData()
 
-    val observations = Map(3 -> DenseVector(2.0, 2.0))
+    val observations = Map(3 -> DenseMatrix(2.0, 2.0))
+    val data = model.outputArray
+    println()
 //    Plotter.plotData(sampleArr)
 
 //    val kernel = new RBFKernel()
@@ -78,6 +80,6 @@ object SimpleDemo {
   }
 
   def main(args: Array[String]): Unit = {
-    higherDim()
+    test()
   }
 }

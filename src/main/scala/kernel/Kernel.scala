@@ -4,17 +4,14 @@ import breeze.linalg._
 import breeze.numerics._
 
 trait Kernel {
-  def apply(p1: DenseVector[Double], p2: DenseVector[Double], deg: Double = 1.0): DenseMatrix[Double]
+  def apply(p1: DenseMatrix[Double], p2: DenseMatrix[Double], deg: Double = 1.0): DenseMatrix[Double]
 }
 
 class RBFKernel extends Kernel {
-  override def apply(p1Vec: DenseVector[Double], p2Vec: DenseVector[Double], deg: Double = 1.0): DenseMatrix[Double] = {
+  override def apply(p1: DenseMatrix[Double], p2: DenseMatrix[Double], deg: Double = 1.0): DenseMatrix[Double] = {
 
-    val n1 = p1Vec.length
-    val n2 = p2Vec.length
-
-    val p1 = DenseMatrix(p1Vec.toArray)
-    val p2 = DenseMatrix(p2Vec.toArray)
+    val n1 = p1.rows
+    val n2 = p2.rows
 
     val G: DenseMatrix[Double] = sum(p1 :* p1, Axis._0).asInstanceOf[DenseMatrix[Double]].t
     val H: DenseMatrix[Double] = sum(p2 :* p2, Axis._0).asInstanceOf[DenseMatrix[Double]].t

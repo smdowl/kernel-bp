@@ -17,9 +17,11 @@ class DemoModel(n: Int, dataFile: String = "") extends Model(n) {
 
   // Model parameters
   override val rootNode = 0
-  val rootMeans = DenseVector(0,2)
+  val rootMeans = DenseMatrix(0.0, 2.0)
   val rootStd = 0.2
   val p1Root = 0.5
+
+  val d = 1
 
   val middleStd = 0.2
 
@@ -28,10 +30,12 @@ class DemoModel(n: Int, dataFile: String = "") extends Model(n) {
 
   val sampleOrder = 0 until numNodes
 
-  var outputArray: DenseMatrix[Double] = _
-  var sampleInd = 0
+  var outputArray: Array[DenseMatrix[Double]] = _
+  var sampleCount = 0
 
-  override def generateData(): DenseMatrix[Double] = {
+  override def generateData(): Array[DenseMatrix[Double]] = {
+
+    outputArray = Array.ofDim(numNodes)
 
     if (shouldReadFromFile)
       readFromFile()
@@ -44,19 +48,23 @@ class DemoModel(n: Int, dataFile: String = "") extends Model(n) {
   def shouldReadFromFile = !dataFile.equals("")
 
   def readFromFile() = {
-    outputArray = MatrixReader.loadMatrixFromFile(dataFile)
+    for (i <- 0 until numNodes)
+      readDataFile(i)
+  }
+  
+  def readDataFile(index: Int) = {
+    outputArray(index) = MatrixReader.loadMatrixFromFile(dataFile + (index + 1))
 
-    assert(outputArray.rows == n)
-    assert(outputArray.cols == numNodes)
+    assert(outputArray(index).rows == n)
+    assert(outputArray(index).cols == d)
   }
 
   def generateRandomData() = {
-    outputArray = DenseMatrix.zeros[Double](n, numNodes)
-
-    sampleInd = 0
-    while (sampleInd < n) {
+    sampleCount = 0
+    while (sampleCount < n) {
+      outputArray(sampleCount) = DenseMatrix.zeros[Double](n, d)
       generateSample()
-      sampleInd += 1
+      sampleCount += 1
     }
 
     outputArray
@@ -80,25 +88,32 @@ class DemoModel(n: Int, dataFile: String = "") extends Model(n) {
   }
 
   private def sampleNonRootNode(whichNode: Int, parents: Seq[Int]) = {
+    // Inner node
     if (getChildren(whichNode).length >= 1) {
-      val mu = outputArray(sampleInd, parents(0)) // Only one parent in this graph
-      outputArray(sampleInd, whichNode) = mu + middleStd * randn()
+      val mu = outputArray(parents(0))(sampleCount, ::) // Only one parent in this graph
+      outputArray(whichNode)(sampleCount, ::) := mu + middleStd * randn()
+      // Outer node
     } else {
-      val mu = outputArray(sampleInd, parents(0))
+      val mu = outputArray(parents(0))(sampleCount, ::)
       val c = rand()
       if (c <= p1Leaf)
-        outputArray(sampleInd, whichNode) = mu + leafStd * randn()
+        outputArray(whichNode)(sampleCount, ::) := mu + leafStd * randn()
       else
-        outputArray(sampleInd, whichNode) = 0 + leafStd * randn()
+        outputArray(whichNode)(sampleCount, ::) := 0 + leafStd * randn()
     }
   }
 
   private def sampleRootNode(whichNode: Int) = {
     val c = rand()
-    if (c <= p1Root)
-      outputArray(sampleInd, whichNode) = rootMeans(0) + rootStd * randn()
+
+    val randomComponent =  rootStd * randn()
+
+    val mean = if (c <= p1Root)
+      rootMeans(0, ::)
     else
-      outputArray(sampleInd, whichNode) = rootMeans(1) + rootStd * randn()
+      rootMeans(1, ::)
+
+    outputArray(whichNode)(sampleCount, ::) := mean + randomComponent
   }
 
   def loadCorrect(): Array[DenseMatrix[Double]] = {

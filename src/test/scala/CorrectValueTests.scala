@@ -17,7 +17,7 @@ class CorrectValueTests extends Test {
     model = new DemoModel(numSamples, Constants.SAMPLE_DATA)
 
     val sampleArr = model.generateData()
-    val observations = Map(3 -> DenseVector(2.0))
+    val observations = Map(3 -> DenseMatrix(2.0))
 
     val kernel = new RBFKernel()
     passer = new MessagePasser(model, kernel)
@@ -31,7 +31,7 @@ class CorrectValueTests extends Test {
   }
 
   def testCacheSimilarity(c1: Cache, c2: Cache) = {
-    nearlyEqualArrays(c1.leafArr.map(vec2mat), c2.leafArr.map(vec2mat))
+    nearlyEqualArrays(c1.leafArr, c2.leafArr)
 
     for ((row1, row2) <- c1.kArr zip c2.kArr)
       allNearlyEqualArrays(row1, row2)
@@ -45,11 +45,11 @@ class CorrectValueTests extends Test {
   }
 
   def loadLeafArr() = {
-    var row = Seq[DenseVector[Double]]()
+    var row = Seq[DenseMatrix[Double]]()
     for (i <- 1 to model.numNodes) {
       val newMatrix = MatrixReader.loadMatrixFromFile(Constants.CORRECT_DIR + s"leafArr$i")
       if (newMatrix != null)
-        row :+= newMatrix.toDenseVector
+        row :+= newMatrix
       else
         row :+= null
     }

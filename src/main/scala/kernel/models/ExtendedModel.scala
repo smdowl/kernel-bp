@@ -1,8 +1,6 @@
 package kernel.models
 
-import app.Constants
 import breeze.linalg._
-import io.MatrixReader
 import kernel.MessageParam
 
 class ExtendedModel(n: Int) extends Model(n) {
@@ -33,7 +31,7 @@ class ExtendedModel(n: Int) extends Model(n) {
   var outputArray: Array[DenseMatrix[Double]] = _
   var sampleCount = 0
 
-  override def generateData(): DenseMatrix[Double] = {
+  override def generateData(): Array[DenseMatrix[Double]] = {
     outputArray = Array.ofDim[DenseMatrix[Double]](numNodes)
 
     for (i <- 0 until numNodes)
@@ -45,7 +43,7 @@ class ExtendedModel(n: Int) extends Model(n) {
       sampleCount += 1
     }
 
-    DenseMatrix.zeros[Double](n, numNodes)
+    outputArray
   }
 
   private def generateSample() = {
