@@ -1,6 +1,7 @@
 package kernel
 
 import breeze.linalg.{DenseVector, Vector, DenseMatrix}
+import kernel.kernels.Kernel
 import kernel.models.Model
 
 object Cache {

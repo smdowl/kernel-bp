@@ -1,5 +1,5 @@
 import breeze.linalg.DenseMatrix
-import kernel.RBFKernel
+import kernel.kernels.RBFKernel
 import org.scalatest._
 
 class KernelTests extends Test {

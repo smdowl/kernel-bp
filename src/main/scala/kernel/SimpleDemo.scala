@@ -1,6 +1,7 @@
 package kernel
 
 import breeze.linalg._
+import kernel.kernels.{RBFKernel, Kernel}
 import kernel.models.{ExtendedModel, DemoModel, Model}
 import kernel.plotting.Plotter
 import app.Constants
