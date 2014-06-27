@@ -6,18 +6,8 @@ import kernel.kernels.Kernel
 import kernel.models.Model
 
 class TreeMessagePasser(model: Model, kernel: Kernel) extends MessagePasser(model, kernel) {
-  def passMessages(sampleArr: Array[DenseMatrix[Double]], observations: Map[Int, DenseMatrix[Double]]): Array[DenseMatrix[Double]] = {
 
-    cache = Cache.buildCache(sampleArr, kernel, model)
-    betaArr = Array.ofDim[DenseMatrix[Double]](model.numNodes)
-
-    calculateObservedMessages(observations)
-    calculateInternalMessages(observations)
-
-    betaArr
-  }
-
-  private def calculateObservedMessages(observations: Map[Int, DenseMatrix[Double]]): Unit = {
+  override protected def calculateObservedMessages(observations: Map[Int, DenseMatrix[Double]]): Unit = {
     for ((leafId, idx) <- observations.keys.zipWithIndex) {
       val parentId = model.getParents(leafId)(0)
 
@@ -41,7 +31,7 @@ class TreeMessagePasser(model: Model, kernel: Kernel) extends MessagePasser(mode
     sol
   }
 
-  private def calculateInternalMessages(observations: Map[Int, DenseMatrix[Double]]): Unit = {
+  override protected def calculateInternalMessages(observations: Map[Int, DenseMatrix[Double]]): Unit = {
     val (prunedA, prunedNodes) = model.getPrunedTree(observations.keySet)
     var computedList = observations.keySet
 
