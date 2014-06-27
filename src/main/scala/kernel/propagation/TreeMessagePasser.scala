@@ -9,7 +9,7 @@ class TreeMessagePasser(model: Model, kernel: Kernel) extends MessagePasser(mode
   def passMessages(sampleArr: Array[DenseMatrix[Double]], observations: Map[Int, DenseMatrix[Double]]): Array[DenseMatrix[Double]] = {
 
     cache = Cache.buildCache(sampleArr, kernel, model)
-    betaArr = Array.ofDim[DenseMatrix[Double]](model.numNodes - observations.size)
+    betaArr = Array.ofDim[DenseMatrix[Double]](model.numNodes)
 
     calculateObservedMessages(observations)
     calculateInternalMessages(observations)
