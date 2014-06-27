@@ -1,6 +1,7 @@
 package kernel.propagation
 
-import breeze.linalg.{max, norm, DenseMatrix}
+import breeze.linalg.{inv, max, norm, DenseMatrix}
+import breeze.numerics.sqrt
 import kernel.caches.{LoopyCache, Cache}
 import kernel.kernels.Kernel
 import kernel.models.Model
@@ -9,20 +10,37 @@ class LoopyMessagePasser(model: Model, kernel: Kernel) {
 
   protected var cache: LoopyCache = _
   protected var betaArr: Array[Array[DenseMatrix[Double]]] = _
+  protected var KarrInv: Array[DenseMatrix[Double]] = _
+  protected var observations: Map[Int, DenseMatrix[Double]] = _
 
   def getCache = this.cache
 
   def passMessages(sampleArr: Array[DenseMatrix[Double]], observations: Map[Int, DenseMatrix[Double]]): Array[Array[DenseMatrix[Double]]] = {
+    this.observations = observations
     cache = LoopyCache.buildCache(sampleArr, kernel, model)
     betaArr = Array.ofDim[DenseMatrix[Double]](model.numNodes, model.numNodes)
+    KarrInv = calculateInverses()
 
-    calculateObservedMessages(observations)
-    calculateInternalMessages(observations)
+    initBetas()
+
+    calculateObservedMessages()
+    calculateInternalMessages()
 
     betaArr
   }
 
-  protected def calculateObservedMessages(observations: Map[Int, DenseMatrix[Double]]): Unit = {
+  def calculateInverses() = {
+    val out = Array.ofDim[DenseMatrix[Double]](model.numNodes)
+
+    for (nodeId <- unobservedNodes)
+      out(nodeId) = inv( cache.kArr(nodeId) + DenseMatrix.eye[Double](model.n) * model.msgParam.lambda )
+
+    out
+  }
+
+  def unobservedNodes = (0 until model.numNodes).filterNot(observations.keySet.contains)
+
+  protected def calculateObservedMessages(): Unit = {
     for ((leafId, idx) <- observations.keys.zipWithIndex) {
       val neighbours = model.getNeighbours(leafId)
 
@@ -53,7 +71,16 @@ class LoopyMessagePasser(model: Model, kernel: Kernel) {
     betaArr(i)(j) = betaArr(i)(j) / max(betaArr(i)(j))
   }
 
-  protected def calculateInternalMessages(observations: Map[Int, DenseMatrix[Double]]): Unit = {
+  private def initBetas() = {
+    unobservedNodes.foreach(nodeId => {
+      val neighbours = model.getNeighbours(nodeId)
+      neighbours.foreach(neighbourId => {
+        betaArr(nodeId)(neighbourId) = DenseMatrix.ones[Double](model.n, 1) / sqrt(model.n)
+      })
+    })
+  }
+
+  protected def calculateInternalMessages(): Unit = {
 
   }
 }
