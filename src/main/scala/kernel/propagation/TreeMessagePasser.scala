@@ -1,15 +1,11 @@
-package kernel
+package kernel.propagation
 
-import app.Constants
-import breeze.linalg.{DenseVector, DenseMatrix}
-import io.MatrixWriter
+import breeze.linalg.DenseMatrix
+import kernel.Cache
 import kernel.kernels.Kernel
 import kernel.models.Model
 
-class MessagePasser(model: Model, kernel: Kernel) {
-  private var cache: Cache = _
-  private var betaArr: Array[DenseMatrix[Double]] = _
-
+class TreeMessagePasser(model: Model, kernel: Kernel) extends MessagePasser(model, kernel) {
   def passMessages(sampleArr: Array[DenseMatrix[Double]], observations: Map[Int, DenseMatrix[Double]]): Array[DenseMatrix[Double]] = {
 
     cache = Cache.buildCache(sampleArr, kernel, model)
@@ -20,8 +16,6 @@ class MessagePasser(model: Model, kernel: Kernel) {
 
     betaArr
   }
-
-  def getCache = this.cache
 
   private def calculateObservedMessages(observations: Map[Int, DenseMatrix[Double]]): Unit = {
     for ((leafId, idx) <- observations.keys.zipWithIndex) {
@@ -37,7 +31,7 @@ class MessagePasser(model: Model, kernel: Kernel) {
     }
   }
 
-  def observedMessage(Kt: DenseMatrix[Double], Ks: DenseMatrix[Double],
+  private def observedMessage(Kt: DenseMatrix[Double], Ks: DenseMatrix[Double],
                       kt: DenseMatrix[Double], I: DenseMatrix[Double], lambda: Double) = {
     // Have to split because type seems not to be infered otherwise
     val left: DenseMatrix[Double] = Kt :+ I * lambda

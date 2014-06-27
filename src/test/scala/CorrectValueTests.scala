@@ -5,12 +5,13 @@ import kernel._
 import kernel.kernels.RBFKernel
 import kernel.linalg.{vec2mat, nearlyEqual}
 import kernel.models.DemoModel
+import kernel.propagation.TreeMessagePasser
 import org.scalatest.{BeforeAndAfter, FunSuite, Matchers}
 import scala.util.Random
 
 class CorrectValueTests extends Test {
   var model: DemoModel = _
-  var passer: MessagePasser = _
+  var passer: TreeMessagePasser = _
   var betaArr: Array[DenseMatrix[Double]] = _
 
   before {
@@ -21,7 +22,7 @@ class CorrectValueTests extends Test {
     val observations = Map(3 -> DenseMatrix(2.0))
 
     val kernel = new RBFKernel()
-    passer = new MessagePasser(model, kernel)
+    passer = new TreeMessagePasser(model, kernel)
 
     betaArr = passer.passMessages(sampleArr, observations)
   }

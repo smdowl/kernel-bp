@@ -6,6 +6,7 @@ import kernel.kernels.{RBFKernel, Kernel}
 import kernel.models.{ExtendedModel, DemoModel, Model}
 import kernel.plotting.Plotter
 import app.Constants
+import kernel.propagation.TreeMessagePasser
 
 case class MessageParam(lambda: Double, sig: Double)
 
@@ -27,7 +28,7 @@ object SimpleDemo {
     Plotter.plotData(sampleArr)
 
     val kernel = new RBFKernel()
-    val passer = new MessagePasser(model, kernel)
+    val passer = new TreeMessagePasser(model, kernel)
 
     val betaArr = passer.passMessages(sampleArr, observations)
 
@@ -47,7 +48,7 @@ object SimpleDemo {
     Plotter.plotData(sampleArr)
 
     val kernel = new RBFKernel()
-    val passer = new MessagePasser(model, kernel)
+    val passer = new TreeMessagePasser(model, kernel)
 
     val betaArr = passer.passMessages(sampleArr, observations)
 
@@ -68,7 +69,7 @@ object SimpleDemo {
 //    Plotter.plotData(sampleArr)
 
     val kernel = new RBFKernel()
-    val passer = new MessagePasser(model, kernel)
+    val passer = new TreeMessagePasser(model, kernel)
 
     val betaArr = passer.passMessages(sampleArr, observations)
 
