@@ -44,11 +44,23 @@ object Plotter {
     val condRootMarginal = calculateKernelCondRootMarginal(rootMarginal, result)
 
     val f = Figure()
-    val p = f.subplot(0)
 
-    p += plot(result.axisBelief.toDenseVector, belief / sum(belief), colorcode = "b")
-    p += plot(result.axisBelief.toDenseVector, condRootMarginal / sum(condRootMarginal), colorcode = "r")
-    p += plot(result.axisBelief.toDenseVector, rootMarginal / sum(rootMarginal), colorcode = "g")
+    val d = result.axisBelief.cols
+    if (d == 1) {
+      val p = f.subplot(0)
+      p += plot(result.axisBelief.toDenseVector, belief / sum(belief), colorcode = "b")
+      p += plot(result.axisBelief.toDenseVector, condRootMarginal / sum(condRootMarginal), colorcode = "r")
+      p += plot(result.axisBelief.toDenseVector, rootMarginal / sum(rootMarginal), colorcode = "g")
+      p.title = "Belief at root"
+    } else if (d == 2) {
+      for (i <- 0 until d) {
+        val p = f.subplot(d, 1, i)
+        val (support, marginalBelief) = calculateMarginalBelief(i, result.axisBelief, condRootMarginal)
+        val y: DenseVector[Double] = marginalBelief / sum(marginalBelief)
+        p += plot(support.toDenseVector, y, colorcode = "r")
+        p.title = s"Belief at root, d$i"
+      }
+    } else throw new Exception("Cannot handle more than 2-d")
   }
 
   def calculateEmpiricalBelief(output: Result): DenseVector[Double] = {
@@ -67,7 +79,7 @@ object Plotter {
       condIndicesArray(index) = newIndices
     }
 
-    // TODO: Only works when conditioning on a single obs
+    // TODO: Only works when conditioning on a single obs, which is actually fine for what we need
     val condIndices = condIndicesArray(0)
     if (condIndices.length > 0) {
       val d = output.sampleArr(0).cols
@@ -81,15 +93,18 @@ object Plotter {
   def closeIndex(j: Int, data: DenseMatrix[Double], nodeObservations: DenseMatrix[Double])(implicit threshold: Double): Boolean = {
     val point: DenseVector[Double] = data(j, ::).t
 
-    assert(nodeObservations.cols == 1, "Only want to convert to a vector when we have a vector matrix")
-    val obs = nodeObservations.toDenseVector
-
-    val dist: Double = norm(point - obs).asInstanceOf[Double]
-
-    dist < threshold
+    // TODO: Close to any of the points. Need to think if this is what we want.
+    (0 until nodeObservations.rows).exists(i => {
+      val obs = nodeObservations(i, ::).t
+      val dist: Double = norm(point - obs).asInstanceOf[Double]
+      dist < threshold
+    })
   }
 
-  def calculateKernelRootMarginal(r: Result) = sum(r.kernel(r.axisBelief, r.sampleArr(r.model.rootNode), r.sigRoot), Axis._1)
+  def calculateKernelRootMarginal(r: Result) = {
+    val kernelRes = r.kernel(r.axisBelief, r.sampleArr(r.model.rootNode), r.sigRoot)
+    sum(kernelRes, Axis._1)
+  }
 
   def calculateKernelCondRootMarginal(rootMarginal: DenseVector[Double], r: Result) = {
     var condRootMarginal: DenseVector[Double] = rootMarginal.copy
@@ -105,5 +120,26 @@ object Plotter {
     }
 
     condRootMarginal
+  }
+
+  def calculateMarginalBelief(dim: Int, points: DenseMatrix[Double], belief: DenseVector[Double]): (DenseVector[Double], DenseVector[Double]) = {
+    val dimPoints = points(::, dim)
+
+    var sums = Map[Double, Seq[Double]]()
+    for ((p, b) <- dimPoints.toArray zip belief.toArray) {
+      val map = sums.getOrElse(p, Seq[Double]())
+      sums += p -> (map :+ b)
+    }
+
+    val support = DenseVector.zeros[Double](sums.size)
+    val out = DenseVector.zeros[Double](sums.size)
+    var i = 0
+    sums.keySet.toSeq.sorted.foreach(key => {
+      support(i) = key
+      out(i) = sums(key).sum / sums(key).length
+      i += 1
+    })
+
+    (support, out)
   }
 }
