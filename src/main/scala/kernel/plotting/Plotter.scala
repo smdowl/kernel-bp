@@ -6,13 +6,34 @@ import kernel.Result
 
 object Plotter {
   def plotData(data: Array[DenseMatrix[Double]]) = {
-    assert(data(0).cols == 1, "Currently only suitable for 1-d data.")
+    val d = data(0).cols
+
+    if (d == 1)
+      plot1dData(data)
+    else if (d == 2)
+      plot2dData(data)
+    else
+      throw new Exception("Cannot handle higher dim data")
+  }
+
+  def plot1dData(data: Array[DenseMatrix[Double]]) = {
     val numNodes = data.length
 
     val f = Figure()
     for (i <- 0 until numNodes) {
       val p = f.subplot(3, 2, i)
       p += hist(data(i)(::, 0))
+      p.title = s"Node $i"
+    }
+  }
+
+  def plot2dData(data: Array[DenseMatrix[Double]]) = {
+    val numNodes = data.length
+
+    val f = Figure()
+    for (i <- 0 until numNodes) {
+      val p = f.subplot(3, 2, i)
+      p += scatter(data(i)(::, 0), data(i)(::, 1), {_ => 0.01})
       p.title = s"Node $i"
     }
   }
