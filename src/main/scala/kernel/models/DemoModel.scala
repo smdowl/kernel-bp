@@ -37,6 +37,9 @@ class DemoModel(n: Int, dataFile: String = "") extends Model(n) {
 
     outputArray = Array.ofDim(numNodes)
 
+    for (i <- 0 until numNodes)
+      outputArray(i) = DenseMatrix.zeros[Double](n, d)
+
     if (shouldReadFromFile)
       readFromFile()
     else
@@ -62,7 +65,6 @@ class DemoModel(n: Int, dataFile: String = "") extends Model(n) {
   def generateRandomData() = {
     sampleCount = 0
     while (sampleCount < n) {
-      outputArray(sampleCount) = DenseMatrix.zeros[Double](n, d)
       generateSample()
       sampleCount += 1
     }
