@@ -6,6 +6,7 @@ import kernel.Result
 
 object Plotter {
   def plotData(data: Array[DenseMatrix[Double]]) = {
+    assert(data(0).cols == 1, "Currently only suitable for 1-d data.")
     val numNodes = data.length
 
     val f = Figure()
