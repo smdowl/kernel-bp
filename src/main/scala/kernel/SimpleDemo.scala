@@ -1,6 +1,7 @@
 package kernel
 
 import breeze.linalg._
+import kernel.linalg._
 import kernel.kernels.{RBFKernel, Kernel}
 import kernel.models.{ExtendedModel, DemoModel, Model}
 import kernel.plotting.Plotter
@@ -58,29 +59,29 @@ object SimpleDemo {
   }
 
   def higherDim() = {
-    val numSamples = 20
+    val numSamples = 100
     val model: ExtendedModel = new ExtendedModel(numSamples)
 
     val sampleArr = model.generateData()
 
-    val observations = Map(3 -> DenseMatrix(2.0, 2.0))
-    val data = model.outputArray
-    println()
+    val observations = Map(3 -> DenseMatrix((0.0, 0.0)))
 //    Plotter.plotData(sampleArr)
 
-//    val kernel = new RBFKernel()
-//    val passer = new MessagePasser(model, kernel)
-//
-//    val betaArr = passer.passMessages(sampleArr, observations)
-//
-//    val axisBelief = linspace(-5, 5, 200)
-//    val sigRoot = 0.1     // Parzen window parameter at root
-//
-//    val result = new Result(model, kernel, sampleArr, observations, betaArr, sigRoot, axisBelief)
-//    Plotter.plotResults(result)
+    val kernel = new RBFKernel()
+    val passer = new MessagePasser(model, kernel)
+
+    val betaArr = passer.passMessages(sampleArr, observations)
+
+    val axisRange = linspace(-5, 5, 150)
+    val axisBelief = meshgrid(axisRange, axisRange)
+
+    val sigRoot = 0.1     // Parzen window parameter at root
+
+    val result = new Result(model, kernel, sampleArr, observations, betaArr, sigRoot, axisBelief)
+    Plotter.plotResults(result)
   }
 
   def main(args: Array[String]): Unit = {
-    test()
+    higherDim()
   }
 }
