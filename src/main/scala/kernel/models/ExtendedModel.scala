@@ -73,16 +73,16 @@ class ExtendedModel(n: Int) extends Model(n) {
       val mu = outputArray(parents(0))(sampleCount, ::)
       val c = rand()
       if (c <= p1Leaf)
-        outputArray(whichNode)(sampleCount, ::) := mu + leafStd * randn()
+        outputArray(whichNode)(sampleCount, ::) := mu + (randn(2).asInstanceOf[DenseVector[Double]] * leafStd).t
       else
-        outputArray(whichNode)(sampleCount, ::) := 0 + leafStd * randn()
+        outputArray(whichNode)(sampleCount, ::) := (randn(2).asInstanceOf[DenseVector[Double]] * leafStd).t
     }
   }
 
   private def sampleRootNode(whichNode: Int) = {
     val c = rand()
 
-    val randomComponent =  rootStd * randn()
+    val randomComponent =  (randn(2).asInstanceOf[DenseVector[Double]] * rootStd).t
 
     val mean = if (c <= p1Root)
        rootMeans(0, ::)
