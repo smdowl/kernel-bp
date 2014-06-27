@@ -57,7 +57,7 @@ object Plotter {
   }
 
   def closeIndex(j: Int, data: DenseMatrix[Double], nodeObservations: DenseMatrix[Double])(implicit threshold: Double): Boolean = {
-    val point: DenseVector[Double] = data(::, j)
+    val point: DenseVector[Double] = data(j, ::).t
 
     assert(nodeObservations.cols == 1, "Only want to convert to a vector when we have a vector matrix")
     val obs = nodeObservations.toDenseVector

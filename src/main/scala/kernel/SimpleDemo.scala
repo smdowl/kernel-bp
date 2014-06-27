@@ -30,7 +30,7 @@ object SimpleDemo {
 
     val betaArr = passer.passMessages(sampleArr, observations)
 
-    val axisBelief = DenseMatrix(linspace(-5, 5, 200).toArray)
+    val axisBelief = DenseMatrix(linspace(-5, 5, 200).toArray).t
     val sigRoot = 0.1     // Parzen window parameter at root
 
     val result = new Result(model, kernel, sampleArr, observations, betaArr, sigRoot, axisBelief)
@@ -50,7 +50,7 @@ object SimpleDemo {
 
     val betaArr = passer.passMessages(sampleArr, observations)
 
-    val axisBelief = DenseMatrix(linspace(-5, 5, 200).toArray)
+    val axisBelief = DenseMatrix(linspace(-5, 5, 200).toArray).t
     val sigRoot = 0.1     // Parzen window parameter at root
 
     val result = new Result(model, kernel, sampleArr, observations, betaArr, sigRoot, axisBelief)
