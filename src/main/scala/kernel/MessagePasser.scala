@@ -72,8 +72,6 @@ class MessagePasser(model: Model, kernel: Kernel) {
 
           // Calculate product of all incoming messages
           for (childId <- childIds) {
-            val left = cache.kArr(nodeId)(childId)
-            val right = betaArr(childId)
             Ktu_beta :*= cache.kArr(nodeId)(childId) * betaArr(childId)
           }
 
