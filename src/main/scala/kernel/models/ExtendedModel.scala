@@ -4,7 +4,7 @@ import breeze.linalg._
 import kernel.MessageParam
 
 class ExtendedModel(n: Int) extends Model(n) {
-  override var A: DenseMatrix[Int] = DenseMatrix(
+  override val _A: DenseMatrix[Int] = DenseMatrix(
     (0,1,1,0,0),
     (0,0,0,1,1),
     (0,0,0,0,0),
