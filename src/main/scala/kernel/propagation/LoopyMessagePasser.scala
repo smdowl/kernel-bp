@@ -8,6 +8,8 @@ import kernel.models.Model
 
 class LoopyMessagePasser(model: Model, kernel: Kernel) {
 
+  private val numIter = 100
+
   protected var cache: LoopyCache = _
   protected var betaArr: Array[Array[DenseMatrix[Double]]] = _
   protected var KarrInv: Array[DenseMatrix[Double]] = _
@@ -81,6 +83,24 @@ class LoopyMessagePasser(model: Model, kernel: Kernel) {
   }
 
   protected def calculateInternalMessages(): Unit = {
+    for(i <- 0 until numIter) {
+      val nodes = (0 until model.numNodes).filterNot(observations.keySet.contains)
 
+      for (nodeIdx <- nodes) {
+        val neighbours = model.getNeighbours(nodeIdx)
+        val nodesToUpdate = (0 until model.numNodes).filterNot(neighbours.contains).toSet
+
+          for (outMessageIdx <- nodesToUpdate) {
+            val Ktu_beta = DenseMatrix.ones[Double](model.n, 1)
+
+            for (inMessageIdx <- nodesToUpdate - outMessageIdx)
+              Ktu_beta :*= (cache.kArr(nodeIdx) * betaArr(inMessageIdx)(outMessageIdx))
+
+            betaArr(nodeIdx)(outMessageIdx) = KarrInv(outMessageIdx) * Ktu_beta
+            normMessage(nodeIdx, outMessageIdx)
+          }
+      }
+
+    }
   }
 }
