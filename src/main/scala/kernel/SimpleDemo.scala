@@ -4,19 +4,13 @@ import breeze.linalg._
 import kernel.linalg._
 import kernel.kernels.{RBFKernel, Kernel}
 import kernel.models.{ExtendedModel, DemoModel, Model}
-import kernel.plotting.Plotter
+import kernel.plotting.{Result, Plotter}
 import app.Constants
 import kernel.propagation.TreeMessagePasser
 
 case class MessageParam(lambda: Double, sig: Double)
 
-case class Result(model: Model,
-                  kernel: Kernel,
-                  sampleArr: Array[DenseMatrix[Double]],
-                  observations: Map[Int, DenseMatrix[Double]],
-                  betaArr: Array[DenseMatrix[Double]],
-                  sigRoot: Double,
-                  axisBelief: DenseMatrix[Double])
+
 
 object SimpleDemo {
   def runDemo() = {

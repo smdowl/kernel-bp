@@ -2,7 +2,7 @@ package kernel.plotting
 
 import breeze.linalg._
 import breeze.plot._
-import kernel.Result
+import Result
 
 object LoopyPlotter {
   def plotData(data: Array[DenseMatrix[Double]]) = {
