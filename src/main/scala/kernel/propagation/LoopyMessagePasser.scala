@@ -51,7 +51,7 @@ class LoopyMessagePasser(model: Model, kernel: Kernel) {
         val Ks = cache.kArr(neighbourId)
         val I = DenseMatrix.eye[Double](Kt.rows)
 
-        val kt = kernel(observations(leafId), observations(leafId), model.msgParam.sig)
+        val kt = cache.kArr(neighbourId)
 
         betaArr(leafId)(neighbourId) = observedMessage(Kt, Ks, kt, I, model.msgParam.lambda)
         normMessage(leafId, neighbourId)
