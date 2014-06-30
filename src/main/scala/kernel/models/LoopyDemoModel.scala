@@ -9,7 +9,7 @@ class LoopyDemoModel(n: Int, datafile: String = "") extends DemoModel(n, datafil
     if (__A == null)
       __A = DenseMatrix(
         (0, 1, 1, 0, 0),
-        (1, 0, 0, 1, 1),
+        (1, 0, 1, 1, 0),
         (1, 1, 0, 1, 1),
         (0, 1, 1, 0, 0),
         (0, 0, 1, 0, 0))
