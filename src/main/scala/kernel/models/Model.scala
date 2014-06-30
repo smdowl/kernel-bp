@@ -4,7 +4,6 @@ import breeze.linalg._
 import kernel.MessageParam
 
 abstract class Model(val n: Int) {
-  val _A: DenseMatrix[Int]
   var temp: Option[DenseMatrix[Int]] = Option.empty
   val msgParam: MessageParam
   val rootNode: Int
@@ -38,6 +37,7 @@ abstract class Model(val n: Int) {
   }
 
   def A: DenseMatrix[Int] = temp.getOrElse(_A)
+  protected def _A: DenseMatrix[Int]
 
   private def shouldCut(observedNodes: Set[Int], nodeId: Int): Boolean = {
     !observedNodes.contains(nodeId) && isLeaf(nodeId) && hasParents(nodeId)

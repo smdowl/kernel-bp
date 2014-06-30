@@ -6,7 +6,7 @@ import io.MatrixReader
 import kernel.MessageParam
 
 class DemoModel(n: Int, dataFile: String = "") extends Model(n) {
-  override val _A: DenseMatrix[Int] = DenseMatrix(
+  override def _A: DenseMatrix[Int] = DenseMatrix(
     (0,1,1,0,0),
     (0,0,0,1,1),
     (0,0,0,0,0),
