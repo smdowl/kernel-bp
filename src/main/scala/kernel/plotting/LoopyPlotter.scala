@@ -2,7 +2,6 @@ package kernel.plotting
 
 import breeze.linalg._
 import breeze.plot._
-import Result
 
 object LoopyPlotter {
   def plotData(data: Array[DenseMatrix[Double]]) = {
@@ -38,10 +37,10 @@ object LoopyPlotter {
     }
   }
 
-  def plotResults(result: Result) = {
+  def plotResults(result: LoopyResult) = {
     val belief = calculateEmpiricalBelief(result)
     val rootMarginal: DenseVector[Double] = calculateKernelRootMarginal(result)
-    val condRootMarginal = calculateKernelCondRootMarginal(rootMarginal, result)
+    val condRootMarginal = calculateKernelCondRootMarginal(0, rootMarginal, result)
 
     val f = Figure()
 
@@ -63,7 +62,7 @@ object LoopyPlotter {
     } else throw new Exception("Cannot handle more than 2-d")
   }
 
-  def calculateEmpiricalBelief(output: Result): DenseVector[Double] = {
+  def calculateEmpiricalBelief(output: LoopyResult): DenseVector[Double] = {
     // Empirical root belief
     implicit val threshold = 0.01
 
@@ -101,19 +100,19 @@ object LoopyPlotter {
     })
   }
 
-  def calculateKernelRootMarginal(r: Result) = {
+  def calculateKernelRootMarginal(r: LoopyResult) = {
     val kernelRes = r.kernel(r.axisBelief, r.sampleArr(r.model.rootNode), r.sigRoot)
     sum(kernelRes, Axis._1)
   }
 
-  def calculateKernelCondRootMarginal(rootMarginal: DenseVector[Double], r: Result) = {
+  def calculateKernelCondRootMarginal(rootIdx: Int, rootMarginal: DenseVector[Double], r: LoopyResult) = {
     var condRootMarginal: DenseVector[Double] = rootMarginal.copy
 
     for (neighbour <- r.model.getNeighbours(r.model.rootNode)) {
 
       val dotLeft = r.axisBelief
       val dotRight = r.sampleArr(r.model.rootNode)
-      val multFactor: DenseMatrix[Double] = r.kernel(dotLeft, dotRight, r.model.msgParam.sig) * r.betaArr(neighbour)(0)
+      val multFactor: DenseMatrix[Double] = r.kernel(dotLeft, dotRight, r.model.msgParam.sig) * r.betaArr(neighbour)(rootIdx)
 
       condRootMarginal :*= multFactor.toDenseVector
     }
