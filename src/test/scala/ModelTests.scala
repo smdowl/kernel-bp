@@ -32,4 +32,12 @@ class ModelTests extends Test {
     model.getParents(3) shouldBe Seq[Int](1)
     model.getParents(4) shouldBe Seq[Int](1)
   }
+
+  test("Nighbour Test") {
+    model.getNeighbours(0) shouldBe Seq[Int](1,2)
+    model.getNeighbours(1) shouldBe Seq[Int](0,3,4)
+    model.getNeighbours(2) shouldBe Seq[Int](0)
+    model.getNeighbours(3) shouldBe Seq[Int](1)
+    model.getNeighbours(4) shouldBe Seq[Int](1)
+  }
 }
