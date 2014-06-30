@@ -88,17 +88,17 @@ class LoopyMessagePasser(model: Model, kernel: Kernel) {
 
       for (nodeIdx <- nodes) {
         val neighbours = model.getNeighbours(nodeIdx)
-        val nodesToUpdate = (0 until model.numNodes).filterNot(neighbours.contains).toSet
+        val nodesToUpdate = neighbours.filterNot(observations.keySet.contains).toSet
 
-          for (outMessageIdx <- nodesToUpdate) {
-            val Ktu_beta = DenseMatrix.ones[Double](model.n, 1)
+        for (outMessageIdx <- nodesToUpdate) {
+          val Ktu_beta = DenseMatrix.ones[Double](model.n, 1)
 
-            for (inMessageIdx <- nodesToUpdate - outMessageIdx)
-              Ktu_beta :*= (cache.kArr(nodeIdx) * betaArr(inMessageIdx)(outMessageIdx))
+          for (inMessageIdx <- nodesToUpdate - outMessageIdx)
+            Ktu_beta :*= (cache.kArr(nodeIdx) * betaArr(inMessageIdx)(nodeIdx))
 
-            betaArr(nodeIdx)(outMessageIdx) = KarrInv(outMessageIdx) * Ktu_beta
-            normMessage(nodeIdx, outMessageIdx)
-          }
+          betaArr(nodeIdx)(outMessageIdx) = KarrInv(outMessageIdx) * Ktu_beta
+          normMessage(nodeIdx, outMessageIdx)
+        }
       }
 
     }

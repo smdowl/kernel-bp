@@ -3,10 +3,10 @@ package kernel
 import breeze.linalg._
 import kernel.linalg._
 import kernel.kernels.{RBFKernel, Kernel}
-import kernel.models.{ExtendedModel, DemoModel, Model}
-import kernel.plotting.{Result, Plotter}
+import kernel.models.{LoopyDemoModel, ExtendedModel, DemoModel, Model}
+import kernel.plotting.{LoopyPlotter, LoopyResult, Result, Plotter}
 import app.Constants
-import kernel.propagation.TreeMessagePasser
+import kernel.propagation.{LoopyMessagePasser, TreeMessagePasser}
 
 case class MessageParam(lambda: Double, sig: Double)
 
@@ -76,7 +76,27 @@ object SimpleDemo {
     Plotter.plotResults(result)
   }
 
+  def runLoopy() = {
+    val numSamples = 50
+    val model: Model = new LoopyDemoModel(numSamples, "/Users/Shaun/dev/kernelBP_source/kernelBP_loopy/test-output/sampArr")
+
+    val sampleArr = model.generateData()
+    val observations = Map(3 -> DenseMatrix(0.0))
+//    Plotter.plotData(sampleArr)
+
+    val kernel = new RBFKernel()
+    val passer = new LoopyMessagePasser(model, kernel)
+
+    val betaArr = passer.passMessages(sampleArr, observations)
+
+    val axisBelief = DenseMatrix(linspace(-5, 5, 200).toArray).t
+    val sigRoot = 0.1     // Parzen window parameter at root
+
+    val result = new LoopyResult(model, kernel, sampleArr, observations, betaArr, sigRoot, axisBelief)
+    LoopyPlotter.plotResults(result)
+  }
+
   def main(args: Array[String]): Unit = {
-    higherDim()
+    runLoopy()
   }
 }
