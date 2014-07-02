@@ -15,7 +15,7 @@ class LoopyCorrectValueTests extends Test {
   var betaArr: Array[Array[DenseMatrix[Double]]] = _
 
   before {
-    val numSamples = 50
+    val numSamples = 2
     model = new LoopyDemoModel(numSamples, Constants.LOOPY_SAMPLE_DATA)
 
     val sampleArr = model.generateData()
@@ -54,23 +54,25 @@ class LoopyCorrectValueTests extends Test {
   test("Any betas match") {
     val trueArr = loadCorrect()
     for (i <- 0 until model.numNodes)
-      anyNearlyEqualArrays(trueArr(i), betaArr(i))
+      if (trueArr(i) != null)
+        anyNearlyEqualArrays(trueArr(i), betaArr(i))
   }
 
   test("All betas match") {
     val trueArr = loadCorrect()
     for (i <- 0 until model.numNodes)
-      allNearlyEqualArrays(trueArr(i), betaArr(i))
+      if (trueArr(i) != null)
+        allNearlyEqualArrays(trueArr(i), betaArr(i))
   }
 
   def loadCorrect(): Array[Array[DenseMatrix[Double]]] = {
     val output = Array.ofDim[Array[DenseMatrix[Double]]](model.numNodes)
 
-    for (i <- 1 until model.numNodes) {
-      output(i) = Array.ofDim[DenseMatrix[Double]](model.numNodes)
-      for (j <- 1 until model.numNodes) {
+    for (i <- 1 to model.numNodes) {
+      output(i-1) = Array.ofDim[DenseMatrix[Double]](model.numNodes)
+      for (j <- 1 to model.numNodes) {
         val filepath = Constants.LOOPY_CORRECT_DIR + s"betaArr$i$j"
-        output(i)(j) = MatrixReader.loadMatrixFromFile(filepath)
+        output(i-1)(j-1) = try {MatrixReader.loadMatrixFromFile(filepath)} catch {case _: Throwable => null}
       }
     }
 
