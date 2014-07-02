@@ -78,7 +78,7 @@ object SimpleDemo {
 
   def runLoopy() = {
     val numSamples = 50
-    val model: Model = new LoopyDemoModel(numSamples, "/Users/Shaun/dev/kernelBP_source/kernelBP_loopy/test-output/sampArr")
+    val model: Model = new LoopyDemoModel(numSamples, Constants.LOOPY_SAMPLE_DATA)
 
     val sampleArr = model.generateData()
     val observations = Map(3 -> DenseMatrix(0.0))

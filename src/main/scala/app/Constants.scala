@@ -17,6 +17,9 @@ object Constants {
   final val CORRECT_DIR = MATLAB_DIR + "test-output/"
   final val SAMPLE_DATA = CORRECT_DIR + "sampArr"
 
+  final val LOOPY_CORRECT_DIR = "/Users/Shaun/dev/kernelBP_source/kernelBP_loopy/test-output/"
+  final val LOOPY_SAMPLE_DATA = LOOPY_CORRECT_DIR + "sampArr"
+
   final val OUTPUT_FILES_DIR = MATLAB_DIR + "scala-out/"
 
   final val INTER_MATRICES_DIR = MATLAB_DIR + "inter-out/"
