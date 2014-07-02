@@ -84,23 +84,29 @@ class LoopyMessagePasser(model: Model, kernel: Kernel) {
 
   protected def calculateInternalMessages(): Unit = {
     for(i <- 0 until numIter) {
-      val nodes = (0 until model.numNodes).filterNot(observations.keySet.contains)
+      propagate()
+    }
+  }
 
-      for (nodeIdx <- nodes) {
-        val neighbours = model.getNeighbours(nodeIdx)
-        val nodesToUpdate = neighbours.filterNot(observations.keySet.contains).toSet
+  private def propagate() = {
+    val nodes = unobservedNodes
 
-        for (outMessageIdx <- nodesToUpdate) {
-          val Ktu_beta = DenseMatrix.ones[Double](model.n, 1)
+    for (nodeIdx <- nodes)
+      updateMessageForNode(nodeIdx)
+  }
 
-          for (inMessageIdx <- nodesToUpdate - outMessageIdx)
-            Ktu_beta :*= (cache.kArr(nodeIdx) * betaArr(inMessageIdx)(nodeIdx))
+  private def updateMessageForNode(nodeId: Int) = {
+    val neighbours = model.getNeighbours(nodeId)
+    val nodesToUpdate = neighbours.filterNot(observations.keySet.contains).toSet
 
-          betaArr(nodeIdx)(outMessageIdx) = KarrInv(outMessageIdx) * Ktu_beta
-          normMessage(nodeIdx, outMessageIdx)
-        }
-      }
+    for (outMessageIdx <- nodesToUpdate) {
+      val Ktu_beta = DenseMatrix.ones[Double](model.n, 1)
 
+      for (inMessageIdx <- nodesToUpdate - outMessageIdx)
+        Ktu_beta :*= (cache.kArr(nodeId) * betaArr(inMessageIdx)(nodeId))
+
+      betaArr(nodeId)(outMessageIdx) = KarrInv(outMessageIdx) * Ktu_beta
+      normMessage(nodeId, outMessageIdx)
     }
   }
 }
