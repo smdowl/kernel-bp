@@ -10,6 +10,13 @@ class KernelTests extends Test {
     kernel(p1, p1, 0.5) === DenseMatrix((1.0, 1.0), (1.0, 1.0)) shouldBe true
   }
 
+  test("Real example") {
+    val p1 = DenseMatrix(-0.348099491208178, -0.264391385304961)
+    val res = kernel(p1, p1, 0.3)
+    val maxDiff: Double = max(res - DenseMatrix((1.000000000000000, 0.976913835942669), (0.976913835942669, 1.000000000000000)))
+    maxDiff < 1e-3 shouldBe true
+  }
+
   test("More complex test") {
     val p1 = DenseMatrix(1.0, 2.0)
     val res = kernel(p1, p1, 0.5)
