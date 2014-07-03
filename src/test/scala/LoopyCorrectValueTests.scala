@@ -1,5 +1,6 @@
 import app.Constants
-import breeze.linalg.DenseMatrix
+import breeze.linalg.{max, DenseMatrix}
+import breeze.numerics.abs
 import io.MatrixReader
 import kernel.caches.{LoopyCache, Cache}
 import kernel.kernels.RBFKernel
@@ -13,13 +14,14 @@ class LoopyCorrectValueTests extends Test {
   var model: LoopyDemoModel = _
   var passer: LoopyMessagePasser = _
   var betaArr: Array[Array[DenseMatrix[Double]]] = _
+  var observations: Map[Int, DenseMatrix[Double]] = _
 
   before {
     val numSamples = 2
     model = new LoopyDemoModel(numSamples, Constants.LOOPY_SAMPLE_DATA)
 
     val sampleArr = model.generateData()
-    val observations = Map(3 -> DenseMatrix(0.0))
+    observations = Map(3 -> DenseMatrix(0.0))
 
     val kernel = new RBFKernel()
     passer = new LoopyMessagePasser(model, kernel)
@@ -59,20 +61,43 @@ class LoopyCorrectValueTests extends Test {
   }
 
   test("All betas match") {
-    val trueArr = loadCorrect()
+    val trueArr = loadCorrect(shouldNorm = false)
     for (i <- 0 until model.numNodes)
       if (trueArr(i) != null)
         allNearlyEqualArrays(trueArr(i), betaArr(i))
   }
 
-  def loadCorrect(): Array[Array[DenseMatrix[Double]]] = {
+  test("Observed messages") {
+    val trueArr = loadCorrect(shouldNorm = true)
+    for (obsId <- observations.keySet) {
+      val neighbours = model.getNeighbours(obsId)
+
+      for (neighbour <- neighbours) {
+        val v1 = betaArr(obsId)(neighbour)
+        val v2 = trueArr(obsId)(neighbour)
+        val matches = nearlyEqual(v1, v2)
+        println(matches, v1, v2)
+
+        matches shouldBe true
+      }
+    }
+  }
+
+  def loadCorrect(shouldNorm: Boolean = false): Array[Array[DenseMatrix[Double]]] = {
     val output = Array.ofDim[Array[DenseMatrix[Double]]](model.numNodes)
 
     for (i <- 1 to model.numNodes) {
       output(i-1) = Array.ofDim[DenseMatrix[Double]](model.numNodes)
       for (j <- 1 to model.numNodes) {
         val filepath = Constants.LOOPY_CORRECT_DIR + s"betaArr$i$j"
-        output(i-1)(j-1) = try {MatrixReader.loadMatrixFromFile(filepath)} catch {case _: Throwable => null}
+        output(i-1)(j-1) = try {
+          val matrix = MatrixReader.loadMatrixFromFile(filepath)
+
+          if (shouldNorm)
+            matrix / abs(max(matrix))
+          else
+            matrix
+        } catch {case _: Throwable => null}
       }
     }
 
