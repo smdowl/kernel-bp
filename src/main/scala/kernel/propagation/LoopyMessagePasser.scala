@@ -1,7 +1,7 @@
 package kernel.propagation
 
 import breeze.linalg.{inv, max, norm, DenseMatrix}
-import breeze.numerics.sqrt
+import breeze.numerics.{abs, sqrt}
 import kernel.caches.{LoopyCache, Cache}
 import kernel.kernels.Kernel
 import kernel.models.Model
@@ -13,11 +13,13 @@ class LoopyMessagePasser(model: Model, kernel: Kernel) {
   protected var cache: LoopyCache = _
   protected var betaArr: Array[Array[DenseMatrix[Double]]] = _
   protected var KarrInv: Array[DenseMatrix[Double]] = _
+  protected var sampleArr: Array[DenseMatrix[Double]] = _
   protected var observations: Map[Int, DenseMatrix[Double]] = _
 
   def getCache = this.cache
 
   def passMessages(sampleArr: Array[DenseMatrix[Double]], observations: Map[Int, DenseMatrix[Double]]): Array[Array[DenseMatrix[Double]]] = {
+    this.sampleArr = sampleArr
     this.observations = observations
     cache = LoopyCache.buildCache(sampleArr, kernel, model)
     betaArr = Array.ofDim[DenseMatrix[Double]](model.numNodes, model.numNodes)
@@ -43,7 +45,7 @@ class LoopyMessagePasser(model: Model, kernel: Kernel) {
   def unobservedNodes = (0 until model.numNodes).filterNot(observations.keySet.contains)
 
   protected def calculateObservedMessages(): Unit = {
-    for ((leafId, idx) <- observations.keys.zipWithIndex) {
+    for (leafId <- observations.keys) {
       val neighbours = model.getNeighbours(leafId)
 
       neighbours.foreach(neighbourId => {
@@ -51,7 +53,7 @@ class LoopyMessagePasser(model: Model, kernel: Kernel) {
         val Ks = cache.kArr(neighbourId)
         val I = DenseMatrix.eye[Double](Kt.rows)
 
-        val kt = cache.kArr(neighbourId)
+        val kt = kernel(sampleArr(leafId), observations(leafId), model.msgParam.sig)
 
         betaArr(leafId)(neighbourId) = observedMessage(Kt, Ks, kt, I, model.msgParam.lambda)
         normMessage(leafId, neighbourId)
@@ -70,7 +72,10 @@ class LoopyMessagePasser(model: Model, kernel: Kernel) {
   }
 
   private def normMessage(i: Int, j: Int) = {
-    betaArr(i)(j) = betaArr(i)(j) / max(betaArr(i)(j))
+    // TODO: Make sure this doesn't do something too crazy in higher dimensions
+    val matNorm = norm(betaArr(i)(j).toDenseVector)
+    val maxNorm = abs(max(betaArr(i)(j)))
+    betaArr(i)(j) /= matNorm
   }
 
   private def initBetas() = {
@@ -84,6 +89,7 @@ class LoopyMessagePasser(model: Model, kernel: Kernel) {
 
   protected def calculateInternalMessages(): Unit = {
     for(i <- 0 until numIter) {
+      println(s"Starting iteration $i")
       propagate()
     }
   }
@@ -97,13 +103,15 @@ class LoopyMessagePasser(model: Model, kernel: Kernel) {
 
   private def updateMessageForNode(nodeId: Int) = {
     val neighbours = model.getNeighbours(nodeId)
-    val nodesToUpdate = neighbours.filterNot(observations.keySet.contains).toSet
+    val nodesToUpdate = neighbours.filterNot(observations.keySet.contains)
 
     for (outMessageIdx <- nodesToUpdate) {
       val Ktu_beta = DenseMatrix.ones[Double](model.n, 1)
 
-      for (inMessageIdx <- nodesToUpdate - outMessageIdx)
-        Ktu_beta :*= (cache.kArr(nodeId) * betaArr(inMessageIdx)(nodeId))
+      for (inMessageIdx <- (neighbours.toSet - outMessageIdx).toSeq.sorted) {
+        val multFactor = cache.kArr(nodeId) * betaArr(inMessageIdx)(nodeId)
+        Ktu_beta :*= multFactor
+      }
 
       betaArr(nodeId)(outMessageIdx) = KarrInv(outMessageIdx) * Ktu_beta
       normMessage(nodeId, outMessageIdx)
