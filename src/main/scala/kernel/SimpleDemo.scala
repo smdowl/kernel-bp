@@ -8,7 +8,7 @@ import kernel.plotting.{LoopyPlotter, LoopyResult, Result, Plotter}
 import app.Constants
 import kernel.propagation.{LoopyMessagePasser, TreeMessagePasser}
 
-case class MessageParam(lambda: Double, sig: Double)
+
 
 
 
@@ -117,6 +117,6 @@ object SimpleDemo {
   }
 
   def main(args: Array[String]): Unit = {
-    demoLoopy()
+    runLoopy()
   }
 }

@@ -3,7 +3,7 @@ package kernel.models
 import app.Constants
 import breeze.linalg._
 import io.MatrixReader
-import kernel.MessageParam
+import MessageParam
 
 class DemoModel(n: Int, dataFile: String = "") extends Model(n) {
   override def _A: DenseMatrix[Int] = DenseMatrix(
