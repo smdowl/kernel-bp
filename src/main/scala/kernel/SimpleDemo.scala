@@ -9,9 +9,6 @@ import app.Constants
 import kernel.propagation.{LoopyMessagePasser, TreeMessagePasser}
 
 
-
-
-
 object SimpleDemo {
   def runDemo() = {
     val numSamples = 400

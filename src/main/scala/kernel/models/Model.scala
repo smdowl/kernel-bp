@@ -1,7 +1,6 @@
 package kernel.models
 
 import breeze.linalg._
-import MessageParam
 
 abstract class Model(val n: Int) {
   var temp: Option[DenseMatrix[Int]] = Option.empty

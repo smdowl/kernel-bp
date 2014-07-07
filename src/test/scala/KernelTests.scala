@@ -1,6 +1,5 @@
 import breeze.linalg.{max, DenseMatrix}
-import kernel.kernels.{SlowRBFKernel, RBFKernel}
-import org.scalatest._
+import kernel.kernels.RBFKernel
 
 class KernelTests extends Test {
   val kernel = new RBFKernel

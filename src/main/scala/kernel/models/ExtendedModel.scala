@@ -1,7 +1,6 @@
 package kernel.models
 
 import breeze.linalg._
-import MessageParam
 
 class ExtendedModel(n: Int) extends Model(n) {
   override def _A: DenseMatrix[Int] = DenseMatrix(
