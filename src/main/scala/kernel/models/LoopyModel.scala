@@ -2,6 +2,10 @@ package kernel.models
 
 import breeze.linalg.DenseMatrix
 
+/**
+ * A class repr a loopy model. Needs to do some messy stuff in order to handle creation of data
+ * from an unmorlised graph, while performing inference on the original graph.
+ */
 abstract class LoopyModel(n: Int, datafile: String = "") extends DemoModel(n, datafile) {
   var storedA: DenseMatrix[Int] = _
 
