@@ -1,5 +1,7 @@
 package input
 
+import breeze.linalg.DenseVector
+
 case class ParsedToken(id: Int,
                       form: String,
                       lemma: String,
@@ -7,4 +9,5 @@ case class ParsedToken(id: Int,
                       POS: String,
                       features: Seq[String],
                       head: Int,
-                      depRel: String)
+                      depRel: String,
+                      wordVector: DenseVector[Double] = null)

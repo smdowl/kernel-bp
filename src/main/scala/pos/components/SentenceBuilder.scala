@@ -18,7 +18,7 @@ class SentenceBuilder(parser: Parser) {
 
   private def buildSentence(parsedSentence: Iterable[ParsedToken]): Seq[Token] = {
     parsedSentence.map(token =>{
-      new Token(token.id, token.form, token.POS)
+      new Token(token.id, token.form, token.POS, token.wordVector)
     }).toSeq
   }
 }

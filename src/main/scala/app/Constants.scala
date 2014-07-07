@@ -2,7 +2,7 @@ package app
 
 object Constants {
   
-  val orig = true
+  val orig = false
   val SUBDIR: String = if (orig) "orig/" else "vector-appended/"
 
   private final val BASE_DIR = "/Users/Shaun/dev/kernel-bp/data/" + SUBDIR
