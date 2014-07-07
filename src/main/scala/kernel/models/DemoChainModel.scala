@@ -1,17 +1,24 @@
 package kernel.models
 
-import breeze.linalg.{DenseVector, randn, DenseMatrix}
+import breeze.linalg._
 
 class DemoChainModel(n: Int, length: Int) extends Model(n) {
   override val msgParam: MessageParam = MessageParam(0.1, 0.3)
   override val rootNode = 0
 
-  override protected def _A: DenseMatrix[Int] = DenseMatrix.eye[Int](length)
+  override protected def _A: DenseMatrix[Int] = DenseMatrix(
+    (0,1,0,0,0),
+    (0,0,1,0,0),
+    (0,0,0,1,0),
+    (0,0,0,0,1),
+    (0,0,0,0,0) )
 
   val d = 1
   var outputArray: Array[DenseMatrix[Double]] = _
   var sampleIndex: Int = _
   val sigma = 0.2
+
+  val rootMeans = DenseMatrix(0.0, 2.0)
 
   override def generateData(): Array[DenseMatrix[Double]] = {
     outputArray = Array.ofDim(length)
@@ -44,13 +51,23 @@ class DemoChainModel(n: Int, length: Int) extends Model(n) {
   }
 
   private def sampleRoot() = {
-    val sample: DenseVector[Double] = randn(d)
-    outputArray(0)(sampleIndex, ::) := sample.t * sigma
+    val c = rand()
+
+    val mean = if (c <= 0.5)
+      rootMeans(0, ::)
+    else
+      rootMeans(1, ::)
+
+    outputArray(0)(sampleIndex, ::) := mean + genSample()
   }
 
   private def sampleNonRoot(nodeId: Int) = {
     val parentId = getParents(nodeId)(0)
+    outputArray(nodeId)(sampleIndex, ::) := outputArray(parentId)(sampleIndex, ::) + genSample()
+  }
+
+  private def genSample() = {
     val sample: DenseVector[Double] = randn(d)
-    outputArray(nodeId)(sampleIndex, ::) := outputArray(parentId)(sampleIndex, ::) + sample.t * sigma
+    sample.t * sigma
   }
 }
