@@ -5,31 +5,34 @@ import breeze.linalg.DenseVector
 import computation.FeatureVector
 import input.{ConllParser, Parser}
 import pos.components.SentenceBuilder
-import pos.features.extractors.{FeatureArrayBuilder, BasicFeatureExtractor, FeatureExtractor}
-import pos.parser.HistoryParser
+import pos.features.extractors.{FeatureArrayBuilder, FeatureExtractor}
+import pos.parser.{ParseHistory, HistoryParser}
 
 object ParsedFeaturesOutput {
   var builder: SentenceBuilder = _
   var historyParser: HistoryParser = _
 
-  def apply(parser: Parser, extractor: FeatureExtractor): Array[DenseVector[Double]] = {
+  def apply(parser: Parser, extractor: FeatureExtractor, source: String = Constants.DEP_TEST) = {
     builder = new SentenceBuilder(parser)
     historyParser = new HistoryParser()
 
-    val parseHistories = getHistories(Constants.DEP_TEST)
+    val parseHistories = getHistories(source)
 
-    var featuresSeq = Seq[FeatureVector]()
-    parseHistories.foreach(_.contexts.foreach(context => {
-      val features = extractor.extractFeatures(context)
-      println(features)
-      featuresSeq :+= features
-    }))
+    var featuresSeq = Seq[Seq[FeatureVector]]()
+    parseHistories.foreach(history => {
+      val sentenceFeatures = getSentenceFeatures(history, extractor)
+      featuresSeq :+= sentenceFeatures
+    })
 
-    FeatureArrayBuilder.buildFeatureArray(featuresSeq.toArray)
+    FeatureArrayBuilder.buildFeatureArray(featuresSeq)
   }
 
   private def getHistories(file: String) = {
     val sentences = builder.buildSentenceFromFile(file)
     sentences.map(historyParser.parseHistory)
+  }
+
+  private def getSentenceFeatures(history: ParseHistory, extractor: FeatureExtractor) = {
+    history.contexts.map(extractor.extractFeatures)
   }
 }
