@@ -1,14 +1,14 @@
 package pos.features.extractors
 
-import breeze.linalg.{DenseMatrix, DenseVector}
+import breeze.linalg.DenseVector
 import computation.FeatureVector
 
 object FeatureArrayBuilder {
-  def buildFeatureArray(featureVectors: Array[FeatureVector]): Array[DenseMatrix[Double]] = {
+  def buildFeatureArray(featureVectors: Array[FeatureVector]): Array[DenseVector[Double]] = {
     val keyArray = getKeyArray(featureVectors)
     val featureIndex = buildInverseIndex(keyArray)
 
-    val featureSeq: Seq[DenseMatrix[Double]] = featureVectors.map(vec => buildFeatureArray(vec, featureIndex))
+    val featureSeq: Seq[DenseVector[Double]] = featureVectors.map(vec => buildFeatureArray(vec, featureIndex))
 
     featureSeq.toArray
   }
@@ -23,12 +23,12 @@ object FeatureArrayBuilder {
     Map[String, Int]() ++ keyPairs
   }
 
-  private def buildFeatureArray(featureVector: FeatureVector, index: Map[String, Int]): DenseMatrix[Double] = {
-    val arr = DenseMatrix.zeros[Double](index.size, 1)
+  private def buildFeatureArray(featureVector: FeatureVector, index: Map[String, Int]): DenseVector[Double] = {
+    val arr = DenseVector.zeros[Double](index.size)
 
     featureVector.keys.foreach(key => {
       val position = index(key)
-      arr(position, 1) = featureVector(key)
+      arr(position) = featureVector(key)
     })
 
     arr
