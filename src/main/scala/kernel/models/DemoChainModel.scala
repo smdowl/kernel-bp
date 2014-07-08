@@ -4,7 +4,6 @@ import breeze.linalg._
 
 class DemoChainModel(n: Int, length: Int) extends ChainModel(n, length) {
   override val msgParam: MessageParam = MessageParam(0.1, 0.3)
-  override val rootNode = 0
 
   val d = 1
   var outputArray: Array[DenseMatrix[Double]] = _

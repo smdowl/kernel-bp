@@ -3,6 +3,7 @@ package kernel.models
 import breeze.linalg.DenseMatrix
 
 abstract class ChainModel(n: Int, length: Int) extends Model(n) {
+  override val rootNode: Int = 0
   private var cachedA: DenseMatrix[Int] = _
 
   override protected def _A: DenseMatrix[Int] = {
