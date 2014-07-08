@@ -1,7 +1,7 @@
 package pos.output
 
 import app.Constants
-import breeze.linalg.DenseVector
+import breeze.linalg.{DenseMatrix, DenseVector}
 import computation.FeatureVector
 import input.{ConllParser, Parser}
 import pos.components.SentenceBuilder
@@ -12,7 +12,7 @@ object ParsedFeaturesOutput {
   var builder: SentenceBuilder = _
   var historyParser: HistoryParser = _
 
-  def apply(parser: Parser, extractor: FeatureExtractor): Array[DenseVector[Double]] = {
+  def apply(parser: Parser, extractor: FeatureExtractor): Array[DenseMatrix[Double]] = {
     builder = new SentenceBuilder(parser)
     historyParser = new HistoryParser()
 
