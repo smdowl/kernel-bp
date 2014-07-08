@@ -15,7 +15,7 @@ object FeatureArrayBuilder {
       output :+= featureSeq.toArray
     })
 
-    (keyArray, output)
+    (keyArray, output.toArray)
   }
 
   private def getKeyArray(featureVectors: Seq[Seq[FeatureVector]]): Array[String] = {
