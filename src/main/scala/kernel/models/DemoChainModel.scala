@@ -2,22 +2,9 @@ package kernel.models
 
 import breeze.linalg._
 
-class DemoChainModel(n: Int, length: Int) extends Model(n) {
+class DemoChainModel(n: Int, length: Int) extends ChainModel(n, length) {
   override val msgParam: MessageParam = MessageParam(0.1, 0.3)
   override val rootNode = 0
-
-  private var cachedA: DenseMatrix[Int] = _
-
-  override protected def _A: DenseMatrix[Int] = {
-    if (cachedA == null) {
-      cachedA = DenseMatrix.zeros[Int](length, length)
-      for (i <- 1 until length) {
-        cachedA(i-1, i) = 1
-      }
-    }
-
-    cachedA
-  }
 
   val d = 1
   var outputArray: Array[DenseMatrix[Double]] = _
