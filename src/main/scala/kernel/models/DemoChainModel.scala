@@ -15,7 +15,7 @@ class DemoChainModel(n: Int, length: Int) extends Model(n) {
         cachedA(i-1, i) = 1
       }
     }
-    
+
     cachedA
   }
 
