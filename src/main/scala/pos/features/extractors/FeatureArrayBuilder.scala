@@ -4,17 +4,23 @@ import breeze.linalg.DenseVector
 import computation.FeatureVector
 
 object FeatureArrayBuilder {
-  def buildFeatureArray(featureVectors: Array[FeatureVector]): Array[DenseVector[Double]] = {
+  def buildFeatureArray(featureVectors: Seq[Seq[FeatureVector]]): Seq[Array[DenseVector[Double]]] = {
     val keyArray = getKeyArray(featureVectors)
     val featureIndex = buildInverseIndex(keyArray)
 
-    val featureSeq: Seq[DenseVector[Double]] = featureVectors.map(vec => buildFeatureArray(vec, featureIndex))
+    var output = Seq[Array[DenseVector[Double]]]()
 
-    featureSeq.toArray
+    featureVectors.foreach(sentence => {
+      val featureSeq: Seq[DenseVector[Double]] = sentence.map(vec => buildFeatureArray(vec, featureIndex))
+      output :+= featureSeq.toArray
+    })
+
+    output
   }
 
-  private def getKeyArray(featureVectors: Array[FeatureVector]): Array[String] = {
-    val fullSet = featureVectors.foldLeft(Set[String]())((set, vec) => set ++ vec.keySet)
+  private def getKeyArray(featureVectors: Seq[Seq[FeatureVector]]): Array[String] = {
+    val allVectors = featureVectors.flatten
+    val fullSet = allVectors.foldLeft(Set[String]())((set, vec) => set ++ vec.keySet)
     fullSet.toArray.sorted
   }
 
