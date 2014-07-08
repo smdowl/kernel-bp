@@ -11,11 +11,21 @@ import pos.parser.{ParseHistory, HistoryParser}
 object ParsedFeaturesOutput {
   var builder: SentenceBuilder = _
   var historyParser: HistoryParser = _
+  var extractor: FeatureExtractor = _
 
-  def apply(parser: Parser, extractor: FeatureExtractor, source: String = Constants.DEP_TEST) = {
+  def apply(parser: Parser, extractor: FeatureExtractor, source: String = Constants.DEP_TEST,
+             testSource: String = Constants.MINI_TEST_FILE) = {
+    this.extractor = extractor
     builder = new SentenceBuilder(parser)
     historyParser = new HistoryParser()
 
+    val trainFeatures = featureVectorsFromSource(source)
+    val testFeatures = featureVectorsFromSource(testSource)
+
+    FeatureArrayBuilder.buildFeatureArray(trainFeatures, testFeatures)
+  }
+
+  private def featureVectorsFromSource(source: String) = {
     val parseHistories = getHistories(source)
 
     var featuresSeq = Seq[Seq[FeatureVector]]()
@@ -24,7 +34,7 @@ object ParsedFeaturesOutput {
       featuresSeq :+= sentenceFeatures
     })
 
-    FeatureArrayBuilder.buildFeatureArray(featuresSeq)
+    featuresSeq
   }
 
   private def getHistories(file: String) = {
