@@ -2,6 +2,7 @@ package kernel.plotting
 
 import breeze.linalg._
 import breeze.plot._
+import kernel.inference.LoopyBeliefInferer
 
 object LoopyPlotter {
   def plotData(data: Array[DenseMatrix[Double]]) = {
@@ -39,8 +40,11 @@ object LoopyPlotter {
 
   def plotResults(result: LoopyResult) = {
     val belief = calculateEmpiricalBelief(result)
-    val rootMarginal: DenseVector[Double] = calculateKernelRootMarginal(result)
-    val condRootMarginal = calculateKernelCondRootMarginal(0, rootMarginal, result)
+
+    val inferer = new LoopyBeliefInferer(result)
+
+    val rootMarginal: DenseVector[Double] = inferer.calculateKernelMarginal(result.model.rootNode)
+    val condRootMarginal = inferer.calculateKernelCondRootMarginal(result.model.rootNode)
 
     val f = Figure()
 
