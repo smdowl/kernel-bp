@@ -1,7 +1,3 @@
 package kernel.models
 
-import breeze.linalg.{DenseMatrix, DenseVector}
-
-trait PosModel {
-  def generateTestData(): Array[DenseMatrix[Double]]
-}
+abstract class PosModel(n: Int, length: Int) extends ChainModel(n, length) with ParsedModel

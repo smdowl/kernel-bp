@@ -12,7 +12,7 @@ object BasicPosModel extends App {
   println(data)
 }
 
-class BasicPosModel(n: Int, length: Int) extends ChainModel(n, length) with PosModel {
+class BasicPosModel(n: Int, length: Int) extends PosModel(n, length) with ParsedModel {
 
   val parser = new ConllParser()
   val extractor = new BasicFeatureExtractor
