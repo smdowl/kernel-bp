@@ -1,19 +1,34 @@
 package pos.features.extractors
 
 import computation.FeatureVector
-import pos.parser.Context
+import pos.parser.{ParseHistory, Context}
 
 class BasicFeatureExtractor extends FeatureExtractor {
-  override def extractFeatures(context: Context): FeatureVector = {
-    val output = new FeatureVector()
+  override def extractFeatures(history: ParseHistory): Seq[FeatureVector] = {
 
-    if (context.prev != null)
-      output add ("label:" + context.prev.token.POS)
+    var seqOut = Seq[FeatureVector]()
 
-    output add ("feature-token:" + context.token.form)
-    if (context.prev != null)
-      output add ("feature-prevtoken:" + context.prev.token.form)
+    for (i <- 0 to history.length) {
+      val vec = new FeatureVector()
+      val context = history.contexts(i)
 
-    output
+      if (i < history.length)
+        vec add ("feature-token:" + history.sentence(i).form)
+
+      if (i > 0) {
+        vec add ("label:" + history.tags(i-1))
+        vec add ("feature-prevtoken:" + history.sentence(i-1).form)
+      }
+
+      addContextFeaturesToVector(vec, context)
+
+      seqOut :+= vec
+    }
+
+    seqOut
+  }
+
+  private def addContextFeaturesToVector(vec: FeatureVector, context: Context) = {
+
   }
 }

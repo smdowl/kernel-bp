@@ -42,7 +42,7 @@ object ParsedFeaturesOutput {
     sentences.map(historyParser.parseHistory)
   }
 
-  private def getSentenceFeatures(history: ParseHistory, extractor: FeatureExtractor) = {
-    history.contexts.map(extractor.extractFeatures)
+  private def getSentenceFeatures(history: ParseHistory, extractor: FeatureExtractor): Seq[FeatureVector] = {
+    extractor.extractFeatures(history)
   }
 }
