@@ -13,7 +13,7 @@ object ParsedFeaturesOutput {
   var historyParser: HistoryParser = _
   var extractor: FeatureExtractor = _
 
-  def apply(parser: Parser, extractor: FeatureExtractor, source: String = Constants.DEP_TEST,
+  def apply(parser: Parser, extractor: FeatureExtractor, length: Int, source: String = Constants.DEP_TEST,
              testSource: String = Constants.MINI_TEST_FILE) = {
     this.extractor = extractor
     builder = new SentenceBuilder(parser)
@@ -22,7 +22,7 @@ object ParsedFeaturesOutput {
     val trainFeatures = featureVectorsFromSource(source)
     val testFeatures = featureVectorsFromSource(testSource)
 
-    FeatureArrayBuilder.buildFeatureArray(trainFeatures, testFeatures)
+    FeatureArrayBuilder.buildFeatureArray(trainFeatures, testFeatures, length)
   }
 
   private def featureVectorsFromSource(source: String) = {

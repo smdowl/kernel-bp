@@ -1,7 +1,7 @@
 package kernel.models
 
 import app.Constants
-import breeze.linalg.{DenseVector, DenseMatrix}
+import breeze.linalg.{any, DenseVector, DenseMatrix}
 import input.ConllParser
 import pos.features.extractors.BasicFeatureExtractor
 import pos.output.ParsedFeaturesOutput
@@ -23,7 +23,7 @@ class BasicPosModel(n: Int, length: Int) extends ChainModel(n, length) with PosM
   var featureKeys: Array[String] = _
 
   override def generateData(): Array[DenseMatrix[Double]] = {
-    val (tempFeatureKeys, featureArrays, testFeatureArrays) = ParsedFeaturesOutput(parser, extractor, Constants.MINI_TRAIN_FILE, Constants.MINI_TEST_FILE)
+    val (tempFeatureKeys, featureArrays, testFeatureArrays) = ParsedFeaturesOutput(parser, extractor, length, Constants.MINI_TRAIN_FILE, Constants.MINI_TEST_FILE)
     featureKeys = tempFeatureKeys
 
     testData = parseTest(testFeatureArrays)
@@ -47,15 +47,19 @@ class BasicPosModel(n: Int, length: Int) extends ChainModel(n, length) with PosM
 
 
   private def convertToDataMatrices(featureArrays: Array[Array[DenseVector[Double]]]) = {
-    val output = Array.ofDim[DenseMatrix[Double]](featureArrays.length)
+    val output = Array.ofDim[DenseMatrix[Double]](this.length)
     val numSamples = featureArrays.length
 
     for (i <- 0 until output.length)
       output(i) = DenseMatrix.zeros[Double](numSamples, d)
 
     for (sample <- 0 until numSamples)
-      for (i <- 0 until output.length)
+      for (i <- 0 until output.length) {
         output(i)(sample, ::) := featureArrays(sample)(i).t
+
+        if (i > 0)
+          assert(any(output(i)(sample, ::).t), "Should still have some non-zero entries")
+      }
 
     output
   }

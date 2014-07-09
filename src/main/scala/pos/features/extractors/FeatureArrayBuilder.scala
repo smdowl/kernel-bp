@@ -1,10 +1,15 @@
 package pos.features.extractors
 
-import breeze.linalg.DenseVector
+import breeze.linalg.{any, DenseVector}
 import computation.FeatureVector
 
 object FeatureArrayBuilder {
-  def buildFeatureArray(trainFeatureVectors: Seq[Seq[FeatureVector]], testFeatureVectors: Seq[Seq[FeatureVector]]) = {
+  var length: Int = _
+
+  def buildFeatureArray(trainFeatureVectors: Seq[Seq[FeatureVector]],
+                        testFeatureVectors: Seq[Seq[FeatureVector]],
+                        length: Int = -1) = {
+    this.length = length
     val keyArray = getKeyArray(trainFeatureVectors ++ testFeatureVectors)
     val featureIndex = buildInverseIndex(keyArray)
 
@@ -29,8 +34,11 @@ object FeatureArrayBuilder {
     var output = Seq[Array[DenseVector[Double]]]()
 
     featureVectors.foreach(sentence => {
-      val featureSeq: Seq[DenseVector[Double]] = sentence.map(vec => parseFeatureVector(vec, index))
-      output :+= featureSeq.toArray
+      if (length > 0 && sentence.length == length) {
+        val featureSeq: Seq[DenseVector[Double]] = sentence.map(vec => parseFeatureVector(vec, index))
+        assert(featureSeq.slice(1, length).forall(vec => any(vec)), "Should have at least one non-zero entry")
+        output :+= featureSeq.toArray
+      }
     })
 
     output.toArray
