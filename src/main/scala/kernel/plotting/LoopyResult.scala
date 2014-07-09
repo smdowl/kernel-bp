@@ -5,9 +5,9 @@ import kernel.kernels.Kernel
 import kernel.models.Model
 
 case class LoopyResult(model: Model,
-                  kernel: Kernel,
-                  sampleArr: Array[DenseMatrix[Double]],
-                  observations: Map[Int, DenseMatrix[Double]],
-                  betaArr: Array[Array[DenseMatrix[Double]]],
-                  sigRoot: Double,
-                  axisBelief: DenseMatrix[Double])
+                       kernel: Kernel,
+                       sampleArr: Array[DenseMatrix[Double]],
+                       observations: Map[Int, DenseMatrix[Double]],
+                       betaArr: Array[Array[DenseMatrix[Double]]],
+                       sigRoot: Double,
+                       support: DenseMatrix[Double])

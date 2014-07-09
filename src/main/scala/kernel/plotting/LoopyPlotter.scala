@@ -48,17 +48,17 @@ object LoopyPlotter {
 
     val f = Figure()
 
-    val d = result.axisBelief.cols
+    val d = result.support.cols
     if (d == 1) {
       val p = f.subplot(0)
-      p += plot(result.axisBelief.toDenseVector, belief / sum(belief), colorcode = "b")
-      p += plot(result.axisBelief.toDenseVector, condRootMarginal / sum(condRootMarginal), colorcode = "r")
-      p += plot(result.axisBelief.toDenseVector, rootMarginal / sum(rootMarginal), colorcode = "g")
+      p += plot(result.support.toDenseVector, belief / sum(belief), colorcode = "b")
+      p += plot(result.support.toDenseVector, condRootMarginal / sum(condRootMarginal), colorcode = "r")
+      p += plot(result.support.toDenseVector, rootMarginal / sum(rootMarginal), colorcode = "g")
       p.title = "Belief at root"
     } else if (d == 2) {
       for (i <- 0 until d) {
         val p = f.subplot(d, 1, i)
-        val (support, marginalBelief) = calculateMarginalBelief(i, result.axisBelief, condRootMarginal)
+        val (support, marginalBelief) = calculateMarginalBelief(i, result.support, condRootMarginal)
         val y: DenseVector[Double] = marginalBelief / sum(marginalBelief)
         p += plot(support.toDenseVector, y, colorcode = "r")
         p.title = s"Belief at root, d$i"
@@ -88,9 +88,9 @@ object LoopyPlotter {
       val d = output.sampleArr(0).cols
       val condNodes = DenseMatrix.tabulate[Double](condIndices.size, d) { (i, j) => output.sampleArr(output.model.rootNode)(condIndices(i), j)}
 
-      val beliefRootEmp = output.kernel(output.axisBelief, condNodes, output.sigRoot)
+      val beliefRootEmp = output.kernel(output.support, condNodes, output.sigRoot)
       sum(beliefRootEmp.t(::, *)).asInstanceOf[DenseMatrix[Double]].toDenseVector
-    } else DenseVector.zeros[Double](output.axisBelief.rows)
+    } else DenseVector.zeros[Double](output.support.rows)
   }
 
   def closeIndex(j: Int, data: DenseMatrix[Double], nodeObservations: DenseMatrix[Double])(implicit threshold: Double): Boolean = {
@@ -105,7 +105,7 @@ object LoopyPlotter {
   }
 
   def calculateKernelRootMarginal(r: LoopyResult) = {
-    val kernelRes = r.kernel(r.axisBelief, r.sampleArr(r.model.rootNode), r.sigRoot)
+    val kernelRes = r.kernel(r.support, r.sampleArr(r.model.rootNode), r.sigRoot)
     sum(kernelRes, Axis._1)
   }
 
@@ -114,7 +114,7 @@ object LoopyPlotter {
 
     for (neighbour <- r.model.getNeighbours(r.model.rootNode)) {
 
-      val dotLeft = r.axisBelief
+      val dotLeft = r.support
       val dotRight = r.sampleArr(r.model.rootNode)
       val multFactor: DenseMatrix[Double] = r.kernel(dotLeft, dotRight, r.model.msgParam.sig) * r.betaArr(neighbour)(rootIdx)
 

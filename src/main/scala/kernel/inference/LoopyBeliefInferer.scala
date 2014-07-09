@@ -6,7 +6,7 @@ import kernel.plotting.LoopyResult
 class LoopyBeliefInferer(result: LoopyResult) {
 
   def calculateKernelMarginal(nodeId: Int) = {
-    val kernelRes = result.kernel(result.axisBelief, result.sampleArr(nodeId), result.sigRoot)
+    val kernelRes = result.kernel(result.support, result.sampleArr(nodeId), result.sigRoot)
     sum(kernelRes, Axis._1)
   }
 
@@ -15,7 +15,7 @@ class LoopyBeliefInferer(result: LoopyResult) {
 
     for (neighbour <- result.model.getNeighbours(nodeId)) {
 
-      val dotLeft = result.axisBelief
+      val dotLeft = result.support
       val dotRight = result.sampleArr(nodeId)
       val multFactor: DenseMatrix[Double] = result.kernel(dotLeft, dotRight, result.model.msgParam.sig) * result.betaArr(neighbour)(nodeId)
 
