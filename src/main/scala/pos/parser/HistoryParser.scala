@@ -8,11 +8,18 @@ class HistoryParser {
     var contexts = Seq[Context]()
     var tags = Seq[String]()
 
-    contexts :+= new Context()
+    var prev = new Context()
+    contexts :+= prev
 
     sentence.foreach(token => {
       tags :+= token.POS
-      contexts :+= contexts.last.add(token)
+
+      val newContext = contexts.last.add(token)
+      contexts :+= newContext
+
+      newContext.prev = prev
+      prev.next = newContext
+      prev = newContext
     })
 
     ParseHistory(sentence, contexts, tags)

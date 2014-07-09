@@ -7,8 +7,12 @@ class BasicFeatureExtractor extends FeatureExtractor {
   override def extractFeatures(context: Context): FeatureVector = {
     val output = new FeatureVector()
 
-    if (context.history.size > 0)
-      output add ("prev-pos:" + context.history.last.POS)
+    if (context.prev != null)
+      output add ("label:" + context.prev.token.POS)
+
+    output add ("feature-token:" + context.token.form)
+    if (context.prev != null)
+      output add ("feature-prevtoken:" + context.prev.token.form)
 
     output
   }
