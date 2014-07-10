@@ -26,6 +26,7 @@ class BasicPosModel(n: Int, length: Int) extends PosModel(n, length) with Parsed
     val (tempFeatureKeys, featureArrays, testFeatureArrays) = ParsedFeaturesOutput(parser, extractor, length, Constants.MINI_TRAIN_FILE, Constants.MINI_TEST_FILE)
     featureKeys = tempFeatureKeys
 
+    // TODO: Convert to sparse
     testData = parseTest(testFeatureArrays)
     parseTraining(featureArrays)
   }
