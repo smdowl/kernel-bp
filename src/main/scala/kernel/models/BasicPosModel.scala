@@ -19,26 +19,41 @@ class BasicPosModel(n: Int, length: Int) extends PosModel(n, length) with Parsed
 
   override val msgParam: MessageParam = MessageParam(0.1, 0.3)
 
-  var testData: Array[DenseMatrix[Double]] = _
-  var featureKeys: Array[String] = _
+  private var testData: Array[DenseMatrix[Double]] = _
+  private var featureKeys: Array[String] = _
+  private var _labelKeys: Set[String] = _
+  private var keyIndex: Map[String, Int] = _
 
   override def generateData(): Array[DenseMatrix[Double]] = {
-    val (tempFeatureKeys, featureArrays, testFeatureArrays) = ParsedFeaturesOutput(parser, extractor, length, Constants.MINI_TRAIN_FILE, Constants.MINI_TEST_FILE)
-    featureKeys = tempFeatureKeys
+    val (featureKeys, featureArrays, testFeatureArrays) = ParsedFeaturesOutput(parser, extractor, length, Constants.MINI_TRAIN_FILE, Constants.MINI_TEST_FILE)
+    this.featureKeys = featureKeys
+    _labelKeys = getLabelKeys(featureKeys)
+    keyIndex = buildIndex(featureKeys)
 
     // TODO: Convert to sparse
     testData = parseTest(testFeatureArrays)
     parseTraining(featureArrays)
   }
 
-  def parseTest(featureArrays: Array[Array[DenseVector[Double]]]) = {
+  private def getLabelKeys(keys: Iterable[String]) = {
+    keys.filter(_.startsWith("label:")).toSet
+  }
+
+  private def buildIndex(featureKeys: Array[String]) = {
+    featureKeys.zipWithIndex.foldLeft(Map[String, Int]()) {
+      case (index, (key, idx)) =>
+        index + (key -> idx)
+    }
+  }
+
+  private def parseTest(featureArrays: Array[Array[DenseVector[Double]]]) = {
     val filteredArrays = featureArrays.filter(_.length == length)
     assert(filteredArrays.length > 0, s"Need at least one test example.")
 
     convertToDataMatrices(filteredArrays.toArray)
   }
 
-  def parseTraining(featureArrays: Array[Array[DenseVector[Double]]]) = {
+  private def parseTraining(featureArrays: Array[Array[DenseVector[Double]]]) = {
     // Ensure all the arrays fit with this model size
     val filteredArrays = featureArrays.filter(_.length == length)
     assert(filteredArrays.length >= n, s"Not enough sentences for requested sample size. Wanted $n but only ${filteredArrays.length} available")
@@ -71,4 +86,8 @@ class BasicPosModel(n: Int, length: Int) extends PosModel(n, length) with Parsed
   }
 
   def d = featureKeys.size
+
+  override def labelKeys: Set[String] = _labelKeys
+
+  override def getIndexForKey(key: String): Int = keyIndex(key)
 }
