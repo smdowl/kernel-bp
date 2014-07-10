@@ -28,27 +28,28 @@ class BasicPosModel(n: Int, length: Int) extends PosModel(n, length) with Parsed
   override def generateData(): Array[DenseMatrix[Double]] = {
     val (featureKeys, featureArrays, testFeatureArrays) = ParsedFeaturesOutput(parser, extractor, length, Constants.MINI_TRAIN_FILE, Constants.MINI_TEST_FILE)
     this.featureKeys = featureKeys
-    _labelKeys = getLabelKeys(featureKeys)
-    keyIndex = buildIndex(featureKeys)
+    _labelKeys = getOnlyLabelKeys(featureKeys)
+    keyIndex = buildKeyIndex(featureKeys)
 
     // TODO: Convert to sparse
-    testData = parseTest(testFeatureArrays)
+    testData = parseTestData(testFeatureArrays)
     testLabels = parseAndRemoveLabels(testData)
+
     parseTraining(featureArrays)
   }
 
-  private def getLabelKeys(keys: Iterable[String]) = {
+  private def getOnlyLabelKeys(keys: Iterable[String]) = {
     keys.filter(_.startsWith("label:")).toSet
   }
 
-  private def buildIndex(featureKeys: Array[String]) = {
+  private def buildKeyIndex(featureKeys: Array[String]) = {
     featureKeys.zipWithIndex.foldLeft(Map[String, Int]()) {
       case (index, (key, idx)) =>
         index + (key -> idx)
     }
   }
 
-  private def parseTest(featureArrays: Array[Array[DenseVector[Double]]]) = {
+  private def parseTestData(featureArrays: Array[Array[DenseVector[Double]]]) = {
     val filteredArrays = featureArrays.filter(_.length == length)
     assert(filteredArrays.length > 0, s"Need at least one test example.")
 
