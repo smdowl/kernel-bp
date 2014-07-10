@@ -118,4 +118,6 @@ class BasicPosModel(n: Int, length: Int) extends PosModel(n, length) with Parsed
   override def labelKeys: Set[String] = _labelKeys
 
   override def getIndexForKey(key: String): Int = keyIndex(key)
+
+  override def getTestLabels: Array[Array[Double]] = testLabels
 }
