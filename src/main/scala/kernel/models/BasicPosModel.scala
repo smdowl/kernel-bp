@@ -1,7 +1,7 @@
 package kernel.models
 
 import app.Constants
-import breeze.linalg.{any, DenseVector, DenseMatrix}
+import breeze.linalg.{DenseMatrix, any, DenseVector}
 import input.ConllParser
 import pos.features.extractors.BasicFeatureExtractor
 import pos.output.ParsedFeaturesOutput
@@ -20,6 +20,7 @@ class BasicPosModel(n: Int, length: Int) extends PosModel(n, length) with Parsed
   override val msgParam: MessageParam = MessageParam(0.1, 0.3)
 
   private var testData: Array[DenseMatrix[Double]] = _
+  private var testLabels: Array[Array[String]] = _
   private var featureKeys: Array[String] = _
   private var _labelKeys: Set[String] = _
   private var keyIndex: Map[String, Int] = _
@@ -32,6 +33,7 @@ class BasicPosModel(n: Int, length: Int) extends PosModel(n, length) with Parsed
 
     // TODO: Convert to sparse
     testData = parseTest(testFeatureArrays)
+    testLabels = parseAndRemoveLabels(testData)
     parseTraining(featureArrays)
   }
 
@@ -51,6 +53,31 @@ class BasicPosModel(n: Int, length: Int) extends PosModel(n, length) with Parsed
     assert(filteredArrays.length > 0, s"Need at least one test example.")
 
     convertToDataMatrices(filteredArrays.toArray)
+  }
+
+  private def parseAndRemoveLabels(data: Array[DenseMatrix[Double]]) = {
+    val labels = Array.ofDim[Array[String]](data.length)
+    for (i <- 0 until data.length) {
+      val matrix = data(i)
+      labels(i) = Array.ofDim[String](matrix.rows)
+
+      for (j <- 0 until matrix.rows) {
+        val row = matrix(j, ::).t
+        val label = getLabel(row)
+        matrix(j, keyIndex(label)) = 0.0
+        labels(i)(j) = label
+      }
+    }
+    labels
+  }
+
+  private def getLabel(vec: DenseVector[Double]) = {
+    val keys = labelKeys.filter(labelKey => {
+      vec(keyIndex(labelKey)) != 0.0
+    })
+
+    assert(keys.size == 1, "Should only be one label.")
+    keys.head
   }
 
   private def parseTraining(featureArrays: Array[Array[DenseVector[Double]]]) = {

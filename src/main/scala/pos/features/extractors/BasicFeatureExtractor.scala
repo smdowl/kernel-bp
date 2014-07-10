@@ -18,6 +18,8 @@ class BasicFeatureExtractor extends FeatureExtractor {
       if (i > 0) {
         vec add ("label:" + history.tags(i-1))
         vec add ("feature-prevtoken:" + history.sentence(i-1).form)
+      } else {
+        vec add "label:NONE"
       }
 
       addContextFeaturesToVector(vec, context)
