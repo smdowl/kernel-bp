@@ -12,15 +12,21 @@ class BasicFeatureExtractor extends FeatureExtractor {
       val vec = new FeatureVector()
       val context = history.contexts(i)
 
-      if (i < history.length)
-        vec add ("feature-token:" + history.sentence(i).form)
+      if (i == 0) {
+        vec add "label:NONE"
+      }
 
       if (i > 0) {
         vec add ("label:" + history.tags(i-1))
         vec add ("feature-prevtoken:" + history.sentence(i-1).form)
-      } else {
-        vec add "label:NONE"
       }
+
+      if (i > 1) {
+        vec add ("feature-prevprevtoken:" + history.sentence(i-2).form)
+      }
+
+      if (i < history.length)
+        vec add ("feature-token:" + history.sentence(i).form)
 
       addContextFeaturesToVector(vec, context)
 
