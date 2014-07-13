@@ -7,7 +7,7 @@ import pos.features.extractors.BasicFeatureExtractor
 import pos.output.ParsedFeaturesOutput
 
 object BasicPosModel extends App {
-  val model = new BasicPosModel(8, 26)
+  val model = new BasicPosModel(8, 20)
   val data = model.generateData()
   println(data)
 }
@@ -26,7 +26,7 @@ class BasicPosModel(n: Int, length: Int) extends PosModel(n, length) with Parsed
   private var keyIndex: Map[String, Int] = _
 
   override def generateData(): Array[DenseMatrix[Double]] = {
-    val (featureKeys, featureArrays, testFeatureArrays) = ParsedFeaturesOutput(parser, extractor, length, Constants.MINI_TRAIN_FILE, Constants.MINI_TEST_FILE)
+    val (featureKeys, featureArrays, testFeatureArrays) = ParsedFeaturesOutput(parser, extractor, length, Constants.SMALL_TRAIN_FILE, Constants.SMALL_DEV_FILE)
     this.featureKeys = featureKeys
     _labelKeys = getOnlyLabelKeys(featureKeys)
     keyIndex = buildKeyIndex(featureKeys)
@@ -50,6 +50,8 @@ class BasicPosModel(n: Int, length: Int) extends PosModel(n, length) with Parsed
   }
 
   private def parseTestData(featureArrays: Array[Array[DenseVector[Double]]]) = {
+    // Check for length + 1 because the way we build the model there is always one more feature vector
+    // (because of the merging of contexts and tags)
     val filteredArrays = featureArrays.filter(_.length == length)
     assert(filteredArrays.length > 0, s"Need at least one test example.")
 
@@ -86,7 +88,7 @@ class BasicPosModel(n: Int, length: Int) extends PosModel(n, length) with Parsed
     val filteredArrays = featureArrays.filter(_.length == length)
     assert(filteredArrays.length >= n, s"Not enough sentences for requested sample size. Wanted $n but only ${filteredArrays.length} available")
 
-    convertToDataMatrices(filteredArrays.toArray)
+    convertToDataMatrices(filteredArrays.slice(0, n).toArray)
   }
 
 
