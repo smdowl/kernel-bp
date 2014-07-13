@@ -13,25 +13,27 @@ object ParsedFeaturesOutput {
   var historyParser: HistoryParser = _
   var extractor: FeatureExtractor = _
 
-  def apply(parser: Parser, extractor: FeatureExtractor, length: Int, source: String = Constants.DEP_TEST,
+  def apply(parser: Parser, extractor: FeatureExtractor, length: Int = -1, source: String = Constants.DEP_TEST,
              testSource: String = Constants.MINI_TEST_FILE) = {
     this.extractor = extractor
     builder = new SentenceBuilder(parser)
     historyParser = new HistoryParser()
 
-    val trainFeatures = featureVectorsFromSource(source)
-    val testFeatures = featureVectorsFromSource(testSource)
+    val trainFeatures = featureVectorsFromSource(source, length)
+    val testFeatures = featureVectorsFromSource(testSource, length)
 
-    FeatureArrayBuilder.buildFeatureArray(trainFeatures, testFeatures, length)
+    FeatureArrayBuilder.buildFeatureArray(trainFeatures, testFeatures)
   }
 
-  private def featureVectorsFromSource(source: String) = {
+  private def featureVectorsFromSource(source: String, length: Int) = {
     val parseHistories = getHistories(source)
 
     var featuresSeq = Seq[Seq[FeatureVector]]()
     parseHistories.foreach(history => {
-      val sentenceFeatures = getSentenceFeatures(history, extractor)
-      featuresSeq :+= sentenceFeatures
+      if (length > 0 && history.contexts.length == length) {
+        val sentenceFeatures = getSentenceFeatures(history, extractor)
+        featuresSeq :+= sentenceFeatures
+      }
     })
 
     featuresSeq
