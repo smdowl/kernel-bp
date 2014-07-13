@@ -16,7 +16,7 @@ object RealRun {
 }
 
 class RealRun {
-  val model: PosModel = new BasicPosModel(8, 26)
+  val model: PosModel = new BasicPosModel(150, 20)
 
   def runDemoChain() = {
     val sampleArr = model.generateData()
@@ -38,8 +38,12 @@ class RealRun {
 
     val betaArr = passer.passMessages(sampleArr, observations)
 
+    var precision = 0.0
+    var count = 0
+
     for (testSet <- 0 until testData(0).rows) {
-      for (nodeId <- 0 until testData.length) {
+      // First and last are always the same
+      for (nodeId <- 1 until testData.length-1) {
         val support = genSupport(testData(nodeId)(testSet, ::).t, allLabels)
         val result = new LoopyResult(model, kernel, sampleArr, observations, betaArr, 1.0, support)
 
@@ -48,14 +52,21 @@ class RealRun {
         val cond = inferer.calculateKernelCondRootMarginal(nodeId)
 
         val guessIdx = cond.findAll(_ == max(cond))
-        println(allLabels(guessIdx(0)))
-        println(testLabels(nodeId)(testSet))
+//        println(allLabels(guessIdx(0)))
+//        println(testLabels(nodeId)(testSet))
 
-        println()
+        precision += (if (allLabels(guessIdx(0)).equals(testLabels(nodeId)(testSet))) 1.0 else 0.0)
+        count += 1
       }
     }
+
+    println(s"Precision: ${precision / count}.")
   }
 
+  /**
+   * Go through and create all possible labelled instances from the base node instance.
+   * i.e. add each possible label to the feature vector
+   */
   private def genSupport(nodeInstance: DenseVector[Double], allLabels: Seq[String]) = {
     val outArr = DenseMatrix.zeros[Double](allLabels.length, nodeInstance.length)
 
