@@ -5,12 +5,12 @@ import kernel.plotting.LoopyResult
 
 class LoopyBeliefInferer(result: LoopyResult) {
 
-  def calculateKernelMarginal(nodeId: Int) = {
+  def calculateKernelMarginal(nodeId: Int): DenseVector[Double] = {
     val kernelRes = result.kernel(result.support, result.sampleArr(nodeId), result.sigRoot)
     sum(kernelRes, Axis._1)
   }
 
-  def calculateKernelCondRootMarginal(nodeId: Int) = {
+  def calculateKernelCondRootMarginal(nodeId: Int): DenseVector[Double] = {
     var condRootMarginal: DenseVector[Double] = calculateKernelMarginal(nodeId)
 
     for (neighbour <- result.model.getNeighbours(nodeId)) {
