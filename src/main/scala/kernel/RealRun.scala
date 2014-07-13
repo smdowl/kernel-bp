@@ -30,18 +30,20 @@ class RealRun {
     val testLabels = model.getTestLabels
     val allLabels = model.labelKeys.toSeq
 
-    val observations = Map(0 -> testData(0)(0, ::).t.toDenseMatrix)
+
     //    Plotter.plotData(sampleArr)
 
     val kernel = new LinearKernel()
-    val passer = new LoopyMessagePasser(model, kernel)
-
-    val betaArr = passer.passMessages(sampleArr, observations)
+    val observedNodes = Set(0)
+    val passer = new LoopyMessagePasser(model, kernel, sampleArr, observedNodes)
 
     var precision = 0.0
     var count = 0
 
     for (testSet <- 0 until testData(0).rows) {
+      val observations = Map(0 -> testData(0)(testSet, ::).t.toDenseMatrix)
+      val betaArr = passer.passMessages(observations)
+
       // First and last are always the same
       for (nodeId <- 1 until testData.length-1) {
         val support = genSupport(testData(nodeId)(testSet, ::).t, allLabels)

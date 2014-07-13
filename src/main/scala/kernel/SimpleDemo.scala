@@ -82,9 +82,9 @@ object SimpleDemo {
 //    Plotter.plotData(sampleArr)
 
     val kernel = new RBFKernel()
-    val passer = new LoopyMessagePasser(model, kernel)
+    val passer = new LoopyMessagePasser(model, kernel, sampleArr, observations.keySet)
 
-    val betaArr = passer.passMessages(sampleArr, observations)
+    val betaArr = passer.passMessages(observations)
 
     val axisBelief = DenseMatrix(linspace(-5, 5, 200).toArray).t
     val sigRoot = 0.1     // Parzen window parameter at root
@@ -102,9 +102,9 @@ object SimpleDemo {
     //    Plotter.plotData(sampleArr)
 
     val kernel = new RBFKernel()
-    val passer = new LoopyMessagePasser(model, kernel)
+    val passer = new LoopyMessagePasser(model, kernel, sampleArr, observations.keySet)
 
-    val betaArr = passer.passMessages(sampleArr, observations)
+    val betaArr = passer.passMessages(observations)
 
     val axisBelief = DenseMatrix(linspace(-5, 5, 200).toArray).t
     val sigRoot = 0.1     // Parzen window parameter at root

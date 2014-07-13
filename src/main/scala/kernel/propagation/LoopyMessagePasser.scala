@@ -6,24 +6,21 @@ import kernel.caches.{LoopyCache, Cache}
 import kernel.kernels.Kernel
 import kernel.models.Model
 
-class LoopyMessagePasser(model: Model, kernel: Kernel) {
+class LoopyMessagePasser(model: Model, kernel: Kernel, sampleArr: Array[DenseMatrix[Double]], observedNodes: Set[Int]) {
 
   private val numIter = 100
 
-  protected var cache: LoopyCache = _
-  protected var betaArr: Array[Array[DenseMatrix[Double]]] = _
-  protected var KarrInv: Array[DenseMatrix[Double]] = _
-  protected var sampleArr: Array[DenseMatrix[Double]] = _
+  protected var cache: LoopyCache = LoopyCache.buildCache(sampleArr, kernel, model)
+  protected var betaArr: Array[Array[DenseMatrix[Double]]] = Array.ofDim[DenseMatrix[Double]](model.numNodes, model.numNodes)
+  protected var KarrInv: Array[DenseMatrix[Double]] = calculateInverses()
   protected var observations: Map[Int, DenseMatrix[Double]] = _
 
   def getCache = this.cache
 
-  def passMessages(sampleArr: Array[DenseMatrix[Double]], observations: Map[Int, DenseMatrix[Double]]): Array[Array[DenseMatrix[Double]]] = {
-    this.sampleArr = sampleArr
+  def passMessages(observations: Map[Int, DenseMatrix[Double]]): Array[Array[DenseMatrix[Double]]] = {
     this.observations = observations
-    cache = LoopyCache.buildCache(sampleArr, kernel, model)
-    betaArr = Array.ofDim[DenseMatrix[Double]](model.numNodes, model.numNodes)
-    KarrInv = calculateInverses()
+
+    assert(observations.keySet.equals(observedNodes), "Should have exactly the same observations")
 
     initBetas()
 
@@ -42,7 +39,7 @@ class LoopyMessagePasser(model: Model, kernel: Kernel) {
     out
   }
 
-  def unobservedNodes = (0 until model.numNodes).filterNot(observations.keySet.contains)
+  def unobservedNodes = (0 until model.numNodes).filterNot(observedNodes.contains)
 
   protected def calculateObservedMessages(): Unit = {
     for (leafId <- observations.keys) {

@@ -21,9 +21,12 @@ class BasicFeatureExtractor extends FeatureExtractor {
         vec add ("feature-prevtoken:" + history.sentence(i-1).form)
       }
 
-      if (i > 1) {
-        vec add ("feature-prevprevtoken:" + history.sentence(i-2).form)
-      }
+//      if (i > 1) {
+//        vec add ("feature-prevprevtoken:" + history.sentence(i-2).form)
+//      }
+
+      if (i < history.length - 1)
+        vec add ("feature-nexttoken:" + history.sentence(i+1).form)
 
       if (i < history.length)
         vec add ("feature-token:" + history.sentence(i).form)

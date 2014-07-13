@@ -24,9 +24,9 @@ class LoopyCorrectValueTests extends Test {
     observations = Map(3 -> DenseMatrix(0.0))
 
     val kernel = new RBFKernel()
-    passer = new LoopyMessagePasser(model, kernel)
+    passer = new LoopyMessagePasser(model, kernel, sampleArr, observations.keySet)
 
-    betaArr = passer.passMessages(sampleArr, observations)
+    betaArr = passer.passMessages(observations)
   }
 
   test("Cache test") {
