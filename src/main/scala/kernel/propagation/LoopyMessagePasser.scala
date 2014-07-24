@@ -30,6 +30,15 @@ class LoopyMessagePasser(model: Model, kernel: Kernel, sampleArr: Array[DenseMat
     betaArr
   }
 
+  private def initBetas() = {
+    unobservedNodes.foreach(nodeId => {
+      val neighbours = model.getNeighbours(nodeId)
+      neighbours.foreach(neighbourId => {
+        betaArr(nodeId)(neighbourId) = DenseMatrix.ones[Double](model.n, 1) / sqrt(model.n)
+      })
+    })
+  }
+
   def calculateInverses() = {
     val out = Array.ofDim[DenseMatrix[Double]](model.numNodes)
 
@@ -73,15 +82,6 @@ class LoopyMessagePasser(model: Model, kernel: Kernel, sampleArr: Array[DenseMat
     val matNorm = norm(betaArr(i)(j).toDenseVector)
     val maxNorm = abs(max(betaArr(i)(j)))
     betaArr(i)(j) /= matNorm
-  }
-
-  private def initBetas() = {
-    unobservedNodes.foreach(nodeId => {
-      val neighbours = model.getNeighbours(nodeId)
-      neighbours.foreach(neighbourId => {
-        betaArr(nodeId)(neighbourId) = DenseMatrix.ones[Double](model.n, 1) / sqrt(model.n)
-      })
-    })
   }
 
   protected def calculateInternalMessages(): Unit = {
