@@ -75,14 +75,16 @@ abstract class Model(val n: Int) {
 
   /**
    * Get the lists of node pairs that share the same distributional relationship.
-   * Defaults to return each edge on it's own
+   * Defaults to return each edge on it's own.
    * @return
    */
   def sharedSets: List[List[(Int, Int)]] = {
     var sets = List[List[(Int, Int)]]()
     for (i <- 0 until numNodes) {
       getNeighbours(i).foreach(j => {
-        sets :+= List[(Int, Int)]((i ,j))
+        // Only consider the edges going forward
+        if (j > i)
+          sets :+= List[(Int, Int)]((i ,j))
       })
     }
     sets
