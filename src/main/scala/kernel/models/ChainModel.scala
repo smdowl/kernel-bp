@@ -16,4 +16,9 @@ abstract class ChainModel(n: Int, length: Int) extends Model(n) {
 
     cachedA
   }
+
+  override def sharedSets: List[List[(Int, Int)]] = {
+    val combinedList = super.sharedSets.foldLeft(List[(Int, Int)]())((b, a) => b ++ a)
+    List(combinedList)
+  }
 }
