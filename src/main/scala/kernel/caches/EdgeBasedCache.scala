@@ -10,6 +10,7 @@ object EdgeBasedCache {
     val numNodes = model.numNodes
     val sig = model.msgParam.sig
 
+    val dataArr = Array.ofDim[DenseMatrix[Double]](numNodes, numNodes)
     val kArr = Array.ofDim[DenseMatrix[Double]](numNodes, numNodes)
 
     val sharedSets = model.sharedSets
@@ -18,13 +19,15 @@ object EdgeBasedCache {
       val (leftData, rightData) = buildData(set, sampleArr)
 
       set.foreach{ case (l, r) =>
-        kArr(l)(r) = leftData
-        kArr(r)(l) = rightData
+        dataArr(l)(r) = leftData
+        kArr(l)(r) = kernel(leftData, leftData, sig)
+
+        dataArr(r)(l) = rightData
+        kArr(r)(l) = kernel(rightData, rightData, sig)
       }
     }
 
-//    EdgeBasedCache(kArr)
-    EdgeBasedCache(null)
+    EdgeBasedCache(dataArr, kArr)
   }
 
   def buildData(set: List[(Int, Int)], sampleArr: Array[DenseMatrix[Double]]) = {
@@ -42,4 +45,7 @@ object EdgeBasedCache {
   def mergeData(dataSeq: Seq[DenseMatrix[Double]]) = dataSeq.tail.foldLeft(dataSeq.head)((a, b) => DenseMatrix.vertcat(a, b))
 }
 
-case class EdgeBasedCache(kArr: Array[DenseMatrix[Double]])
+case class EdgeBasedCache(dataArr: Array[Array[DenseMatrix[Double]]],
+                          kArr: Array[Array[DenseMatrix[Double]]]) {
+  def numSamples(i: Int, j: Int) = kArr(i)(j).rows
+}
