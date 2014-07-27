@@ -5,7 +5,17 @@ import breeze.stats.distributions.Multinomial
 import kernel.models.toys.extractors.{SimpleFeatureExtractor, ToyFeatureExtractor}
 import pos.features.extractors.FeatureArrayBuilder
 
+import scala.util.Random
+
+object HMMModel extends App {
+  val model = new HMMModel(1)
+  val edges = model.generateEdges()
+}
+
 class HMMModel(n: Int) extends EdgeModel {
+  private val minLength = 15
+  private val maxLength = 30
+
   private val hiddenStates = Seq("A", "B", "C")
   private val visibleStates = Seq("X", "Y", "Z")
 
@@ -25,23 +35,30 @@ class HMMModel(n: Int) extends EdgeModel {
 
   private val extractor: ToyFeatureExtractor = new SimpleFeatureExtractor()
 
-  override def generateEdges(): Map[String, Edge] = ???
-
-
   /**
    * Generate data for the model. The output format is an array where each position is the training data
    * relevant to a given node and each row of those matrices is a single sample.
    */
-  private def generateData(): Array[DenseMatrix[Double]] = {
+  override def generateEdges(): Map[String, Edge] = {
     val sampleSequences = for (i <- 0 until n) yield drawSample()
     val testSequences = for (i <- 0 until n) yield drawSample()
 
     val (keyArray, trainData, testData) = FeatureArrayBuilder.buildFeatureArray(sampleSequences, testSequences)
-    trainData
-    null
+
+    var output = Map[String, Edge]()
+
+    output += ("hidden" -> buildTransitionEdges(trainData))
+    output += ("visible" -> buildEmissionEdges(trainData))
+
+    output
   }
 
+  /**
+   * Draw a single sample of hidden and visible states
+   */
   private def drawSample() = {
+    val length = minLength + Random.nextInt(maxLength - minLength)
+
     val hiddenSample = (0 until length).foldLeft(Seq[Int](initDist.draw()))((b, _) => {
       b :+ transitionDists(b.last).draw()
     })
@@ -52,4 +69,36 @@ class HMMModel(n: Int) extends EdgeModel {
 
     extractor.extractFeatures(hiddenSample.map(hiddenStates.apply) ++ visibleSample.map(visibleStates.apply))
   }
+
+  private def buildTransitionEdges(data: Array[Array[DenseVector[Double]]]) = {
+    var leftData = List[DenseMatrix[Double]]()
+    var rightData = List[DenseMatrix[Double]]()
+
+    data.foreach(sample => {
+      val sentenceLength = sample.length / 2
+      for (i <- 0 until sentenceLength - 1) {
+        leftData :+= sample(i).toDenseMatrix
+        rightData :+= sample(i+1).toDenseMatrix
+      }
+    })
+
+    Edge(mergeData(leftData), mergeData(rightData))
+  }
+
+  private def buildEmissionEdges(data: Array[Array[DenseVector[Double]]]) = {
+    var leftData = List[DenseMatrix[Double]]()
+    var rightData = List[DenseMatrix[Double]]()
+
+    data.foreach(sample => {
+      val sentenceLength = sample.length / 2
+      for (i <- 0 until sentenceLength - 1) {
+        leftData :+= sample(i).toDenseMatrix
+        rightData :+= sample(sentenceLength + i).toDenseMatrix
+      }
+    })
+
+    Edge(mergeData(leftData), mergeData(rightData))
+  }
+
+  private def mergeData(dataSeq: Seq[DenseMatrix[Double]]) = dataSeq.tail.foldLeft(dataSeq.head)((a, b) => DenseMatrix.vertcat(a, b))
 }
