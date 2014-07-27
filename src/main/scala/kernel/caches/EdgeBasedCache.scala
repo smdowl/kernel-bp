@@ -48,4 +48,17 @@ object EdgeBasedCache {
 case class EdgeBasedCache(dataArr: Array[Array[DenseMatrix[Double]]],
                           kArr: Array[Array[DenseMatrix[Double]]]) {
   def numSamples(i: Int, j: Int) = kArr(i)(j).rows
+
+  def numNodes = kArr.length
+  
+  def getNeighbours(nodeId: Int): Seq[Int] = {
+    var out = Seq[Int]()
+
+    (kArr(nodeId) zipWithIndex).foreach( pair => {
+      if (pair._1 != null)
+        out :+= pair._2
+    })
+
+    out
+  }
 }
