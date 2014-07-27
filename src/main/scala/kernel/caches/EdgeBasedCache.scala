@@ -50,7 +50,7 @@ case class EdgeBasedCache(dataArr: Array[Array[DenseMatrix[Double]]],
   def numSamples(i: Int, j: Int) = kArr(i)(j).rows
 
   def numNodes = kArr.length
-  
+
   def getNeighbours(nodeId: Int): Seq[Int] = {
     var out = Seq[Int]()
 

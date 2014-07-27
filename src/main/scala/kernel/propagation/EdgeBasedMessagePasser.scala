@@ -13,7 +13,7 @@ class EdgeBasedMessagePasser(model: Model, kernel: Kernel, sampleArr: Array[Dens
   private val msgParam: MessageParam = MessageParam(0.1, 0.3)
 
   protected var cache: EdgeBasedCache = EdgeBasedCache.buildCache(sampleArr, kernel, model)
-  protected var betaArr: Array[Array[DenseMatrix[Double]]] = Array.ofDim[DenseMatrix[Double]](model.numNodes, model.numNodes)
+  protected var betaArr: Array[Array[DenseMatrix[Double]]] = Array.ofDim[DenseMatrix[Double]](cache.numNodes, cache.numNodes)
   protected var KarrInv: Array[Array[DenseMatrix[Double]]] = calculateInverses()
   protected var observations: Map[Int, DenseMatrix[Double]] = _
 
@@ -34,7 +34,7 @@ class EdgeBasedMessagePasser(model: Model, kernel: Kernel, sampleArr: Array[Dens
 
   private def initBetas() = {
     unobservedNodes.foreach(nodeId => {
-      val neighbours = model.getNeighbours(nodeId)
+      val neighbours = cache.getNeighbours(nodeId)
       neighbours.foreach(neighbourId => {
         val numSamples = cache.numSamples(nodeId, neighbourId)
         betaArr(nodeId)(neighbourId) = DenseMatrix.ones[Double](numSamples, 1) / sqrt(numSamples)
@@ -43,20 +43,20 @@ class EdgeBasedMessagePasser(model: Model, kernel: Kernel, sampleArr: Array[Dens
   }
 
   def calculateInverses() = {
-    val out = Array.ofDim[DenseMatrix[Double]](model.numNodes, model.numNodes)
+    val out = Array.ofDim[DenseMatrix[Double]](cache.numNodes, cache.numNodes)
 
     for (i <- unobservedNodes)
-      for (j <- model.getNeighbours(i).filter(unobservedNodes.contains))
-        out(i)(j) = inv( cache.kArr(i)(j) + DenseMatrix.eye[Double](cache.numSamples(i, j)) * model.msgParam.lambda )
+      for (j <- cache.getNeighbours(i).filter(unobservedNodes.contains))
+        out(i)(j) = inv( cache.kArr(i)(j) + DenseMatrix.eye[Double](cache.numSamples(i, j)) * msgParam.lambda )
 
     out
   }
 
-  def unobservedNodes = (0 until model.numNodes).filterNot(observedNodes.contains)
+  def unobservedNodes = (0 until cache.numNodes).filterNot(observedNodes.contains)
 
   protected def calculateObservedMessages(): Unit = {
     for (leafId <- observations.keys) {
-      val neighbours = model.getNeighbours(leafId)
+      val neighbours = cache.getNeighbours(leafId)
 
       neighbours.foreach(neighbourId => {
         val Kt = cache.kArr(leafId)(neighbourId)
@@ -103,7 +103,7 @@ class EdgeBasedMessagePasser(model: Model, kernel: Kernel, sampleArr: Array[Dens
   }
 
   private def updateMessageForNode(nodeId: Int) = {
-    val neighbours = model.getNeighbours(nodeId)
+    val neighbours = cache.getNeighbours(nodeId)
     val nodesToUpdate = neighbours.filterNot(observations.keySet.contains)
 
     for (outMessageIdx <- nodesToUpdate) {
