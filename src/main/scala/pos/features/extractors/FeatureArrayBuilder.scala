@@ -4,6 +4,9 @@ import breeze.linalg.{any, DenseVector}
 import computation.FeatureVector
 
 object FeatureArrayBuilder {
+  /**
+   * Take a load of feature vector objects and convert them to actual feature vectors
+   */
   def buildFeatureArray(trainFeatureVectors: Seq[Seq[FeatureVector]],
                         testFeatureVectors: Seq[Seq[FeatureVector]]) = {
 
