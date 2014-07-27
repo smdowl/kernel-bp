@@ -4,11 +4,13 @@ import breeze.linalg.{inv, max, norm, DenseMatrix}
 import breeze.numerics.{abs, sqrt}
 import kernel.caches.{LoopyCache, EdgeBasedCache}
 import kernel.kernels.Kernel
-import kernel.models.Model
+import kernel.models.{MessageParam, Model}
 
 class EdgeBasedMessagePasser(model: Model, kernel: Kernel, sampleArr: Array[DenseMatrix[Double]], observedNodes: Set[Int]) {
 
   private val numIter = 100
+
+  private val msgParam: MessageParam = MessageParam(0.1, 0.3)
 
   protected var cache: EdgeBasedCache = EdgeBasedCache.buildCache(sampleArr, kernel, model)
   protected var betaArr: Array[Array[DenseMatrix[Double]]] = Array.ofDim[DenseMatrix[Double]](model.numNodes, model.numNodes)
@@ -61,9 +63,9 @@ class EdgeBasedMessagePasser(model: Model, kernel: Kernel, sampleArr: Array[Dens
         val Ks = cache.kArr(neighbourId)(leafId)
         val I = DenseMatrix.eye[Double](Kt.rows)
 
-        val kt = kernel(cache.dataArr(neighbourId)(leafId), observations(leafId), model.msgParam.sig)
+        val kt = kernel(cache.dataArr(neighbourId)(leafId), observations(leafId), msgParam.sig)
 
-        betaArr(leafId)(neighbourId) = observedMessage(Kt, Ks, kt, I, model.msgParam.lambda)
+        betaArr(leafId)(neighbourId) = observedMessage(Kt, Ks, kt, I, msgParam.lambda)
         normMessage(leafId, neighbourId)
       })
     }
