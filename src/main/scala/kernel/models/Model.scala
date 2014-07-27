@@ -2,6 +2,10 @@ package kernel.models
 
 import breeze.linalg._
 
+/**
+ * Model subclasses are responsible for describing a particular model type and for
+ * the creation of data sets associated with that model.
+ */
 abstract class Model(val n: Int) {
 
   /**
