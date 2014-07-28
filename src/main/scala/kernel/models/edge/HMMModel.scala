@@ -39,6 +39,10 @@ class HMMModel(n: Int) extends EdgeModel {
   private var _testData: Array[Array[DenseVector[Double]]] = _
   private var _keyArray: Array[String] = _
 
+  override def edges: Map[String, Edge] = _edges
+  override def testData: Array[Array[DenseVector[Double]]] = _testData
+  override def keyArray: Array[String] = _keyArray
+
   initialise()
 
   /**
@@ -58,12 +62,6 @@ class HMMModel(n: Int) extends EdgeModel {
     _edges += ("hidden" -> buildTransitionEdges(trainData))
     _edges += ("visible" -> buildEmissionEdges(trainData))
   }
-
-  override def edges: Map[String, Edge] = _edges
-
-  override def testData: Array[Array[DenseVector[Double]]] = _testData
-
-  override def keyArray: Array[String] = _keyArray
 
   /**
    * Draw a single sample of hidden and visible states
