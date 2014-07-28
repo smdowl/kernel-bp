@@ -9,7 +9,7 @@ import scala.util.Random
 
 object HMMModel extends App {
   val model = new HMMModel(1)
-  val edges = model.generateEdges()
+  val edges = model.edges
 }
 
 class HMMModel(n: Int) extends EdgeModel {
@@ -35,23 +35,35 @@ class HMMModel(n: Int) extends EdgeModel {
 
   private val extractor: ToyFeatureExtractor = new SimpleFeatureExtractor()
 
+  private var _edges: Map[String, Edge] = _
+  private var _testData: Array[Array[DenseVector[Double]]] = _
+  private var _keyArray: Array[String] = _
+
+  initialise()
+
   /**
    * Generate data for the model. The output format is an array where each position is the training data
    * relevant to a given node and each row of those matrices is a single sample.
    */
-  override def generateEdges(): Map[String, Edge] = {
+  private def initialise() = {
     val sampleSequences = for (i <- 0 until n) yield drawSample()
     val testSequences = for (i <- 0 until n) yield drawSample()
 
     val (keyArray, trainData, testData) = FeatureArrayBuilder.buildFeatureArray(sampleSequences, testSequences)
+    _keyArray = keyArray
+    _testData = testData
 
-    var output = Map[String, Edge]()
+    _edges = Map[String, Edge]()
 
-    output += ("hidden" -> buildTransitionEdges(trainData))
-    output += ("visible" -> buildEmissionEdges(trainData))
-
-    output
+    _edges += ("hidden" -> buildTransitionEdges(trainData))
+    _edges += ("visible" -> buildEmissionEdges(trainData))
   }
+
+  override def edges: Map[String, Edge] = _edges
+
+  override def testData: Array[Array[DenseVector[Double]]] = _testData
+
+  override def keyArray: Array[String] = _keyArray
 
   /**
    * Draw a single sample of hidden and visible states
