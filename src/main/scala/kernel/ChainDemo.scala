@@ -21,8 +21,7 @@ object ChainDemo {
     val loopyCache = LoopyCache.buildCache(sampleArr, kernel, model)
     val edgeCache = EdgeBasedCache.buildCache(sampleArr, kernel, model)
 
-    val cache: EdgeBasedCache = EdgeBasedCache.buildCache(sampleArr, kernel, model)
-    val edgePasser = new EdgeBasedMessagePasser(cache, observations.keySet)
+    val edgePasser = new EdgeBasedMessagePasser(edgeCache, observations.keySet)
 
     val betaArr = passer.passMessages(observations)
     val edgeBetaArr = edgePasser.passMessages(observations)
