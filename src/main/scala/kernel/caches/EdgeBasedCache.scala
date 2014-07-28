@@ -27,7 +27,7 @@ object EdgeBasedCache {
       }
     }
 
-    EdgeBasedCache(dataArr, kArr)
+    EdgeBasedCache(dataArr, kArr, kernel)
   }
 
   def buildData(set: List[(Int, Int)], sampleArr: Array[DenseMatrix[Double]]) = {
@@ -46,7 +46,8 @@ object EdgeBasedCache {
 }
 
 case class EdgeBasedCache(dataArr: Array[Array[DenseMatrix[Double]]],
-                          kArr: Array[Array[DenseMatrix[Double]]]) {
+                          kArr: Array[Array[DenseMatrix[Double]]],
+                           kernel: Kernel) {
   def numSamples(i: Int, j: Int) = kArr(i)(j).rows
 
   def numNodes = kArr.length
