@@ -36,11 +36,13 @@ class HMMModel(n: Int) extends EdgeModel {
   private val extractor: ToyFeatureExtractor = new SimpleFeatureExtractor()
 
   private var _edges: Map[String, Edge] = _
-  private var _testData: Array[Array[DenseVector[Double]]] = _
+  private var _testObservations: Array[Map[Int, DenseMatrix[Double]]] = _
+  private var _testLabels: Array[Map[Int, DenseMatrix[Double]]] = _
   private var _keyArray: Array[String] = _
 
   override def edges: Map[String, Edge] = _edges
-  override def testData: Array[Array[DenseVector[Double]]] = _testData
+  override def testObservations: Array[Map[Int, DenseMatrix[Double]]] = _testObservations
+  override def testLabels: Array[Map[Int, DenseMatrix[Double]]] = _testLabels
   override def keyArray: Array[String] = _keyArray
 
   initialise()
@@ -54,8 +56,10 @@ class HMMModel(n: Int) extends EdgeModel {
     val testSequences = for (i <- 0 until n) yield drawSample()
 
     val (keyArray, trainData, testData) = FeatureArrayBuilder.buildFeatureArray(sampleSequences, testSequences)
+
     _keyArray = keyArray
-    _testData = testData
+    _testObservations = getObservations(testData)
+    _testLabels = getTestLabels(testData)
 
     _edges = Map[String, Edge]()
 
@@ -78,6 +82,26 @@ class HMMModel(n: Int) extends EdgeModel {
     })
 
     extractor.extractFeatures(hiddenSample.map(hiddenStates.apply) ++ visibleSample.map(visibleStates.apply))
+  }
+
+  private def getObservations(testData: Array[Array[DenseVector[Double]]]): Array[Map[Int, DenseMatrix[Double]]] = {
+    testData.map(sample => {
+      convertRangeToMap(sample, 0, sample.length / 2)
+    })
+  }
+
+  private def getTestLabels(testData: Array[Array[DenseVector[Double]]]): Array[Map[Int, DenseMatrix[Double]]] = {
+    testData.map(sample => {
+      convertRangeToMap(sample, sample.length / 2, sample.length)
+    })
+  }
+
+  private def convertRangeToMap(sample: Array[DenseVector[Double]], from: Int, until: Int) = {
+    var map = Map[Int, DenseMatrix[Double]]()
+    for (i <- from until until) {
+      map += i -> sample(i).toDenseMatrix
+    }
+    map
   }
 
   private def buildTransitionEdges(data: Array[Array[DenseVector[Double]]]) = {

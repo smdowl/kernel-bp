@@ -1,9 +1,10 @@
 package kernel.models.edge
 
-import breeze.linalg.DenseVector
+import breeze.linalg.{DenseMatrix}
 
 trait EdgeModel {
   def edges: Map[String, Edge]
-  def testData: Array[Array[DenseVector[Double]]]
+  def testObservations: Array[Map[Int, DenseMatrix[Double]]]
+  def testLabels: Array[Map[Int, DenseMatrix[Double]]]
   def keyArray: Array[String]
 }
