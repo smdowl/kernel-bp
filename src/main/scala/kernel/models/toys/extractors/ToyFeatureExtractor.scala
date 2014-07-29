@@ -7,5 +7,5 @@ trait ToyFeatureExtractor {
   /**
    * Convert each set of samples into an array of feature
    */
-  def extractFeatures(sampleData: Iterable[String]): Seq[FeatureVector]
+  def extractFeatures(sampleData: Seq[String]): Seq[FeatureVector]
 }

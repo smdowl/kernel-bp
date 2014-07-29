@@ -2,7 +2,7 @@ package kernel.models.edge
 
 import breeze.linalg.{DenseMatrix, DenseVector}
 import breeze.stats.distributions.Multinomial
-import kernel.models.toys.extractors.{SimpleFeatureExtractor, ToyFeatureExtractor}
+import kernel.models.toys.extractors.{SimpleHMMFeatureExtractor, ToyFeatureExtractor}
 import pos.features.extractors.FeatureArrayBuilder
 
 import scala.util.Random
@@ -33,7 +33,7 @@ class HMMModel(n: Int) extends EdgeModel {
     new Multinomial(DenseVector(0.0, 0.0, 1.0))
   )
 
-  private val extractor: ToyFeatureExtractor = new SimpleFeatureExtractor()
+  private val extractor: ToyFeatureExtractor = new SimpleHMMFeatureExtractor()
 
   private var _edges: Map[String, Edge] = _
   private var _testObservations: Array[Map[Int, DenseMatrix[Double]]] = _

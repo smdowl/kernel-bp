@@ -2,7 +2,7 @@ package kernel.models.toys
 
 import breeze.linalg.{DenseVector, DenseMatrix}
 import breeze.stats.distributions.Multinomial
-import kernel.models.toys.extractors.{SimpleFeatureExtractor, ToyFeatureExtractor}
+import kernel.models.toys.extractors.{SimpleHMMFeatureExtractor, ToyFeatureExtractor}
 import kernel.models.{HMMModel, ParsedModel, MessageParam}
 import pos.features.extractors.FeatureArrayBuilder
 
@@ -33,7 +33,7 @@ class DeterministicHMMModel(n: Int, length: Int) extends HMMModel(n, length) wit
     new Multinomial(DenseVector(0.0, 0.0, 1.0))
   )
 
-  private val extractor: ToyFeatureExtractor = new SimpleFeatureExtractor()
+  private val extractor: ToyFeatureExtractor = new SimpleHMMFeatureExtractor()
 
   /**
    * Generate data for the model. The output format is an array where each position is the training data
