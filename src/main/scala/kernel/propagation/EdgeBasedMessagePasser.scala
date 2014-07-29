@@ -3,14 +3,10 @@ package kernel.propagation
 import breeze.linalg.{inv, max, norm, DenseMatrix}
 import breeze.numerics.{abs, sqrt}
 import kernel.caches.{LoopyCache, EdgeBasedCache}
-import kernel.kernels.Kernel
-import kernel.models.{MessageParam, Model}
 
 class EdgeBasedMessagePasser(cache: EdgeBasedCache, observedNodes: Set[Int]) {
 
   private val numIter = 100
-
-  private val msgParam: MessageParam = MessageParam(0.1, 0.3)
 
   protected var betaArr: Array[Array[DenseMatrix[Double]]] = Array.ofDim[DenseMatrix[Double]](cache.numNodes, cache.numNodes)
   protected var KarrInv: Array[Array[DenseMatrix[Double]]] = calculateInverses()
@@ -46,7 +42,7 @@ class EdgeBasedMessagePasser(cache: EdgeBasedCache, observedNodes: Set[Int]) {
 
     for (i <- unobservedNodes)
       for (j <- cache.getNeighbours(i).filter(unobservedNodes.contains))
-        out(i)(j) = inv( cache.kArr(i)(j) + DenseMatrix.eye[Double](cache.numSamples(i, j)) * msgParam.lambda )
+        out(i)(j) = inv( cache.kArr(i)(j) + DenseMatrix.eye[Double](cache.numSamples(i, j)) * cache.msgParam.lambda )
 
     out
   }
@@ -62,9 +58,9 @@ class EdgeBasedMessagePasser(cache: EdgeBasedCache, observedNodes: Set[Int]) {
         val Ks = cache.kArr(neighbourId)(leafId)
         val I = DenseMatrix.eye[Double](Kt.rows)
 
-        val kt = cache.kernel(cache.dataArr(neighbourId)(leafId), observations(leafId), msgParam.sig)
+        val kt = cache.kernel(cache.dataArr(neighbourId)(leafId), observations(leafId), cache.msgParam.sig)
 
-        betaArr(leafId)(neighbourId) = observedMessage(Kt, Ks, kt, I, msgParam.lambda)
+        betaArr(leafId)(neighbourId) = observedMessage(Kt, Ks, kt, I, cache.msgParam.lambda)
         normMessage(leafId, neighbourId)
       })
     }

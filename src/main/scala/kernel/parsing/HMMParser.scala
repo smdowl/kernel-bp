@@ -3,12 +3,11 @@ package kernel.parsing
 import breeze.linalg.DenseMatrix
 import kernel.caches.EdgeBasedCache
 import kernel.kernels.Kernel
+import kernel.models.MessageParam
 import kernel.models.edge.Edge
 
-class HMMParser(kernel: Kernel) extends EdgeParser(kernel) {
+class HMMParser(msgParam: MessageParam, kernel: Kernel) extends EdgeParser(kernel) {
   private var length: Int = _
-  // TODO: Pass in somehow
-  private val sig = 0.7
 
   private var dataArr: Array[Array[DenseMatrix[Double]]] = _
   private var kArr: Array[Array[DenseMatrix[Double]]] = _
@@ -27,7 +26,7 @@ class HMMParser(kernel: Kernel) extends EdgeParser(kernel) {
     fillHidden(edges)
     fillVisible(edges)
 
-    EdgeBasedCache(dataArr, kArr, kernel)
+    EdgeBasedCache(dataArr, kArr, kernel, msgParam)
   }
 
   private def fillHidden(edges: Map[String, Edge]) = {
@@ -35,10 +34,10 @@ class HMMParser(kernel: Kernel) extends EdgeParser(kernel) {
 
     for (i <- 0 until length - 1) {
       dataArr(i)(i+1) = edge.startData
-      kArr(i)(i+1) = kernel(edge.startData, edge.startData, sig)
+      kArr(i)(i+1) = kernel(edge.startData, edge.startData, msgParam.sig)
 
       dataArr(i+1)(i) = edge.endData
-      kArr(i+1)(i) = kernel(edge.endData, edge.endData, sig)
+      kArr(i+1)(i) = kernel(edge.endData, edge.endData, msgParam.sig)
     }
   }
 
@@ -47,10 +46,10 @@ class HMMParser(kernel: Kernel) extends EdgeParser(kernel) {
 
     for (i <- 0 until length) {
       dataArr(i)(i+length) = edge.startData
-      kArr(i)(i+length) = kernel(edge.startData, edge.startData, sig)
+      kArr(i)(i+length) = kernel(edge.startData, edge.startData, msgParam.sig)
 
       dataArr(i+length)(i) = edge.endData
-      kArr(i+length)(i) = kernel(edge.endData, edge.endData, sig)
+      kArr(i+length)(i) = kernel(edge.endData, edge.endData, msgParam.sig)
     }
   }
 }
