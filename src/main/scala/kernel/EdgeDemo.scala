@@ -42,9 +42,13 @@ object EdgeDemo {
   }
 
   def isPredictionCorrect(labelKeys: Array[String], probs: DenseVector[Double], keyIndex: Map[String, Int], correct: DenseMatrix[Double]) = {
-    val predictedLabel = labelKeys(probs.argmax)
-    val predictedFeature = keyIndex(predictedLabel)
-    correct(0, predictedFeature) != 0
+    if (probs.contains(Double.NaN))
+      false
+    else {
+      val predictedLabel = labelKeys(probs.argmax)
+      val predictedFeature = keyIndex(predictedLabel)
+      correct(0, predictedFeature) != 0
+    }
   }
 
   def main(args: Array[String]): Unit = {
