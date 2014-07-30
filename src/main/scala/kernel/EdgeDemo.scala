@@ -1,6 +1,6 @@
 package kernel
 
-import breeze.linalg.{DenseMatrix, DenseVector}
+import breeze.linalg.{BitVector, any, DenseMatrix, DenseVector}
 import kernel.kernels.LinearKernel
 import kernel.models.MessageParam
 import kernel.models.edge.{Inferer, HMMModel}
@@ -42,13 +42,18 @@ object EdgeDemo {
   }
 
   def isPredictionCorrect(labelKeys: Array[String], probs: DenseVector[Double], keyIndex: Map[String, Int], correct: DenseMatrix[Double]) = {
-    if (probs.contains(Double.NaN))
+    if (containsNaN(probs))
       false
     else {
       val predictedLabel = labelKeys(probs.argmax)
       val predictedFeature = keyIndex(predictedLabel)
       correct(0, predictedFeature) != 0
     }
+  }
+
+  private def containsNaN(vec: DenseVector[Double]) = {
+    val test: BitVector = vec :== Double.NaN
+    any(test)
   }
 
   def main(args: Array[String]): Unit = {
