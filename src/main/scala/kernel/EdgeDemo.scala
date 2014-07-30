@@ -1,7 +1,5 @@
 package kernel
 
-import java.lang.Class
-
 import breeze.linalg.{BitVector, any, DenseMatrix, DenseVector}
 import kernel.caches.EdgeBasedCache
 import kernel.kernels.{RBFKernel, LinearKernel}
@@ -11,7 +9,7 @@ import kernel.parsing.HMMParser
 import kernel.propagation.EdgeBasedMessagePasser
 
 object EdgeDemo {
-  val numSamples = 25
+  val numSamples = 75
   val msgParam: MessageParam = MessageParam(0.1, 3.0)
   val model = new HMMModel(numSamples)
   val kernel = new LinearKernel()

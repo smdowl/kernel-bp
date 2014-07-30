@@ -1,10 +1,10 @@
 package kernel.caches
 
-import breeze.linalg.DenseMatrix
+import breeze.linalg.{CSCMatrix, DenseMatrix}
 import kernel.kernels.Kernel
 import kernel.models.{MessageParam, Model}
 
-case class EdgeBasedCache(dataArr: Array[Array[DenseMatrix[Double]]],
+case class EdgeBasedCache(dataArr: Array[Array[CSCMatrix[Double]]],
                           kArr: Array[Array[DenseMatrix[Double]]],
                           kernel: Kernel,
                           msgParam: MessageParam ) {

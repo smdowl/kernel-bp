@@ -1,5 +1,5 @@
 package kernel.models.edge
 
-import breeze.linalg.DenseMatrix
+import breeze.linalg.CSCMatrix
 
-case class Edge(startData: DenseMatrix[Double], endData: DenseMatrix[Double])
+case class Edge(startData: CSCMatrix[Double], endData: CSCMatrix[Double])

@@ -1,7 +1,8 @@
 package kernel.models.edge
 
-import breeze.linalg.{DenseMatrix, DenseVector}
+import breeze.linalg.{CSCMatrix, DenseMatrix, DenseVector}
 import breeze.stats.distributions.Multinomial
+import kernel.linalg
 import kernel.models.toys.extractors.{SimpleHMMFeatureExtractor, ToyFeatureExtractor}
 import pos.features.extractors.FeatureArrayBuilder
 
@@ -134,5 +135,8 @@ class HMMModel(n: Int) extends EdgeModel {
     Edge(mergeData(leftData), mergeData(rightData))
   }
 
-  private def mergeData(dataSeq: Seq[DenseMatrix[Double]]) = dataSeq.tail.foldLeft(dataSeq.head)((a, b) => DenseMatrix.vertcat(a, b)) + 1e-10
+  private def mergeData(dataSeq: Seq[DenseMatrix[Double]]) = {
+    val denseMat = dataSeq.tail.foldLeft(dataSeq.head)((a, b) => DenseMatrix.vertcat(a, b)) + 1e-10
+    kernel.linalg.toSparse(denseMat)
+  }
 }

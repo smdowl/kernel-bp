@@ -1,6 +1,6 @@
 package kernel
 
-import breeze.linalg.{DenseVector, DenseMatrix, all}
+import breeze.linalg.{CSCMatrix, DenseVector, DenseMatrix, all}
 
 package object linalg {
   def nearlyEqual(m1: DenseMatrix[Double], m2: DenseMatrix[Double], bound: Double=1.0e-5): Boolean = {
@@ -25,5 +25,13 @@ package object linalg {
     }
 
     DenseMatrix(x2Mesh.toDenseVector.toArray, x1Mesh.toDenseVector.toArray).t
+  }
+
+  def toSparse(dense: DenseMatrix[Double]) = {
+    val out = CSCMatrix.zeros[Double](dense.rows, dense.cols)
+    for (i <- 0 until dense.rows)
+      for (j <- 0 until dense.cols)
+        if (dense(i, j) != 0.0) out(i, j) = dense(i, j)
+    out
   }
 }
