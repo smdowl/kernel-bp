@@ -86,13 +86,13 @@ class HMMModel(n: Int) extends EdgeModel {
 
   private def getObservations(testData: Array[Array[DenseVector[Double]]]): Array[Map[Int, DenseMatrix[Double]]] = {
     testData.map(sample => {
-      convertRangeToMap(sample, 0, sample.length / 2)
+      convertRangeToMap(sample, sample.length / 2, sample.length)
     })
   }
 
   private def getTestLabels(testData: Array[Array[DenseVector[Double]]]): Array[Map[Int, DenseMatrix[Double]]] = {
     testData.map(sample => {
-      convertRangeToMap(sample, sample.length / 2, sample.length)
+      convertRangeToMap(sample, 0, sample.length / 2)
     })
   }
 
@@ -134,5 +134,5 @@ class HMMModel(n: Int) extends EdgeModel {
     Edge(mergeData(leftData), mergeData(rightData))
   }
 
-  private def mergeData(dataSeq: Seq[DenseMatrix[Double]]) = dataSeq.tail.foldLeft(dataSeq.head)((a, b) => DenseMatrix.vertcat(a, b)) + 1e-10
+  private def mergeData(dataSeq: Seq[DenseMatrix[Double]]) = dataSeq.tail.foldLeft(dataSeq.head)((a, b) => DenseMatrix.vertcat(a, b)) + 1e-12
 }
