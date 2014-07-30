@@ -14,20 +14,21 @@ trait EdgeModel {
     })
   }
 
+  def labelKeys = keyArray.filter(_.startsWith("label:"))
+
   /**
    * The matrix of all possible label assignments.
    * i.e. each row is a vector of one possible labelling of a test node
    */
-  def testMatrix: DenseMatrix[Double] = {
-    val labels = keyArray.filter(_.startsWith("label:"))
+  def testMatrix: (Array[String], DenseMatrix[Double]) = {
     val labelIndex = this.keyIndex
 
-    val matrix = DenseMatrix.zeros[Double](labels.length, keyArray.length)
+    val matrix = DenseMatrix.zeros[Double](labelKeys.length, keyArray.length)
 
-    labels.zipWithIndex.foreach{ case (labelKey: String, idx: Int) => {
+    labelKeys.zipWithIndex.foreach{ case (labelKey: String, idx: Int) => {
       matrix(idx, labelIndex(labelKey)) = 1.0
     }}
 
-    matrix
+    (labelKeys, matrix)
   }
 }

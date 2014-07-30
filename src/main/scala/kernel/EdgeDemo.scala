@@ -1,5 +1,6 @@
 package kernel
 
+import breeze.linalg.{DenseMatrix, DenseVector}
 import kernel.kernels.LinearKernel
 import kernel.models.MessageParam
 import kernel.models.edge.{Inferer, HMMModel}
@@ -28,16 +29,22 @@ object EdgeDemo {
     val passer = new EdgeBasedMessagePasser(cache, observations.keySet)
     val betaArr = passer.passMessages(observations)
 
-    val testMatrix = model.testMatrix
+    val (labelKeys, testMatrix) = model.testMatrix
 
     val inferer = new Inferer(testMatrix)
 
-    val testNode = testArr(0).head._1
-    val correct = testArr(0).head._2
+    val testNode = testArr(testIdx).head._1
+    val correct = testArr(testIdx).head._2
 
     val probs = inferer.calculateKernelCondRootMarginal(testNode, cache, betaArr)
 
-    println()
+    println(isPredictionCorrect(labelKeys, probs, model.keyIndex, correct))
+  }
+
+  def isPredictionCorrect(labelKeys: Array[String], probs: DenseVector[Double], keyIndex: Map[String, Int], correct: DenseMatrix[Double]) = {
+    val predictedLabel = labelKeys(probs.argmax)
+    val predictedFeature = keyIndex(predictedLabel)
+    correct(0, predictedFeature) != 0
   }
 
   def main(args: Array[String]): Unit = {

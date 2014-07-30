@@ -134,5 +134,5 @@ class HMMModel(n: Int) extends EdgeModel {
     Edge(mergeData(leftData), mergeData(rightData))
   }
 
-  private def mergeData(dataSeq: Seq[DenseMatrix[Double]]) = dataSeq.tail.foldLeft(dataSeq.head)((a, b) => DenseMatrix.vertcat(a, b)) + 1e-6
+  private def mergeData(dataSeq: Seq[DenseMatrix[Double]]) = dataSeq.tail.foldLeft(dataSeq.head)((a, b) => DenseMatrix.vertcat(a, b)) + 1e-10
 }
