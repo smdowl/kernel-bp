@@ -1,44 +1,64 @@
 package kernel
 
+import java.lang.Class
+
 import breeze.linalg.{BitVector, any, DenseMatrix, DenseVector}
-import kernel.kernels.LinearKernel
+import kernel.caches.EdgeBasedCache
+import kernel.kernels.{RBFKernel, LinearKernel}
 import kernel.models.MessageParam
 import kernel.models.edge.{Inferer, HMMModel}
 import kernel.parsing.HMMParser
 import kernel.propagation.EdgeBasedMessagePasser
 
 object EdgeDemo {
-  def runDemo() = {
-    val numSamples = 5
-    val msgParam: MessageParam = MessageParam(0.1, 3.0)
-    val model = new HMMModel(numSamples)
+  val numSamples = 25
+  val msgParam: MessageParam = MessageParam(0.1, 3.0)
+  val model = new HMMModel(numSamples)
+  val kernel = new RBFKernel()
+  val parser = new HMMParser(msgParam, kernel)
 
-    val edges = model.edges
-    val obsArr = model.testObservations
-    val testArr = model.testLabels
+  def buildPasser(cache: EdgeBasedCache, observedNodes: Set[Int]) = new EdgeBasedMessagePasser(cache, observedNodes)
+
+  def runDemo() = {
 
     val testIdx = 0
 
-    val observations = obsArr(testIdx)
+    val results = testSentence(testIdx)
 
-    val kernel = new LinearKernel()
-    val parser = new HMMParser(msgParam, kernel)
+    println(results)
+  }
+
+  def testSentence(testIdx: Int) = {
+    val edges = model.edges
+    val obsArr = model.testObservations
+    val testArr = model.testLabels
+    val (labelKeys, testMatrix) = model.testMatrix
+
+    val observations = obsArr(testIdx)
+    val testSet = testArr(testIdx)
 
     val cache = parser.buildCache(edges, observations.size)
 
-    val passer = new EdgeBasedMessagePasser(cache, observations.keySet)
+    val passer = buildPasser(cache, observations.keySet)
     val betaArr = passer.passMessages(observations)
-
-    val (labelKeys, testMatrix) = model.testMatrix
 
     val inferer = new Inferer(testMatrix)
 
-    val testNode = testArr(testIdx).head._1
-    val correct = testArr(testIdx).head._2
+    val results = testSet.map{ case (testNode, correctPrediction) =>
+        testToken(testNode, correctPrediction, cache, betaArr, inferer, labelKeys)
+    }
 
+    results
+  }
+
+  def testToken(testNode: Int,
+                correctPrediction: DenseMatrix[Double],
+                cache: EdgeBasedCache,
+                betaArr: Array[Array[DenseMatrix[Double]]],
+                inferer: Inferer,
+                labelKeys: Array[String]) = {
     val probs = inferer.calculateKernelCondRootMarginal(testNode, cache, betaArr)
-
-    println(isPredictionCorrect(labelKeys, probs, model.keyIndex, correct))
+    isPredictionCorrect(labelKeys, probs, model.keyIndex, correctPrediction)
   }
 
   def isPredictionCorrect(labelKeys: Array[String], probs: DenseVector[Double], keyIndex: Map[String, Int], correct: DenseMatrix[Double]) = {
