@@ -14,7 +14,7 @@ object EdgeDemo {
   val numSamples = 25
   val msgParam: MessageParam = MessageParam(0.1, 3.0)
   val model = new HMMModel(numSamples)
-  val kernel = new RBFKernel()
+  val kernel = new LinearKernel()
   val parser = new HMMParser(msgParam, kernel)
 
   def buildPasser(cache: EdgeBasedCache, observedNodes: Set[Int]) = new EdgeBasedMessagePasser(cache, observedNodes)
