@@ -1,17 +1,17 @@
 package kernel
 
-import breeze.linalg.{BitVector, any, DenseMatrix, DenseVector}
+import breeze.linalg._
 import kernel.caches.EdgeBasedCache
 import kernel.kernels.{RBFKernel, LinearKernel}
 import kernel.models.MessageParam
-import kernel.models.edge.{Inferer, DeterministicHMMModel}
+import kernel.models.edge.{NonDeterministicHMMModel, Inferer, DeterministicHMMModel}
 import kernel.parsing.HMMParser
 import kernel.propagation.EdgeBasedMessagePasser
 
 object EdgeDemo {
-  val numSamples = 20
+  val numSamples = 50
   val msgParam: MessageParam = MessageParam(0.3, 1.0)
-  val model = new DeterministicHMMModel(numSamples)
+  val model = new NonDeterministicHMMModel(numSamples)
   val kernel = new LinearKernel()
   val parser = new HMMParser(msgParam, kernel)
 
@@ -22,7 +22,7 @@ object EdgeDemo {
     var correct = 0.0
     var total = 0.0
 
-    for (testIdx <- 0 until numSamples) {
+    for (testIdx <- 0 until min(numSamples, 10)) {
       val results = testSentence(testIdx)
 
       for (r <- results)
