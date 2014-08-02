@@ -8,7 +8,7 @@ import pos.features.extractors.FeatureArrayBuilder
 import scala.util.Random
 
 abstract class HMMModel(n: Int) extends EdgeModel {
-  private val minLength = 10
+  private val minLength = 5
   private val maxLength = minLength
 
   protected def hiddenStates: Seq[String]
