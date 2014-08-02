@@ -7,38 +7,36 @@ import pos.features.extractors.FeatureArrayBuilder
 
 import scala.util.Random
 
-object HMMModel extends App {
-  val model = new HMMModel(1)
-  val edges = model.edges
-}
-
-class HMMModel(n: Int) extends EdgeModel {
+abstract class HMMModel(n: Int) extends EdgeModel {
   private val minLength = 10
   private val maxLength = minLength
 
-  private val hiddenStates = Seq("A", "B", "C")
-  private val visibleStates = Seq("X", "Y", "Z")
+  protected def hiddenStates: Seq[String]
+  protected def visibleStates: Seq[String]
 
-  private val initDist = new Multinomial(DenseVector.ones[Double](3) * (1.0 / 3))
+  protected val initDist = new Multinomial(DenseVector.ones[Double](hiddenStates.length) * (1.0 / hiddenStates.length))
 
-  private val transitionDists = Seq(
-    new Multinomial(DenseVector(0.0, 1.0, 0.0)),
-    new Multinomial(DenseVector(0.0, 0.0, 1.0)),
-    new Multinomial(DenseVector(1.0, 0.0, 0.0))
-  )
+  protected def transitionMatrix: DenseMatrix[Double]
+  protected def emissionMatrix: DenseMatrix[Double]
 
-  private val emissionDists = Seq(
-    new Multinomial(DenseVector(1.0, 0.0, 0.0)),
-    new Multinomial(DenseVector(0.0, 1.0, 0.0)),
-    new Multinomial(DenseVector(0.0, 0.0, 1.0))
-  )
+  protected var transitionDists = {
+    (0 until transitionMatrix.rows).map(i => {
+      new Multinomial(transitionMatrix(i, ::).t)
+    })
+  }
 
-  private val extractor: ToyFeatureExtractor = new SimpleHMMFeatureExtractor()
+  protected var emissionDists = {
+    (0 until emissionMatrix.rows).map(i => {
+      new Multinomial(emissionMatrix(i, ::).t)
+    })
+  }
 
-  private var _edges: Map[String, Edge] = _
-  private var _testObservations: Array[Map[Int, DenseMatrix[Double]]] = _
-  private var _testLabels: Array[Map[Int, DenseMatrix[Double]]] = _
-  private var _keyArray: Array[String] = _
+  protected def extractor: ToyFeatureExtractor
+
+  protected var _edges: Map[String, Edge] = _
+  protected var _testObservations: Array[Map[Int, DenseMatrix[Double]]] = _
+  protected var _testLabels: Array[Map[Int, DenseMatrix[Double]]] = _
+  protected var _keyArray: Array[String] = _
 
   override def edges: Map[String, Edge] = _edges
   override def testObservations: Array[Map[Int, DenseMatrix[Double]]] = _testObservations
@@ -51,7 +49,10 @@ class HMMModel(n: Int) extends EdgeModel {
    * Generate data for the model. The output format is an array where each position is the training data
    * relevant to a given node and each row of those matrices is a single sample.
    */
-  private def initialise() = {
+  protected def initialise() = {
+    assert(transitionMatrix.rows == hiddenStates.length)
+    assert(emissionMatrix.rows == visibleStates.length)
+
     val sampleSequences = for (i <- 0 until n) yield drawSample()
     val testSequences = for (i <- 0 until n) yield drawSample()
 
@@ -71,21 +72,13 @@ class HMMModel(n: Int) extends EdgeModel {
    * Draw a single sample of hidden and visible states
    */
   private def drawSample() = {
-
-    val length = sampleLength()
-
-    val hiddenSample = (0 until length - 1).foldLeft(Seq[Int](initDist.draw()))((b, _) => {
-      b :+ transitionDists(b.last).draw()
-    })
-
-    val visibleSample: Seq[Int] = hiddenSample.map(hiddenState => {
-      emissionDists(hiddenState).draw()
-    })
-
+    val (hiddenSample, visibleSample) = makeSequence()
     extractor.extractFeatures(hiddenSample.map(hiddenStates.apply) ++ visibleSample.map(visibleStates.apply))
   }
 
-  private def sampleLength() = {
+  protected def makeSequence(): (Seq[Int], Seq[Int])
+
+  protected def sampleLength() = {
     val sampleRange = maxLength - minLength
     val upper = if (sampleRange > 0) Random.nextInt(maxLength - minLength) else 0
     minLength + upper

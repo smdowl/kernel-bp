@@ -4,14 +4,14 @@ import breeze.linalg.{BitVector, any, DenseMatrix, DenseVector}
 import kernel.caches.EdgeBasedCache
 import kernel.kernels.{RBFKernel, LinearKernel}
 import kernel.models.MessageParam
-import kernel.models.edge.{Inferer, HMMModel}
+import kernel.models.edge.{Inferer, DeterministicHMMModel}
 import kernel.parsing.HMMParser
 import kernel.propagation.EdgeBasedMessagePasser
 
 object EdgeDemo {
-  val numSamples = 10
+  val numSamples = 20
   val msgParam: MessageParam = MessageParam(0.3, 1.0)
-  val model = new HMMModel(numSamples)
+  val model = new DeterministicHMMModel(numSamples)
   val kernel = new LinearKernel()
   val parser = new HMMParser(msgParam, kernel)
 
@@ -27,6 +27,8 @@ object EdgeDemo {
 
       for (r <- results)
         if (r) correct += 1
+
+      println(results)
 
       total += results.size
     }
