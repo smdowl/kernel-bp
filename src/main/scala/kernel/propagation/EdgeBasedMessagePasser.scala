@@ -40,9 +40,14 @@ class EdgeBasedMessagePasser(cache: EdgeBasedCache, observedNodes: Set[Int]) {
   def calculateInverses() = {
     val out = Array.ofDim[DenseMatrix[Double]](cache.numNodes, cache.numNodes)
 
-    for (i <- unobservedNodes)
-      for (j <- cache.getNeighbours(i).filter(unobservedNodes.contains))
-        out(i)(j) = inv( cache.kArr(i)(j) + DenseMatrix.eye[Double](cache.numSamples(i, j)) * cache.msgParam.lambda )
+    for (i <- unobservedNodes) {
+      val neighbours = cache.getNeighbours(i)
+      val filtered = neighbours.filter(unobservedNodes.contains)
+      for (j <- filtered) {
+        val invMatrix = cache.kArr(i)(j) + DenseMatrix.eye[Double](cache.numSamples(i, j)) * cache.msgParam.lambda
+        out(i)(j) = inv(invMatrix)
+      }
+    }
 
     out
   }
@@ -84,10 +89,8 @@ class EdgeBasedMessagePasser(cache: EdgeBasedCache, observedNodes: Set[Int]) {
   }
 
   protected def calculateInternalMessages(): Unit = {
-    for(i <- 0 until numIter) {
-      println(s"Starting iteration $i")
+    for(i <- 0 until numIter)
       propagate()
-    }
   }
 
   private def propagate() = {
@@ -105,7 +108,7 @@ class EdgeBasedMessagePasser(cache: EdgeBasedCache, observedNodes: Set[Int]) {
       val Ktu_beta = DenseMatrix.ones[Double](cache.numSamples(nodeId, outMessageIdx), 1)
 
       for (inMessageIdx <- (neighbours.toSet - outMessageIdx).toSeq.sorted) {
-        val multFactor = cache.kArr(nodeId)(inMessageIdx) * betaArr(inMessageIdx)(nodeId)
+        val multFactor = cache.kArr(nodeId)(inMessageIdx) * betaArr(nodeId)(inMessageIdx)
         Ktu_beta :*= multFactor
       }
 

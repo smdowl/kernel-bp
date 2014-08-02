@@ -13,7 +13,7 @@ object HMMModel extends App {
 }
 
 class HMMModel(n: Int) extends EdgeModel {
-  private val minLength = 1
+  private val minLength = 10
   private val maxLength = minLength
 
   private val hiddenStates = Seq("A", "B", "C")
