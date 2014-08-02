@@ -6,7 +6,7 @@ import kernel.caches.{LoopyCache, EdgeBasedCache}
 
 class EdgeBasedMessagePasser(cache: EdgeBasedCache, observedNodes: Set[Int]) {
 
-  private val numIter = 100
+  private val numIter = 50
 
   protected var betaArr: Array[Array[DenseMatrix[Double]]] = Array.ofDim[DenseMatrix[Double]](cache.numNodes, cache.numNodes)
   protected var KarrInv: Array[Array[DenseMatrix[Double]]] = calculateInverses()
