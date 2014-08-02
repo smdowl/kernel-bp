@@ -58,7 +58,7 @@ class EdgeBasedMessagePasser(cache: EdgeBasedCache, observedNodes: Set[Int]) {
         val Ks = cache.kArr(neighbourId)(leafId)
         val I = DenseMatrix.eye[Double](Kt.rows)
 
-        val kt = cache.kernel(cache.dataArr(neighbourId)(leafId), observations(leafId), cache.msgParam.sig)
+        val kt = cache.kernel(cache.dataArr(leafId)(neighbourId), observations(leafId), cache.msgParam.sig)
 
         betaArr(leafId)(neighbourId) = observedMessage(Kt, Ks, kt, I, cache.msgParam.lambda)
         normMessage(leafId, neighbourId)
