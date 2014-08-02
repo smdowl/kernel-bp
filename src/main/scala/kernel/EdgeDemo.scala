@@ -1,7 +1,5 @@
 package kernel
 
-import java.lang.Class
-
 import breeze.linalg.{BitVector, any, DenseMatrix, DenseVector}
 import kernel.caches.EdgeBasedCache
 import kernel.kernels.{RBFKernel, LinearKernel}
@@ -11,8 +9,8 @@ import kernel.parsing.HMMParser
 import kernel.propagation.EdgeBasedMessagePasser
 
 object EdgeDemo {
-  val numSamples = 25
-  val msgParam: MessageParam = MessageParam(0.1, 3.0)
+  val numSamples = 10
+  val msgParam: MessageParam = MessageParam(0.3, 1.0)
   val model = new HMMModel(numSamples)
   val kernel = new LinearKernel()
   val parser = new HMMParser(msgParam, kernel)
@@ -21,11 +19,19 @@ object EdgeDemo {
 
   def runDemo() = {
 
-    val testIdx = 0
+    var correct = 0.0
+    var total = 0.0
 
-    val results = testSentence(testIdx)
+    for (testIdx <- 0 until numSamples) {
+      val results = testSentence(testIdx)
 
-    println(results)
+      for (r <- results)
+        if (r) correct += 1
+
+      total += results.size
+    }
+
+    println(s"${correct / total} are correct")
   }
 
   def testSentence(testIdx: Int) = {
