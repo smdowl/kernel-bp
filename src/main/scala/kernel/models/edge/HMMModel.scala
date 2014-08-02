@@ -19,13 +19,13 @@ abstract class HMMModel(n: Int) extends EdgeModel {
   protected def transitionMatrix: DenseMatrix[Double]
   protected def emissionMatrix: DenseMatrix[Double]
 
-  protected var transitionDists = {
+  protected def transitionDists = {
     (0 until transitionMatrix.rows).map(i => {
       new Multinomial(transitionMatrix(i, ::).t)
     })
   }
 
-  protected var emissionDists = {
+  protected def emissionDists = {
     (0 until emissionMatrix.rows).map(i => {
       new Multinomial(emissionMatrix(i, ::).t)
     })
