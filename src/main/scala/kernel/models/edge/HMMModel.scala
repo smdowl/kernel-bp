@@ -13,8 +13,8 @@ object HMMModel extends App {
 }
 
 class HMMModel(n: Int) extends EdgeModel {
-  private val minLength = 15
-  private val maxLength = 30
+  private val minLength = 1
+  private val maxLength = minLength
 
   private val hiddenStates = Seq("A", "B", "C")
   private val visibleStates = Seq("X", "Y", "Z")
@@ -71,9 +71,10 @@ class HMMModel(n: Int) extends EdgeModel {
    * Draw a single sample of hidden and visible states
    */
   private def drawSample() = {
-    val length = minLength + Random.nextInt(maxLength - minLength)
 
-    val hiddenSample = (0 until length).foldLeft(Seq[Int](initDist.draw()))((b, _) => {
+    val length = sampleLength()
+
+    val hiddenSample = (0 until length - 1).foldLeft(Seq[Int](initDist.draw()))((b, _) => {
       b :+ transitionDists(b.last).draw()
     })
 
@@ -82,6 +83,12 @@ class HMMModel(n: Int) extends EdgeModel {
     })
 
     extractor.extractFeatures(hiddenSample.map(hiddenStates.apply) ++ visibleSample.map(visibleStates.apply))
+  }
+
+  private def sampleLength() = {
+    val sampleRange = maxLength - minLength
+    val upper = if (sampleRange > 0) Random.nextInt(maxLength - minLength) else 0
+    minLength + upper
   }
 
   private def getObservations(testData: Array[Array[DenseVector[Double]]]): Array[Map[Int, DenseMatrix[Double]]] = {
@@ -110,7 +117,7 @@ class HMMModel(n: Int) extends EdgeModel {
 
     data.foreach(sample => {
       val sentenceLength = sample.length / 2
-      for (i <- 0 until sentenceLength - 1) {
+      for (i <- 0 until sentenceLength) {
         leftData :+= sample(i).toDenseMatrix
         rightData :+= sample(i+1).toDenseMatrix
       }
@@ -125,7 +132,7 @@ class HMMModel(n: Int) extends EdgeModel {
 
     data.foreach(sample => {
       val sentenceLength = sample.length / 2
-      for (i <- 0 until sentenceLength - 1) {
+      for (i <- 0 until sentenceLength) {
         leftData :+= sample(i).toDenseMatrix
         rightData :+= sample(sentenceLength + i).toDenseMatrix
       }
@@ -134,5 +141,10 @@ class HMMModel(n: Int) extends EdgeModel {
     Edge(mergeData(leftData), mergeData(rightData))
   }
 
-  private def mergeData(dataSeq: Seq[DenseMatrix[Double]]) = dataSeq.tail.foldLeft(dataSeq.head)((a, b) => DenseMatrix.vertcat(a, b)) + 1e-12
+  private def mergeData(dataSeq: Seq[DenseMatrix[Double]]) = {
+    if (dataSeq.length > 0)
+      dataSeq.tail.foldLeft(dataSeq.head)((a, b) => DenseMatrix.vertcat(a, b)) + 1e-9
+    else
+      DenseMatrix.zeros[Double](0, 0)
+  }
 }
