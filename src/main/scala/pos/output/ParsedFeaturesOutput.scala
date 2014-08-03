@@ -30,7 +30,7 @@ object ParsedFeaturesOutput {
 
     var featuresSeq = Seq[Seq[FeatureVector]]()
     parseHistories.foreach(history => {
-      if (length > 0 && history.contexts.length == length) {
+      if (length < 0 || history.contexts.length == length) {
         val sentenceFeatures = getSentenceFeatures(history, extractor)
         featuresSeq :+= sentenceFeatures
       }

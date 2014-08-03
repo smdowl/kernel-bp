@@ -4,14 +4,14 @@ import breeze.linalg._
 import kernel.caches.EdgeBasedCache
 import kernel.kernels.{RBFKernel, LinearKernel}
 import kernel.models.MessageParam
-import kernel.models.edge.{TrigramModel, NonDeterministicHMMModel, Inferer, DeterministicHMMModel}
+import kernel.models.edge._
 import kernel.parsing.HMMParser
 import kernel.propagation.EdgeBasedMessagePasser
 
 object EdgeDemo {
   val numSamples = 50
   val msgParam: MessageParam = MessageParam(1.0, 1.0)
-  val model = new DeterministicHMMModel(numSamples)
+  val model = new RealPOSModel()
   val kernel = new LinearKernel()
   val parser = new HMMParser(msgParam, kernel)
 
