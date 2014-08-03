@@ -11,7 +11,7 @@ import kernel.propagation.EdgeBasedMessagePasser
 object EdgeDemo {
   val numSamples = 50
   val msgParam: MessageParam = MessageParam(1.0, 1.0)
-  val model = new TrigramModel(numSamples)
+  val model = new DeterministicHMMModel(numSamples)
   val kernel = new LinearKernel()
   val parser = new HMMParser(msgParam, kernel)
 

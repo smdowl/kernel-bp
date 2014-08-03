@@ -36,4 +36,11 @@ trait EdgeModel {
 
     (labelKeys, matrix)
   }
+
+  protected def mergeData(dataSeq: Seq[DenseMatrix[Double]]) = {
+    if (dataSeq.length > 0)
+      dataSeq.tail.foldLeft(dataSeq.head)((a, b) => DenseMatrix.vertcat(a, b)) + 1e-9
+    else
+      DenseMatrix.zeros[Double](0, 0)
+  }
 }

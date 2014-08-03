@@ -12,7 +12,7 @@ object DeterministicHMMModel extends App {
   val edges = model.edges
 }
 
-class DeterministicHMMModel(n: Int) extends HMMModel(n) {
+class DeterministicHMMModel(n: Int) extends ProbabalisticHMMModel(n) {
   protected def hiddenStates = Seq("A", "B", "C")
   protected def visibleStates = Seq("X", "Y", "Z")
 

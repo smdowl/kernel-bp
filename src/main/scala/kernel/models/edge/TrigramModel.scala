@@ -4,7 +4,7 @@ import breeze.linalg.{DenseMatrix, DenseVector}
 import breeze.stats.distributions.Multinomial
 import kernel.models.toys.extractors.{SimpleHMMFeatureExtractor, ToyFeatureExtractor}
 
-class TrigramModel(n: Int) extends HMMModel(n) {
+class TrigramModel(n: Int) extends ProbabalisticHMMModel(n) {
   protected def hiddenStates = Seq("A", "B")
   protected def visibleStates = Seq("X", "Y")
 
@@ -42,7 +42,6 @@ class TrigramModel(n: Int) extends HMMModel(n) {
     )
 
     val length = sampleLength()
-
     var hiddenSample = Seq[Int](initDist.draw())
     hiddenSample :+= secondDist(getLastUnigram(hiddenSample)).draw()
 
