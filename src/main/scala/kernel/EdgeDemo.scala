@@ -4,14 +4,14 @@ import breeze.linalg._
 import kernel.caches.EdgeBasedCache
 import kernel.kernels.{RBFKernel, LinearKernel}
 import kernel.models.MessageParam
-import kernel.models.edge.{NonDeterministicHMMModel, Inferer, DeterministicHMMModel}
+import kernel.models.edge.{TrigramModel, NonDeterministicHMMModel, Inferer, DeterministicHMMModel}
 import kernel.parsing.HMMParser
 import kernel.propagation.EdgeBasedMessagePasser
 
 object EdgeDemo {
   val numSamples = 50
-  val msgParam: MessageParam = MessageParam(0.3, 1.0)
-  val model = new NonDeterministicHMMModel(numSamples)
+  val msgParam: MessageParam = MessageParam(1.0, 1.0)
+  val model = new TrigramModel(numSamples)
   val kernel = new LinearKernel()
   val parser = new HMMParser(msgParam, kernel)
 
@@ -52,9 +52,10 @@ object EdgeDemo {
 
     val inferer = new Inferer(testMatrix)
 
-    val results = testSet.map{ case (testNode, correctPrediction) =>
-        testToken(testNode, correctPrediction, cache, betaArr, inferer, labelKeys)
-    }
+    val results = (0 until cache.numNodes / 2).map(testNode => {
+      val correctPrediction = testSet(testNode)
+      testToken(testNode, correctPrediction, cache, betaArr, inferer, labelKeys)
+    })
 
     results
   }
@@ -74,6 +75,7 @@ object EdgeDemo {
       false
     else {
       val predictedLabel = labelKeys(probs.argmax)
+      println(s"predicted: $predictedLabel")
       val predictedFeature = keyIndex(predictedLabel)
       correct(0, predictedFeature) != 0
     }

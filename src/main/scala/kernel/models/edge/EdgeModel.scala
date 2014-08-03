@@ -3,10 +3,15 @@ package kernel.models.edge
 import breeze.linalg.DenseMatrix
 
 trait EdgeModel {
-  def edges: Map[String, Edge]
-  def testObservations: Array[Map[Int, DenseMatrix[Double]]]
-  def testLabels: Array[Map[Int, DenseMatrix[Double]]]
-  def keyArray: Array[String]
+  protected var _edges: Map[String, Edge] = _
+  protected var _testObservations: Array[Map[Int, DenseMatrix[Double]]] = _
+  protected var _testLabels: Array[Map[Int, DenseMatrix[Double]]] = _
+  protected var _keyArray: Array[String] = _
+
+  def edges: Map[String, Edge] = _edges
+  def testObservations: Array[Map[Int, DenseMatrix[Double]]] = _testObservations
+  def testLabels: Array[Map[Int, DenseMatrix[Double]]] = _testLabels
+  def keyArray: Array[String] = _keyArray
 
   def keyIndex: Map[String, Int] = {
     Map[String, Int]() ++ (0 until keyArray.length).map(i => {

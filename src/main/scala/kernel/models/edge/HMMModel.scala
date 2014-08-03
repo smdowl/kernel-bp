@@ -8,7 +8,7 @@ import pos.features.extractors.FeatureArrayBuilder
 import scala.util.Random
 
 abstract class HMMModel(n: Int) extends EdgeModel {
-  private val minLength = 5
+  private val minLength = 10
   private val maxLength = minLength
 
   protected def hiddenStates: Seq[String]
@@ -32,16 +32,6 @@ abstract class HMMModel(n: Int) extends EdgeModel {
   }
 
   protected def extractor: ToyFeatureExtractor
-
-  protected var _edges: Map[String, Edge] = _
-  protected var _testObservations: Array[Map[Int, DenseMatrix[Double]]] = _
-  protected var _testLabels: Array[Map[Int, DenseMatrix[Double]]] = _
-  protected var _keyArray: Array[String] = _
-
-  override def edges: Map[String, Edge] = _edges
-  override def testObservations: Array[Map[Int, DenseMatrix[Double]]] = _testObservations
-  override def testLabels: Array[Map[Int, DenseMatrix[Double]]] = _testLabels
-  override def keyArray: Array[String] = _keyArray
 
   initialise()
 
