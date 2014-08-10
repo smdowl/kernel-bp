@@ -25,14 +25,20 @@ class ViterbiMarkovModel {
     val builder = new SentenceBuilder(parser)
     
     val sentences = builder.buildSentenceFromFile(filepath)
-    val (initProbs, transition, emission) = learnTransitionAndEmissionProbabilties(sentences)
+    val (initProbs, transition, emission) = learnTransitionAndEmissionProbabilties(sentences.slice(0, 1))
 
     val testSentences = builder.buildSentenceFromFile(testFilepath)
     val observations = stripObservations(sentences)
+    val correctTags = stripTags(sentences)
 
     val observation = observations(0)
+    val correct = correctTags(0)
     val path = viterbi(observation, states, initProbs, transition, emission)
-    println(path)
+
+    val results = (correct zip path._2).map{ case (a, b) =>
+        a.equals(b)
+    }
+    println(results)
   }
 
   def learnTransitionAndEmissionProbabilties(sentences: Seq[Seq[Token]]): (InitProbabilityMap, ProbabilityMap, EmissionMap) = {
@@ -96,47 +102,38 @@ class ViterbiMarkovModel {
 
   def viterbi(observations: Seq[Observation],
               states: Seq[State],
-              start: State => Probability,
-              transition: ProbabilityMap,
+              initDist: State => Probability,
+              transitions: ProbabilityMap,
               emissions: EmissionMap): ProbabilityPath = {
 
     def probability(p: ProbabilityPath) = p._1
 
-    def mostLikelyPathFrom(state: State, time: Int): ProbabilityPath = {
-      println(time)
-      val em = (state, observations(time))
-      val emission = emissions(em)
-
-      time match {
-        case 0 =>
-          // (probability that were in the initial state) times
-          // (probability of observing the initial observation from the initial state)
-          (start(state) * emission, List(state))
-        case _ =>
-          val (prob, path) = states map { (state) =>
-            val (prob, path) = mostLikelyPathFrom(state, time - 1)
-            val prevState = path.head
-            // (probability of the previous state) times
-            // (probability of moving from previous state to this state)
-            val trans = (prevState, state)
-            (prob * transition(trans), path)
-          } maxBy probability
-          // (probability of observing the current observation from this state) times
-          // (probability of the maximizing state)
-          (emission * prob, state :: path)
-      }
-    }
-
-    val (prob, path) = states map { (state) =>
-      mostLikelyPathFrom(state, observations.size - 1)
+    val initial = states map { (state) =>
+      (initDist(state) * emissions((state, observations(0))), List(state))
     } maxBy probability
 
-    (prob, path.reverse)
+    val probPath = observations.tail.foldLeft(initial)((probPath: ProbabilityPath, observation: Observation) => {
+      states map { (state) =>
+        val prevState = probPath._2.head
+        val transition = (prevState, state)
+        val emission = (state, observation)
+        
+        (probPath._1 * transitions(transition) * emissions(emission), state :: probPath._2)
+      } maxBy probability
+    })
+
+    (probPath._1, probPath._2.reverse)
   }
 
   private def stripObservations(sentences: Seq[Seq[Token]]) = {
     sentences.map(sentence => {
       sentence.map(_.form)
+    })
+  }
+
+  private def stripTags(sentences: Seq[Seq[Token]]) = {
+    sentences.map(sentence => {
+      sentence.map(_.POS)
     })
   }
 }
