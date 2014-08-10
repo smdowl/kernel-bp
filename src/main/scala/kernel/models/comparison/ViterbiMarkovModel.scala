@@ -6,7 +6,7 @@ import pos.components.{Token, SentenceBuilder}
 
 object ViterbiMarkovModel extends App {
   val model = new ViterbiMarkovModel()
-  model.train(Constants.MINI_TRAIN_FILE, Constants.MINI_TEST_FILE)
+  model.train(Constants.SMALL_TRAIN_FILE, Constants.MINI_TEST_FILE)
 }
 
 class ViterbiMarkovModel {
@@ -25,20 +25,23 @@ class ViterbiMarkovModel {
     val builder = new SentenceBuilder(parser)
     
     val sentences = builder.buildSentenceFromFile(filepath)
-    val (initProbs, transition, emission) = learnTransitionAndEmissionProbabilties(sentences.slice(0, 1))
+    val (initProbs, transition, emission) = learnTransitionAndEmissionProbabilties(sentences)
 
     val testSentences = builder.buildSentenceFromFile(testFilepath)
-    val observations = stripObservations(sentences)
-    val correctTags = stripTags(sentences)
+    val observations = stripObservations(testSentences)
+    val correctTags = stripTags(testSentences)
 
-    val observation = observations(0)
-    val correct = correctTags(0)
-    val path = viterbi(observation, states, initProbs, transition, emission)
+    val results = (observations zip correctTags).flatMap{ case (observation, correct) =>
+      val path = viterbi(observation, states, initProbs, transition, emission)
 
-    val results = (correct zip path._2).map{ case (a, b) =>
+      val results = (correct zip path._2).map { case (a, b) =>
         a.equals(b)
+      }
+      results
     }
-    println(results)
+
+    val accuracy = results.foldLeft(0.0)((sum, correct) => sum + (if (correct) 1.0 else 0.0)) / results.length
+    println(accuracy)
   }
 
   def learnTransitionAndEmissionProbabilties(sentences: Seq[Seq[Token]]): (InitProbabilityMap, ProbabilityMap, EmissionMap) = {
