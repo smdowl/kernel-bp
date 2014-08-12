@@ -1,8 +1,8 @@
-package kernel.models.comparison
+package comparison
 
 import app.Constants
 import input.ConllParser
-import pos.components.{Token, SentenceBuilder}
+import pos.components.{SentenceBuilder, Token}
 
 object ViterbiMarkovModel extends App {
   val model = new ViterbiMarkovModel()
