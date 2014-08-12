@@ -25,7 +25,14 @@ class ViterbiMarkovModel {
     val builder = new SentenceBuilder(parser)
     
     val sentences = builder.buildSentenceFromFile(filepath)
-    val (initProbs, transition, emission) = learnTransitionAndEmissionProbabilties(sentences)
+
+    val splitSentences = sentences.map(sentence => {
+      sentence.map(token => {
+        (token.form, token.POS)
+      })
+    })
+
+    val (initProbs, transition, emission) = learnTransitionAndEmissionProbabilties(splitSentences)
 
     val testSentences = builder.buildSentenceFromFile(testFilepath)
     val observations = stripObservations(testSentences)
@@ -44,7 +51,7 @@ class ViterbiMarkovModel {
     println(accuracy)
   }
 
-  def learnTransitionAndEmissionProbabilties(sentences: Seq[Seq[Token]]): (InitProbabilityMap, ProbabilityMap, EmissionMap) = {
+  def learnTransitionAndEmissionProbabilties(sentences: Seq[Seq[(State, Observation)]]): (InitProbabilityMap, ProbabilityMap, EmissionMap) = {
     states = Seq[String]()
     var emissions = Seq[String]()
 
@@ -60,23 +67,23 @@ class ViterbiMarkovModel {
     for (sentence <- sentences) {
       numSamples += sentence.length
 
-      val initPos = sentence(0).POS
+      val initPos = sentence(0)._1
       initCounts = increment(initCounts, initPos)
 
-      for (token <- sentence) {
-        if (!states.contains(token.POS))
-          states :+= token.POS
-        if (!emissions.contains(token.form))
-          emissions :+= token.form
+      for ((pos, form) <- sentence) {
+        if (!states.contains(pos))
+          states :+= pos
+        if (!emissions.contains(form))
+          emissions :+= form
 
-        val emission = (token.POS, token.form)
+        val emission = (pos, form)
         emissionCounts = increment(emissionCounts, emission)
 
         if (prev != null) {
-          val trans = (prev, token.POS)
+          val trans = (prev, pos)
           transCounts = increment(transCounts, trans)
         }
-        prev = token.POS
+        prev = pos
       }
     }
     initCounts = normalise(initCounts, numSentences)
