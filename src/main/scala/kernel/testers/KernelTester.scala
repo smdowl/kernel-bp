@@ -1,6 +1,7 @@
 package kernel.testers
 
 import breeze.linalg.{any, BitVector, DenseVector, DenseMatrix}
+import comparison.ViterbiMarkovModel
 import kernel.caches.EdgeBasedCache
 import kernel.kernels.LinearKernel
 import kernel.models.MessageParam
@@ -11,15 +12,20 @@ import kernel.propagation.EdgeBasedMessagePasser
 object KernelTester extends App {
   val model = new DeterministicHMMModel(10)
   val tester = new KernelTester(model)
-  val data = tester.reconstructTrainingData()
 
-  println(data)
+  for (i <- 0 until model.testObservations.length) {
+    val kernelResults = tester.testSentence(i)
+  }
 }
 
 class KernelTester(model: EdgeModel) {
   val kernel = new LinearKernel()
   val msgParam: MessageParam = MessageParam(1.0, 1.0)
   val parser = new HMMParser(msgParam, kernel)
+  val trainingData = reconstructTrainingData()
+  val testData = reconstructTestData()
+  val compModel = new ViterbiMarkovModel()
+  compModel.train(trainingData)
 
   def reconstructTrainingData() = {
     val keys = model.keyArray
@@ -39,6 +45,34 @@ class KernelTester(model: EdgeModel) {
         hiddenSeq :+= keys(featureIdx).split(":")(1)
       }
       for (node <- visible) {
+        val featureIdx = node.findAll(_.equals(1.0))(0)
+        visibleSeq :+= keys(featureIdx).split(":")(1)
+      }
+
+      output :+= (hiddenSeq zip visibleSeq)
+    }
+
+    output
+  }
+
+  def reconstructTestData() = {
+    val keys = model.keyArray
+    val observations = model.testObservations
+    val labels = model.testLabels
+
+    var output = Seq[Seq[(String, String)]]()
+
+    for ((hidden, visible) <- labels zip observations) {
+      var hiddenSeq = Seq[String]()
+      var visibleSeq = Seq[String]()
+
+      for (nodeIdx <- 0 until hidden.size) {
+        val node = hidden(nodeIdx).toDenseVector
+        val featureIdx = node.findAll(_.equals(1.0))(0)
+        hiddenSeq :+= keys(featureIdx).split(":")(1)
+      }
+      for (nodeIdx <- visible.size until 2 * visible.size) {
+        val node = visible(nodeIdx).toDenseVector
         val featureIdx = node.findAll(_.equals(1.0))(0)
         visibleSeq :+= keys(featureIdx).split(":")(1)
       }
@@ -69,6 +103,8 @@ class KernelTester(model: EdgeModel) {
       val correctPrediction = testSet(testNode)
       testToken(testNode, correctPrediction, cache, betaArr, inferer, labelKeys)
     })
+
+//    val compResults = compModel.testSentence()
 
     results
   }
