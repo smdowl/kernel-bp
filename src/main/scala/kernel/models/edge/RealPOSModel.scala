@@ -11,6 +11,6 @@ class RealPOSModel extends HMMModel {
     val parser = new ConllParser()
     val extractor = new BasicFeatureExtractor
 
-    ParsedFeaturesOutput(parser, extractor, -1, Constants.MINI_TRAIN_FILE, Constants.MINI_TEST_FILE)
+    ParsedFeaturesOutput(parser, extractor, -1, Constants.MINI_TEST_FILE, Constants.MINI_TEST_FILE)
   }
 }

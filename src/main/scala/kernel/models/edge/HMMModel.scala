@@ -12,7 +12,7 @@ abstract class HMMModel extends EdgeModel {
    */
   protected def initialise() = {
     val (keyArray, trainData, testData) = generateFeatureVectors()
-
+    this.trainData = trainData
     _keyArray = keyArray
     _testObservations = getObservations(testData)
     _testLabels = getTestLabels(testData)

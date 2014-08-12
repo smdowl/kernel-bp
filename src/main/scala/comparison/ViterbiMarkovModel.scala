@@ -6,7 +6,7 @@ import pos.components.{SentenceBuilder, Token}
 
 object ViterbiMarkovModel extends App {
   val model = new ViterbiMarkovModel()
-  model.train(Constants.SMALL_TRAIN_FILE, Constants.MINI_TEST_FILE)
+  model.trainAndTestFromFiles(Constants.SMALL_TRAIN_FILE, Constants.MINI_TEST_FILE)
 }
 
 class ViterbiMarkovModel {
@@ -20,38 +20,40 @@ class ViterbiMarkovModel {
 
   var states: Seq[State] = _
 
-  def train(filepath: String, testFilepath: String) = {
+  var initProbs: InitProbabilityMap = _
+  var transition: ProbabilityMap = _
+  var emission: EmissionMap = _
+
+  def trainAndTestFromFiles(filepath: String, testFilepath: String) = {
     val parser = new ConllParser()
     val builder = new SentenceBuilder(parser)
     
     val sentences = builder.buildSentenceFromFile(filepath)
 
-    val splitSentences = sentences.map(sentence => {
-      sentence.map(token => {
-        (token.form, token.POS)
-      })
-    })
+    val splitSentences = this.splitSentences(sentences)
 
-    val (initProbs, transition, emission) = learnTransitionAndEmissionProbabilties(splitSentences)
+    train(splitSentences)
 
-    val testSentences = builder.buildSentenceFromFile(testFilepath)
-    val observations = stripObservations(testSentences)
-    val correctTags = stripTags(testSentences)
+    val testSentences = this.splitSentences(builder.buildSentenceFromFile(testFilepath))
 
-    val results = (observations zip correctTags).flatMap{ case (observation, correct) =>
-      val path = viterbi(observation, states, initProbs, transition, emission)
+    val results = testSentences.flatMap(testSentence)
 
-      val results = (correct zip path._2).map { case (a, b) =>
-        a.equals(b)
-      }
-      results
-    }
-
-    val accuracy = results.foldLeft(0.0)((sum, correct) => sum + (if (correct) 1.0 else 0.0)) / results.length
+    val accuracy = results.foldLeft(0.0)((sum, actual) => sum + (if (actual) 1.0 else 0.0)) / results.length
     println(accuracy)
   }
 
-  def learnTransitionAndEmissionProbabilties(sentences: Seq[Seq[(State, Observation)]]): (InitProbabilityMap, ProbabilityMap, EmissionMap) = {
+  def testSentence(pairs: Seq[(State, Observation)]) = {
+    val visible = pairs.map(_._1)
+    val correct = pairs.map(_._2)
+
+    val path = viterbi(visible, states, initProbs, transition, emission)
+    val results = (correct zip path._2).map { case (a, b) =>
+      a.equals(b)
+    }
+    results
+  }
+
+  def train(sentences: Seq[Seq[(State, Observation)]]) = {
     states = Seq[String]()
     var emissions = Seq[String]()
 
@@ -90,7 +92,9 @@ class ViterbiMarkovModel {
     emissionCounts = normalise(emissionCounts, numSamples)
     transCounts = normalise(transCounts, numSamples)
 
-    (getProbDist(initCounts), getProbDist(transCounts), getProbDist(emissionCounts))
+    initProbs = getProbDist(initCounts)
+    transition = getProbDist(transCounts)
+    emission = getProbDist(emissionCounts)
   }
 
   private def increment[T](map: Map[T, Probability], key: T): Map[T, Probability] = {
@@ -135,15 +139,9 @@ class ViterbiMarkovModel {
     (probPath._1, probPath._2.reverse)
   }
 
-  private def stripObservations(sentences: Seq[Seq[Token]]) = {
-    sentences.map(sentence => {
-      sentence.map(_.form)
+  private def splitSentences(sentences: Seq[Seq[Token]]) = sentences.map(sentence => {
+    sentence.map(token => {
+      (token.form, token.POS)
     })
-  }
-
-  private def stripTags(sentences: Seq[Seq[Token]]) = {
-    sentences.map(sentence => {
-      sentence.map(_.POS)
-    })
-  }
+  })
 }
