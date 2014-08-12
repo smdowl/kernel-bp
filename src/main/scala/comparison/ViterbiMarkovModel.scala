@@ -43,8 +43,8 @@ class ViterbiMarkovModel {
   }
 
   def testSentence(pairs: Seq[(State, Observation)]) = {
-    val visible = pairs.map(_._1)
-    val correct = pairs.map(_._2)
+    val correct = pairs.map(_._1)
+    val visible = pairs.map(_._2)
 
     val path = viterbi(visible, states, initProbs, transition, emission)
     val results = (correct zip path._2).map { case (a, b) =>
@@ -88,9 +88,10 @@ class ViterbiMarkovModel {
         prev = pos
       }
     }
-    initCounts = normalise(initCounts, numSentences)
-    emissionCounts = normalise(emissionCounts, numSamples)
-    transCounts = normalise(transCounts, numSamples)
+    initCounts = normaliseInit(initCounts, numSentences)
+
+    emissionCounts = normaliseTuples(emissionCounts, numSamples)
+    transCounts = normaliseTuples(transCounts, numSamples)
 
     initProbs = getProbDist(initCounts)
     transition = getProbDist(transCounts)
@@ -101,10 +102,24 @@ class ViterbiMarkovModel {
     map + (key -> (map.getOrElse(key, 0.0) + 1.0))
   }
 
-  private def normalise[T](map: Map[T, Probability], normaliser: Probability): Map[T, Probability] = {
+  private def normaliseInit(map: Map[State, Probability], normaliser: Probability): Map[State, Probability] = {
     var out = map
     for (key <- map.keys)
       out += key -> (map(key) / normaliser)
+    out
+  }
+
+  private def normaliseTuples(map: Map[(State, Observation), Probability],
+                            normaliser: Probability): Map[(State, Observation), Probability] = {
+    var normalisers = Map[State, Probability]()
+
+    for (key <- map.keys) {
+      normalisers += key._1 -> (normalisers.getOrElse(key._1, 0.0) + map(key))
+    }
+
+    var out = map
+    for (key <- map.keys)
+      out += key -> (map(key) / normalisers(key._1))
     out
   }
 

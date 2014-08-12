@@ -14,7 +14,10 @@ object KernelTester extends App {
   val tester = new KernelTester(model)
 
   for (i <- 0 until model.testObservations.length) {
-    val kernelResults = tester.testSentence(i)
+    val (kernelResults, compResults) = tester.testSentence(i)
+    println(kernelResults)
+    println(compResults)
+    println()
   }
 }
 
@@ -99,14 +102,14 @@ class KernelTester(model: EdgeModel) {
 
     val inferer = new Inferer(testMatrix)
 
-    val results = (0 until cache.numNodes / 2).map(testNode => {
+    val kernelResults = (0 until cache.numNodes / 2).map(testNode => {
       val correctPrediction = testSet(testNode)
       testToken(testNode, correctPrediction, cache, betaArr, inferer, labelKeys)
     })
 
-//    val compResults = compModel.testSentence()
+    val compResults = compModel.testSentence(testData(testIdx))
 
-    results
+    (kernelResults, compResults)
   }
 
   private def buildPasser(cache: EdgeBasedCache, observedNodes: Set[Int]) = new EdgeBasedMessagePasser(cache, observedNodes)
