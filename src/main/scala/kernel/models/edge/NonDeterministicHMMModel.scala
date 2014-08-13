@@ -9,16 +9,20 @@ class NonDeterministicHMMModel(n: Int) extends DeterministicHMMModel(n) {
   override protected def visibleStates = Seq("X", "Y")
 
   override protected def transitionMatrix: DenseMatrix[Double] = {
+    val xx = 0.0
+    val yy = 0.1
     DenseMatrix(
-      (0.0, 1.0),
-      (0.95, 0.05)
+      (xx, 1 - xx),
+      (1-yy, yy)
     )
   }
 
   override protected def emissionMatrix: DenseMatrix[Double] = {
+    val ax = 0.8
+    val bx = 0.2
     DenseMatrix(
-      (0.95, 0.05),
-      (0.05, 0.95)
+      (ax, 1-ax),
+      (bx, 1-bx)
     )
   }
 
