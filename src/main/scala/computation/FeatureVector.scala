@@ -22,11 +22,13 @@ class FeatureVector() {
     Math.pow(sum, 0.5)
   }
 
-  def add(key: String, value: Double = 1.0): Unit = {
+  def add(key: String, value: Double = 1.0): FeatureVector = {
     if (value == 0.0)
       values -= key
 
     values += (key -> value)
+
+    this
   }
 
   def merge(other: FeatureVector): FeatureVector = {
