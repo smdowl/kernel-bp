@@ -5,34 +5,41 @@ import comparison.ViterbiMarkovModel
 import kernel.caches.EdgeBasedCache
 import kernel.kernels.LinearKernel
 import kernel.models.MessageParam
-import kernel.models.edge.{DeterministicHMMModel, EdgeModel, Inferer}
+import kernel.models.edge.{NonDeterministicHMMModel, DeterministicHMMModel, EdgeModel, Inferer}
 import kernel.parsing.HMMParser
 import kernel.propagation.EdgeBasedMessagePasser
 
 object KernelTester extends App {
-  val model = new DeterministicHMMModel(10)
-  val tester = new KernelTester(model)
+  val model = new NonDeterministicHMMModel(100)
+  val viterbiModel = new ViterbiMarkovModel()
+  val tester = new KernelTester(model, viterbiModel)
 
+  var kernelAccuracy = 0.0
+  var compAccuracy = 0.0
+  var total = 0
   for (i <- 0 until model.testObservations.length) {
     val (kernelResults, compResults) = tester.testSentence(i)
-    println(kernelResults)
-    println(compResults)
-    println()
+    assert(kernelResults.length == compResults.length, "Should be exactly the same length")
+
+    kernelAccuracy += kernelResults.count(_ == true)
+    compAccuracy += compResults.count(_ == true)
+    total += kernelResults.length
   }
+
+  println(s"Kernel Accuracy: ${kernelAccuracy / total}\nComparision Accuracy: ${compAccuracy / total}")
 }
 
-class KernelTester(model: EdgeModel) {
+class KernelTester(kernelModel: EdgeModel, compModel: ViterbiMarkovModel) {
   val kernel = new LinearKernel()
   val msgParam: MessageParam = MessageParam(1.0, 1.0)
   val parser = new HMMParser(msgParam, kernel)
   val trainingData = reconstructTrainingData()
   val testData = reconstructTestData()
-  val compModel = new ViterbiMarkovModel()
   compModel.train(trainingData)
 
   def reconstructTrainingData() = {
-    val keys = model.keyArray
-    val data = model.trainData
+    val keys = kernelModel.keyArray
+    val data = kernelModel.trainData
 
     var output = Seq[Seq[(String, String)]]()
 
@@ -59,9 +66,9 @@ class KernelTester(model: EdgeModel) {
   }
 
   def reconstructTestData() = {
-    val keys = model.keyArray
-    val observations = model.testObservations
-    val labels = model.testLabels
+    val keys = kernelModel.keyArray
+    val observations = kernelModel.testObservations
+    val labels = kernelModel.testLabels
 
     var output = Seq[Seq[(String, String)]]()
 
@@ -87,10 +94,10 @@ class KernelTester(model: EdgeModel) {
   }
 
   def testSentence(testIdx: Int) = {
-    val edges = model.edges
-    val obsArr = model.testObservations
-    val testArr = model.testLabels
-    val (labelKeys, testMatrix) = model.testMatrix
+    val edges = kernelModel.edges
+    val obsArr = kernelModel.testObservations
+    val testArr = kernelModel.testLabels
+    val (labelKeys, testMatrix) = kernelModel.testMatrix
 
     val observations = obsArr(testIdx)
     val testSet = testArr(testIdx)
@@ -121,7 +128,7 @@ class KernelTester(model: EdgeModel) {
                 inferer: Inferer,
                 labelKeys: Array[String]) = {
     val probs = inferer.calculateKernelCondRootMarginal(testNode, cache, betaArr)
-    isPredictionCorrect(labelKeys, probs, model.keyIndex, correctPrediction)
+    isPredictionCorrect(labelKeys, probs, kernelModel.keyIndex, correctPrediction)
   }
 
   private def isPredictionCorrect(labelKeys: Array[String], probs: DenseVector[Double], keyIndex: Map[String, Int], correct: DenseMatrix[Double]) = {
@@ -129,7 +136,7 @@ class KernelTester(model: EdgeModel) {
       false
     else {
       val predictedLabel = labelKeys(probs.argmax)
-      println(s"predicted: $predictedLabel")
+//      println(s"predicted: $predictedLabel")
       val predictedFeature = keyIndex(predictedLabel)
       correct(0, predictedFeature) != 0
     }
