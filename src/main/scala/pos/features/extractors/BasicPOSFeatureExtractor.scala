@@ -3,7 +3,7 @@ package pos.features.extractors
 import computation.FeatureVector
 import pos.parser.{ParseHistory, Context}
 
-class BasicFeatureExtractor extends FeatureExtractor {
+class BasicPOSFeatureExtractor extends POSFeatureExtractor {
   override def extractFeatures(history: ParseHistory): Seq[FeatureVector] = {
 
     var seqOut = Seq[FeatureVector]()

@@ -2,7 +2,7 @@ package kernel.models.edge
 
 import breeze.linalg.{SparseVector, CSCMatrix, DenseVector, DenseMatrix}
 
-trait EdgeModel {
+trait Model {
   protected var _edges: Map[String, Edge] = _
   var trainData: Array[Array[SparseVector[Double]]] = _
   protected var _testObservations: Array[Map[Int, CSCMatrix[Double]]] = _

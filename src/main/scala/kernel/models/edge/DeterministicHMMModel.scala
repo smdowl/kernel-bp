@@ -2,7 +2,7 @@ package kernel.models.edge
 
 import breeze.linalg.{DenseMatrix, DenseVector}
 import breeze.stats.distributions.Multinomial
-import kernel.models.toys.extractors.{SimpleHMMFeatureExtractor, ToyFeatureExtractor}
+import kernel.models.toys.extractors.{SimpleToyFeatureExtractor, ToyFeatureExtractor}
 import pos.features.extractors.FeatureArrayBuilder
 
 import scala.util.Random
@@ -32,7 +32,7 @@ class DeterministicHMMModel(n: Int) extends ProbabalisticHMMModel(n) {
     )
   }
 
-  protected def extractor: ToyFeatureExtractor = new SimpleHMMFeatureExtractor()
+  protected def extractor: ToyFeatureExtractor = new SimpleToyFeatureExtractor()
 
   /**
    * Draw a single sample of hidden and visible states

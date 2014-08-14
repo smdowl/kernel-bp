@@ -1,21 +1,21 @@
 package kernel
 
 import breeze.linalg._
-import kernel.caches.EdgeBasedCache
+import kernel.caches.Cache
 import kernel.kernels.{RBFKernel, LinearKernel}
 import kernel.models.MessageParam
 import kernel.models.edge._
 import kernel.parsing.HMMParser
-import kernel.propagation.EdgeBasedMessagePasser
+import kernel.propagation.MessagePasser
 
-object EdgeDemo {
+object Demo {
   val numSamples = 50
   val msgParam: MessageParam = MessageParam(1.0, 1.0)
   val model = new RealPOSModel()
   val kernel = new LinearKernel()
   val parser = new HMMParser(msgParam, kernel)
 
-  def buildPasser(cache: EdgeBasedCache, observedNodes: Set[Int]) = new EdgeBasedMessagePasser(cache, observedNodes)
+  def buildPasser(cache: Cache, observedNodes: Set[Int]) = new MessagePasser(cache, observedNodes)
 
   def runDemo() = {
 
@@ -66,7 +66,7 @@ object EdgeDemo {
 
   def testToken(testNode: Int,
                 correctPrediction: DenseMatrix[Double],
-                cache: EdgeBasedCache,
+                cache: Cache,
                 betaArr: Array[Array[DenseMatrix[Double]]],
                 inferer: Inferer,
                 labelKeys: Array[String]) = {

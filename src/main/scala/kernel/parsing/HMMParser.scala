@@ -1,7 +1,7 @@
 package kernel.parsing
 
 import breeze.linalg.{CSCMatrix, DenseMatrix}
-import kernel.caches.EdgeBasedCache
+import kernel.caches.Cache
 import kernel.kernels.Kernel
 import kernel.models.MessageParam
 import kernel.models.edge.Edge
@@ -13,7 +13,7 @@ class HMMParser(msgParam: MessageParam, kernel: Kernel) extends EdgeParser(kerne
   private var kArr: Array[Array[DenseMatrix[Double]]] = _
   private val REQUIRED_KEYS = Set("hidden", "visible")
 
-  override def buildCache(edges: Map[String, Edge], length: Int): EdgeBasedCache = {
+  override def buildCache(edges: Map[String, Edge], length: Int): Cache = {
 
     assert(edges.keySet.equals(REQUIRED_KEYS), "Should have exactly the right edges defined")
 
@@ -26,7 +26,7 @@ class HMMParser(msgParam: MessageParam, kernel: Kernel) extends EdgeParser(kerne
     fillHidden(edges)
     fillVisible(edges)
 
-    EdgeBasedCache(dataArr, kArr, kernel, msgParam)
+    Cache(dataArr, kArr, kernel, msgParam)
   }
 
   private def fillHidden(edges: Map[String, Edge]) = {

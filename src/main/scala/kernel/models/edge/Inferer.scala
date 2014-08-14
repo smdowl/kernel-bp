@@ -1,17 +1,17 @@
 package kernel.models.edge
 
 import breeze.linalg.{sum, DenseMatrix, Axis, DenseVector}
-import kernel.caches.EdgeBasedCache
+import kernel.caches.Cache
 
 class Inferer(testMatrix: DenseMatrix[Double]) {
 
-  def calculateKernelMarginal(nodeId: Int, cache: EdgeBasedCache): DenseVector[Double] = {
+  def calculateKernelMarginal(nodeId: Int, cache: Cache): DenseVector[Double] = {
     val neighbour = cache.getNeighbours(nodeId)(0)
     val kernelRes = cache.kernel(testMatrix, cache.dataArr(nodeId)(neighbour), cache.msgParam.sig)
     sum(kernelRes, Axis._1)
   }
 
-  def calculateKernelCondRootMarginal(nodeId: Int, cache: EdgeBasedCache, betaArr: Array[Array[DenseMatrix[Double]]]): DenseVector[Double] = {
+  def calculateKernelCondRootMarginal(nodeId: Int, cache: Cache, betaArr: Array[Array[DenseMatrix[Double]]]): DenseVector[Double] = {
     var condRootMarginal: DenseVector[Double] = calculateKernelMarginal(nodeId, cache)
 
     for (neighbour <- cache.getNeighbours(nodeId)) {

@@ -1,34 +1,25 @@
 package kernel.caches
 
-import breeze.linalg.DenseMatrix
+import breeze.linalg.{CSCMatrix, DenseMatrix}
 import kernel.kernels.Kernel
-import kernel.models.Model
+import kernel.models.MessageParam
 
-object Cache {
-  def buildCache(sampleArr: Array[DenseMatrix[Double]], kernel: Kernel, model: Model): Cache = {
+case class Cache(dataArr: Array[Array[CSCMatrix[Double]]],
+                          kArr: Array[Array[DenseMatrix[Double]]],
+                          kernel: Kernel,
+                          msgParam: MessageParam ) {
+  def numSamples(i: Int, j: Int) = kArr(i)(j).rows
 
-    val numNodes = model.numNodes
-    val sig = model.msgParam.sig
+  def numNodes = kArr.length
 
-    val kArr = Array.ofDim[DenseMatrix[Double]](numNodes, numNodes)
-    val leafArr = Array.ofDim[DenseMatrix[Double]](numNodes)
+  def getNeighbours(nodeId: Int): Seq[Int] = {
+    var out = Seq[Int]()
 
-    for (nodeInd <- 0 until numNodes) {
-      val children = model.getChildren(nodeInd)
-      for (childInd <- children)
-        kArr(nodeInd)(childInd) = kernel(sampleArr(nodeInd), sampleArr(nodeInd), sig)
+    (kArr(nodeId) zipWithIndex).foreach( pair => {
+      if (pair._1 != null)
+        out :+= pair._2
+    })
 
-      if (children.length == 0) {
-        kArr(nodeInd)(nodeInd) = kernel(sampleArr(nodeInd), sampleArr(nodeInd), sig)
-        leafArr(nodeInd) = sampleArr(nodeInd)
-      }
-
-      for (parentInd <- model.getParents(nodeInd))
-        kArr(nodeInd)(parentInd) = kernel(sampleArr(parentInd), sampleArr(parentInd), sig)
-    }
-
-    Cache(kArr, leafArr)
+    out
   }
 }
-
-case class Cache(kArr: Array[Array[DenseMatrix[Double]]], leafArr: Array[DenseMatrix[Double]])

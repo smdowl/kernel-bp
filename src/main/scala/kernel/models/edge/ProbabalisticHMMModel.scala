@@ -3,7 +3,7 @@ package kernel.models.edge
 import breeze.linalg.{SparseVector, DenseMatrix, DenseVector}
 import breeze.stats.distributions.Multinomial
 import computation.FeatureVector
-import kernel.models.toys.extractors.{SimpleHMMFeatureExtractor, ToyFeatureExtractor}
+import kernel.models.toys.extractors.{SimpleToyFeatureExtractor, ToyFeatureExtractor}
 import pos.features.extractors.FeatureArrayBuilder
 
 import scala.util.Random

@@ -2,12 +2,12 @@ package kernel.testers
 
 import breeze.linalg.{any, BitVector, DenseVector, DenseMatrix}
 import comparison.ViterbiMarkovModel
-import kernel.caches.EdgeBasedCache
+import kernel.caches.Cache
 import kernel.kernels.LinearKernel
 import kernel.models.MessageParam
-import kernel.models.edge.{NonDeterministicHMMModel, DeterministicHMMModel, EdgeModel, Inferer}
+import kernel.models.edge.{NonDeterministicHMMModel, DeterministicHMMModel, Model, Inferer}
 import kernel.parsing.HMMParser
-import kernel.propagation.EdgeBasedMessagePasser
+import kernel.propagation.MessagePasser
 
 object KernelTester extends App {
   val model = new NonDeterministicHMMModel(50)
@@ -31,7 +31,7 @@ object KernelTester extends App {
   println(s"Kernel Accuracy: ${kernelAccuracy / total}\nComparision Accuracy: ${compAccuracy / total}")
 }
 
-class KernelTester(kernelModel: EdgeModel, compModel: ViterbiMarkovModel) {
+class KernelTester(kernelModel: Model, compModel: ViterbiMarkovModel) {
   val kernel = new LinearKernel()
   val msgParam: MessageParam = MessageParam(1.0, 1.0)
   val parser = new HMMParser(msgParam, kernel)
@@ -121,11 +121,11 @@ class KernelTester(kernelModel: EdgeModel, compModel: ViterbiMarkovModel) {
     (kernelResults, compResults)
   }
 
-  private def buildPasser(cache: EdgeBasedCache, observedNodes: Set[Int]) = new EdgeBasedMessagePasser(cache, observedNodes)
+  private def buildPasser(cache: Cache, observedNodes: Set[Int]) = new MessagePasser(cache, observedNodes)
 
   private def testToken(testNode: Int,
                 correctPrediction: DenseMatrix[Double],
-                cache: EdgeBasedCache,
+                cache: Cache,
                 betaArr: Array[Array[DenseMatrix[Double]]],
                 inferer: Inferer,
                 labelKeys: Array[String]) = {

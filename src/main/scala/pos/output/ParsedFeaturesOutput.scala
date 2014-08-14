@@ -5,15 +5,15 @@ import breeze.linalg.DenseVector
 import computation.FeatureVector
 import input.{ConllParser, Parser}
 import pos.components.SentenceBuilder
-import pos.features.extractors.{FeatureArrayBuilder, FeatureExtractor}
+import pos.features.extractors.{FeatureArrayBuilder, POSFeatureExtractor}
 import pos.parser.{ParseHistory, HistoryParser}
 
 object ParsedFeaturesOutput {
   var builder: SentenceBuilder = _
   var historyParser: HistoryParser = _
-  var extractor: FeatureExtractor = _
+  var extractor: POSFeatureExtractor = _
 
-  def apply(parser: Parser, extractor: FeatureExtractor, length: Int = -1, source: String = Constants.DEP_TEST,
+  def apply(parser: Parser, extractor: POSFeatureExtractor, length: Int = -1, source: String = Constants.DEP_TEST,
              testSource: String = Constants.MINI_TEST_FILE) = {
     this.extractor = extractor
     builder = new SentenceBuilder(parser)
@@ -44,7 +44,7 @@ object ParsedFeaturesOutput {
     sentences.map(historyParser.parseHistory)
   }
 
-  private def getSentenceFeatures(history: ParseHistory, extractor: FeatureExtractor): Seq[FeatureVector] = {
+  private def getSentenceFeatures(history: ParseHistory, extractor: POSFeatureExtractor): Seq[FeatureVector] = {
     extractor.extractFeatures(history)
   }
 }
