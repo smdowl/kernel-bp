@@ -10,11 +10,7 @@ object ViterbiMarkovModel extends App {
 }
 
 class ViterbiMarkovModel extends MarkovModel {
-  override def inference(observations: Seq[Observation],
-              states: Seq[State],
-              initDist: State => Probability,
-              transitions: ProbabilityMap,
-              emissions: EmissionMap): ProbabilityPath = {
+  override def inference(observations: Seq[Observation]): ProbabilityPath = {
 
     def probability(p: ProbabilityPath) = p._1
 

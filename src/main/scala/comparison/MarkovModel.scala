@@ -15,9 +15,9 @@ abstract class MarkovModel {
 
   var states: Seq[State] = _
 
-  var initProbs: InitProbabilityMap = _
-  var transition: ProbabilityMap = _
-  var emission: EmissionMap = _
+  var initDist: InitProbabilityMap = _
+  var transitions: ProbabilityMap = _
+  var emissions: EmissionMap = _
 
   def trainAndTestFromFiles(filepath: String, testFilepath: String) = {
     val parser = new ConllParser()
@@ -47,7 +47,7 @@ abstract class MarkovModel {
     val correct = pairs.map(_._1)
     val visible = pairs.map(_._2)
 
-    val path = inference(visible, states, initProbs, transition, emission)
+    val path = inference(visible)
     val results = (correct zip path._2).map { case (a, b) =>
       a.equals(b)
     }
@@ -94,9 +94,9 @@ abstract class MarkovModel {
     emissionCounts = normaliseTuples(emissionCounts, numSamples)
     transCounts = normaliseTuples(transCounts, numSamples)
 
-    initProbs = getProbDist(initCounts)
-    transition = getProbDist(transCounts)
-    emission = getProbDist(emissionCounts)
+    initDist = getProbDist(initCounts)
+    transitions = getProbDist(transCounts)
+    this.emissions = getProbDist(emissionCounts)
   }
 
   private def increment[T](map: Map[T, Probability], key: T): Map[T, Probability] = {
@@ -130,9 +130,5 @@ abstract class MarkovModel {
     }
   }
 
-  def inference(observations: Seq[Observation],
-              states: Seq[State],
-              initDist: State => Probability,
-              transitions: ProbabilityMap,
-              emissions: EmissionMap): ProbabilityPath
+  def inference(observations: Seq[Observation]): ProbabilityPath
 }
