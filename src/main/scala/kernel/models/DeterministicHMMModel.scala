@@ -1,11 +1,7 @@
-package kernel.models.edge
+package kernel.models
 
-import breeze.linalg.{DenseMatrix, DenseVector}
-import breeze.stats.distributions.Multinomial
-import kernel.models.toys.extractors.{SimpleToyFeatureExtractor, ToyFeatureExtractor}
-import pos.features.extractors.FeatureArrayBuilder
-
-import scala.util.Random
+import breeze.linalg.DenseMatrix
+import kernel.models.toyextractors.{SimpleToyFeatureExtractor, ToyFeatureExtractor}
 
 object DeterministicHMMModel extends App {
   val model = new DeterministicHMMModel(1)

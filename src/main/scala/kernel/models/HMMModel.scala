@@ -1,6 +1,7 @@
-package kernel.models.edge
+package kernel.models
 
-import breeze.linalg.{SparseVector, CSCMatrix, DenseMatrix, DenseVector}
+import breeze.linalg.{CSCMatrix, DenseMatrix, SparseVector}
+import kernel.models.components.Edge
 
 abstract class HMMModel extends Model {
   initialise()

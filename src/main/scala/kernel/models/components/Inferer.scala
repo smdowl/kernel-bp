@@ -1,6 +1,6 @@
-package kernel.models.edge
+package kernel.models.components
 
-import breeze.linalg.{sum, DenseMatrix, Axis, DenseVector}
+import breeze.linalg.{Axis, DenseMatrix, DenseVector, sum}
 import kernel.caches.Cache
 
 class Inferer(testMatrix: DenseMatrix[Double]) {

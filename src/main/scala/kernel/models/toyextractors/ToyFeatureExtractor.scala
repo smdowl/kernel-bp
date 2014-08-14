@@ -1,6 +1,5 @@
-package kernel.models.toys.extractors
+package kernel.models.toyextractors
 
-import breeze.linalg.{DenseVector, DenseMatrix}
 import computation.FeatureVector
 
 trait ToyFeatureExtractor {

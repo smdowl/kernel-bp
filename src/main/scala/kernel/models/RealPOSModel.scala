@@ -1,7 +1,7 @@
-package kernel.models.edge
+package kernel.models
 
 import app.Constants
-import breeze.linalg.{SparseVector, DenseVector}
+import breeze.linalg.SparseVector
 import input.ConllParser
 import pos.features.extractors.BasicPOSFeatureExtractor
 import pos.output.ParsedFeaturesOutput

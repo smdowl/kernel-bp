@@ -1,9 +1,9 @@
-package kernel.models.edge
+package kernel.models
 
-import breeze.linalg.{SparseVector, DenseMatrix, DenseVector}
+import breeze.linalg.{DenseMatrix, DenseVector, SparseVector}
 import breeze.stats.distributions.Multinomial
 import computation.FeatureVector
-import kernel.models.toys.extractors.{SimpleToyFeatureExtractor, ToyFeatureExtractor}
+import kernel.models.toyextractors.ToyFeatureExtractor
 import pos.features.extractors.FeatureArrayBuilder
 
 import scala.util.Random

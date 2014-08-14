@@ -2,7 +2,7 @@ package kernel.caches
 
 import breeze.linalg.{CSCMatrix, DenseMatrix}
 import kernel.kernels.Kernel
-import kernel.models.MessageParam
+import kernel.models.components.MessageParam
 
 case class Cache(dataArr: Array[Array[CSCMatrix[Double]]],
                           kArr: Array[Array[DenseMatrix[Double]]],

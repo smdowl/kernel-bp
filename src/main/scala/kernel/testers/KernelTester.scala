@@ -4,8 +4,9 @@ import breeze.linalg.{any, BitVector, DenseVector, DenseMatrix}
 import comparison.ViterbiMarkovModel
 import kernel.caches.Cache
 import kernel.kernels.LinearKernel
-import kernel.models.MessageParam
-import kernel.models.edge.{NonDeterministicHMMModel, DeterministicHMMModel, Model, Inferer}
+import kernel.models.components.{MessageParam, Inferer}
+import kernel.models.{NonDeterministicHMMModel, Model}
+import kernel.models.edge.NonDeterministicHMMModel
 import kernel.parsing.HMMParser
 import kernel.propagation.MessagePasser
 

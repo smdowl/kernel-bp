@@ -1,7 +1,7 @@
-package kernel.models.edge
+package kernel.models
 
 import breeze.linalg.DenseMatrix
-import kernel.models.toys.extractors.{SimpleToyFeatureExtractor, ToyFeatureExtractor}
+import kernel.models.toyextractors.{SimpleToyFeatureExtractor, ToyFeatureExtractor}
 
 class NonDeterministicHMMModel(n: Int) extends DeterministicHMMModel(n) {
   override protected def hiddenStates = Seq("A", "B")

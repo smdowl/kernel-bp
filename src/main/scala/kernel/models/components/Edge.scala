@@ -1,4 +1,4 @@
-package kernel.models.edge
+package kernel.models.components
 
 import breeze.linalg.CSCMatrix
 

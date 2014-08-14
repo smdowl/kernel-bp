@@ -1,6 +1,7 @@
-package kernel.models.edge
+package kernel.models
 
-import breeze.linalg.{SparseVector, CSCMatrix, DenseVector, DenseMatrix}
+import breeze.linalg.{CSCMatrix, DenseMatrix, SparseVector}
+import kernel.models.components.Edge
 
 trait Model {
   protected var _edges: Map[String, Edge] = _
