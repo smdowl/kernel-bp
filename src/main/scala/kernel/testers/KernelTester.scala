@@ -10,7 +10,7 @@ import kernel.parsing.HMMParser
 import kernel.propagation.EdgeBasedMessagePasser
 
 object KernelTester extends App {
-  val model = new NonDeterministicHMMModel(100)
+  val model = new NonDeterministicHMMModel(50)
   val viterbiModel = new ViterbiMarkovModel()
   val tester = new KernelTester(model, viterbiModel)
 
@@ -18,6 +18,8 @@ object KernelTester extends App {
   var compAccuracy = 0.0
   var total = 0
   for (i <- 0 until model.testObservations.length) {
+    println(s"Starting test $i")
+
     val (kernelResults, compResults) = tester.testSentence(i)
     assert(kernelResults.length == compResults.length, "Should be exactly the same length")
 
@@ -77,13 +79,13 @@ class KernelTester(kernelModel: EdgeModel, compModel: ViterbiMarkovModel) {
       var visibleSeq = Seq[String]()
 
       for (nodeIdx <- 0 until hidden.size) {
-        val node = hidden(nodeIdx).toDenseVector
-        val featureIdx = node.findAll(_.equals(1.0))(0)
+        val node = hidden(nodeIdx).toDenseMatrix
+        val featureIdx = node.findAll(_.equals(1.0))(0)._2
         hiddenSeq :+= keys(featureIdx).split(":")(1)
       }
       for (nodeIdx <- visible.size until 2 * visible.size) {
-        val node = visible(nodeIdx).toDenseVector
-        val featureIdx = node.findAll(_.equals(1.0))(0)
+        val node = visible(nodeIdx).toDenseMatrix
+        val featureIdx = node.findAll(_.equals(1.0))(0)._2
         visibleSeq :+= keys(featureIdx).split(":")(1)
       }
 
@@ -99,8 +101,8 @@ class KernelTester(kernelModel: EdgeModel, compModel: ViterbiMarkovModel) {
     val testArr = kernelModel.testLabels
     val (labelKeys, testMatrix) = kernelModel.testMatrix
 
-    val observations = obsArr(testIdx)
-    val testSet = testArr(testIdx)
+    val observations = obsArr(testIdx).map{ case (key, sparse) => key -> sparse.toDenseMatrix}
+    val testSet = testArr(testIdx).map{ case (key, sparse) => key -> sparse.toDenseMatrix}
 
     val cache = parser.buildCache(edges, observations.size)
 

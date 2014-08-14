@@ -1,17 +1,17 @@
 package kernel.models.edge
 
-import breeze.linalg.{DenseVector, DenseMatrix}
+import breeze.linalg.{SparseVector, CSCMatrix, DenseVector, DenseMatrix}
 
 trait EdgeModel {
   protected var _edges: Map[String, Edge] = _
-  var trainData: Array[Array[DenseVector[Double]]] = _
-  protected var _testObservations: Array[Map[Int, DenseMatrix[Double]]] = _
-  protected var _testLabels: Array[Map[Int, DenseMatrix[Double]]] = _
+  var trainData: Array[Array[SparseVector[Double]]] = _
+  protected var _testObservations: Array[Map[Int, CSCMatrix[Double]]] = _
+  protected var _testLabels: Array[Map[Int, CSCMatrix[Double]]] = _
   protected var _keyArray: Array[String] = _
 
   def edges: Map[String, Edge] = _edges
-  def testObservations: Array[Map[Int, DenseMatrix[Double]]] = _testObservations
-  def testLabels: Array[Map[Int, DenseMatrix[Double]]] = _testLabels
+  def testObservations: Array[Map[Int, CSCMatrix[Double]]] = _testObservations
+  def testLabels: Array[Map[Int, CSCMatrix[Double]]] = _testLabels
   def keyArray: Array[String] = _keyArray
 
   def keyIndex: Map[String, Int] = {
@@ -38,10 +38,12 @@ trait EdgeModel {
     (labelKeys, matrix)
   }
 
-  protected def mergeData(dataSeq: Seq[DenseMatrix[Double]]) = {
-    if (dataSeq.length > 0)
-      dataSeq.tail.foldLeft(dataSeq.head)((a, b) => DenseMatrix.vertcat(a, b)) + 1e-9
+  protected def mergeData(dataSeq: Seq[DenseMatrix[Double]]): CSCMatrix[Double] = {
+    val denseMat = if (dataSeq.length > 0)
+      dataSeq.tail.foldLeft(dataSeq.head)((a, b) => DenseMatrix.vertcat(a, b))
     else
       DenseMatrix.zeros[Double](0, 0)
+
+    kernel.linalg.toSparse(denseMat)
   }
 }

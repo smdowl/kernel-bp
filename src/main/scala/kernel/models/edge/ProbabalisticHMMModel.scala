@@ -1,6 +1,6 @@
 package kernel.models.edge
 
-import breeze.linalg.{DenseMatrix, DenseVector}
+import breeze.linalg.{SparseVector, DenseMatrix, DenseVector}
 import breeze.stats.distributions.Multinomial
 import computation.FeatureVector
 import kernel.models.toys.extractors.{SimpleHMMFeatureExtractor, ToyFeatureExtractor}
@@ -9,7 +9,7 @@ import pos.features.extractors.FeatureArrayBuilder
 import scala.util.Random
 
 abstract class ProbabalisticHMMModel(n: Int) extends HMMModel {
-  protected def minLength = 10
+  protected def minLength = 5
   protected def maxLength = minLength
 
   protected def hiddenStates: Seq[String]
@@ -41,7 +41,7 @@ abstract class ProbabalisticHMMModel(n: Int) extends HMMModel {
   }
 
 
-  override protected def generateFeatureVectors(): (Array[String], Array[Array[DenseVector[Double]]], Array[Array[DenseVector[Double]]]) = {
+  override protected def generateFeatureVectors(): (Array[String], Array[Array[SparseVector[Double]]], Array[Array[SparseVector[Double]]]) = {
     FeatureArrayBuilder.buildFeatureArray(sampleSequences, testSequences)
   }
 

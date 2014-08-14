@@ -42,8 +42,12 @@ object EdgeDemo {
     val testArr = model.testLabels
     val (labelKeys, testMatrix) = model.testMatrix
 
-    val observations = obsArr(testIdx)
-    val testSet = testArr(testIdx)
+    val observations = obsArr(testIdx).map{case (key, matrix) =>
+      (key, matrix.toDenseMatrix)
+    }
+    val testSet = testArr(testIdx).map{case (key, matrix) =>
+      (key, matrix.toDenseMatrix)
+    }
 
     val cache = parser.buildCache(edges, observations.size)
 

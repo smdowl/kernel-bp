@@ -1,7 +1,6 @@
 package kernel.models.edge
 
-import breeze.linalg.{DenseMatrix, DenseVector}
-import kernel.models.toys.extractors.ToyFeatureExtractor
+import breeze.linalg.{SparseVector, CSCMatrix, DenseMatrix, DenseVector}
 
 abstract class HMMModel extends EdgeModel {
   initialise()
@@ -23,52 +22,55 @@ abstract class HMMModel extends EdgeModel {
     _edges += ("visible" -> buildEmissionEdges(trainData))
   }
 
-  protected def generateFeatureVectors(): (Array[String], Array[Array[DenseVector[Double]]], Array[Array[DenseVector[Double]]])
+  protected def generateFeatureVectors(): (Array[String], Array[Array[SparseVector[Double]]], Array[Array[SparseVector[Double]]])
 
-  final def getObservations(testData: Array[Array[DenseVector[Double]]]): Array[Map[Int, DenseMatrix[Double]]] = {
+  final def getObservations(testData: Array[Array[SparseVector[Double]]]): Array[Map[Int, CSCMatrix[Double]]] = {
     testData.map(sample => {
       convertRangeToMap(sample, sample.length / 2, sample.length)
     })
   }
 
-  final def getTestLabels(testData: Array[Array[DenseVector[Double]]]): Array[Map[Int, DenseMatrix[Double]]] = {
+  final def getTestLabels(testData: Array[Array[SparseVector[Double]]]): Array[Map[Int, CSCMatrix[Double]]] = {
     testData.map(sample => {
       convertRangeToMap(sample, 0, sample.length / 2)
     })
   }
 
-  private def convertRangeToMap(sample: Array[DenseVector[Double]], from: Int, until: Int) = {
-    var map = Map[Int, DenseMatrix[Double]]()
+  private def convertRangeToMap(sample: Array[SparseVector[Double]], from: Int, until: Int) = {
+    var map = Map[Int, CSCMatrix[Double]]()
     for (i <- from until until) {
-      map += i -> sample(i).toDenseMatrix
+      val matrix = CSCMatrix.zeros[Double](1, sample(i).length)
+      for (j <- 0 until sample(i).length)
+        matrix(0, j) = sample(i)(j)
+      map += i -> matrix
     }
     map
   }
 
-  private def buildTransitionEdges(data: Array[Array[DenseVector[Double]]]) = {
+  private def buildTransitionEdges(data: Array[Array[SparseVector[Double]]]) = {
     var leftData = List[DenseMatrix[Double]]()
     var rightData = List[DenseMatrix[Double]]()
 
     data.foreach(sample => {
       val sentenceLength = sample.length / 2
       for (i <- 0 until sentenceLength) {
-        leftData :+= sample(i).toDenseMatrix
-        rightData :+= sample(i+1).toDenseMatrix
+        leftData :+= sample(i).toDenseVector.toDenseMatrix
+        rightData :+= sample(i+1).toDenseVector.toDenseMatrix
       }
     })
 
     Edge(mergeData(leftData), mergeData(rightData))
   }
 
-  private def buildEmissionEdges(data: Array[Array[DenseVector[Double]]]) = {
+  private def buildEmissionEdges(data: Array[Array[SparseVector[Double]]]) = {
     var leftData = List[DenseMatrix[Double]]()
     var rightData = List[DenseMatrix[Double]]()
 
     data.foreach(sample => {
       val sentenceLength = sample.length / 2
       for (i <- 0 until sentenceLength) {
-        leftData :+= sample(i).toDenseMatrix
-        rightData :+= sample(sentenceLength + i).toDenseMatrix
+        leftData :+= sample(i).toDenseVector.toDenseMatrix
+        rightData :+= sample(sentenceLength + i).toDenseVector.toDenseMatrix
       }
     })
 

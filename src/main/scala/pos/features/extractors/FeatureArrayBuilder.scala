@@ -1,6 +1,6 @@
 package pos.features.extractors
 
-import breeze.linalg.{any, DenseVector}
+import breeze.linalg.{SparseVector, any, DenseVector}
 import computation.FeatureVector
 
 object FeatureArrayBuilder {
@@ -30,11 +30,11 @@ object FeatureArrayBuilder {
     Map[String, Int]() ++ keyPairs
   }
 
-  private def parseFeatureVectors(featureVectors: Seq[Seq[FeatureVector]], index: Map[String, Int]): Array[Array[DenseVector[Double]]] = {
-    var output = Seq[Array[DenseVector[Double]]]()
+  private def parseFeatureVectors(featureVectors: Seq[Seq[FeatureVector]], index: Map[String, Int]): Array[Array[SparseVector[Double]]] = {
+    var output = Seq[Array[SparseVector[Double]]]()
 
     featureVectors.foreach(sentence => {
-      val featureSeq: Seq[DenseVector[Double]] = sentence.map(vec => parseFeatureVector(vec, index))
+      val featureSeq: Seq[SparseVector[Double]] = sentence.map(vec => parseFeatureVector(vec, index))
       assert(featureSeq.slice(1, sentence.length).forall(vec => any(vec)), "Should have at least one non-zero entry")
       output :+= featureSeq.toArray
     })
@@ -42,8 +42,8 @@ object FeatureArrayBuilder {
     output.toArray
   }
 
-  private def parseFeatureVector(featureVector: FeatureVector, index: Map[String, Int]): DenseVector[Double] = {
-    val arr = DenseVector.zeros[Double](index.size)
+  private def parseFeatureVector(featureVector: FeatureVector, index: Map[String, Int]): SparseVector[Double] = {
+    val arr = SparseVector.zeros[Double](index.size)
 
     featureVector.keys.foreach(key => {
       val position = index(key)
