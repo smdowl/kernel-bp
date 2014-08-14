@@ -2,10 +2,9 @@ package kernel
 
 import breeze.linalg._
 import kernel.caches.Cache
-import kernel.kernels.{RBFKernel, LinearKernel}
-import kernel.models.components.{MessageParam, Inferer}
-import kernel.models.RealPOSModel
-import kernel.models.edge._
+import kernel.kernels._
+import kernel.models.components._
+import kernel.models._
 import kernel.parsing.HMMParser
 import kernel.propagation.MessagePasser
 

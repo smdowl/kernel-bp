@@ -3,8 +3,7 @@ package kernel.parsing
 import breeze.linalg.{CSCMatrix, DenseMatrix}
 import kernel.caches.Cache
 import kernel.kernels.Kernel
-import kernel.models.MessageParam
-import kernel.models.components.{MessageParam, Edge}
+import kernel.models.components._
 
 class HMMParser(msgParam: MessageParam, kernel: Kernel) extends EdgeParser(kernel) {
   private var length: Int = _

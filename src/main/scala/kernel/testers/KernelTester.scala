@@ -6,7 +6,6 @@ import kernel.caches.Cache
 import kernel.kernels.LinearKernel
 import kernel.models.components.{MessageParam, Inferer}
 import kernel.models.{NonDeterministicHMMModel, Model}
-import kernel.models.edge.NonDeterministicHMMModel
 import kernel.parsing.HMMParser
 import kernel.propagation.MessagePasser
 
