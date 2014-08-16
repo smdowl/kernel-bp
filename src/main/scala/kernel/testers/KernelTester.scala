@@ -1,7 +1,7 @@
 package kernel.testers
 
 import breeze.linalg.{any, BitVector, DenseVector, DenseMatrix}
-import comparison.ViterbiMarkovModel
+import comparison.MarkovModel
 import kernel.caches.Cache
 import kernel.kernels.LinearKernel
 import kernel.models.components.{MessageParam, Inferer}
@@ -11,7 +11,7 @@ import kernel.propagation.MessagePasser
 
 object KernelTester extends App {
   val model = new NonDeterministicHMMModel(50)
-  val viterbiModel = new ViterbiMarkovModel()
+  val viterbiModel = new MarkovModel()
   val tester = new KernelTester(model, viterbiModel)
 
   var kernelAccuracy = 0.0
@@ -31,7 +31,7 @@ object KernelTester extends App {
   println(s"Kernel Accuracy: ${kernelAccuracy / total}\nComparision Accuracy: ${compAccuracy / total}")
 }
 
-class KernelTester(kernelModel: Model, compModel: ViterbiMarkovModel) {
+class KernelTester(kernelModel: Model, compModel: MarkovModel) {
   val kernel = new LinearKernel()
   val msgParam: MessageParam = MessageParam(1.0, 1.0)
   val parser = new HMMParser(msgParam, kernel)
@@ -116,7 +116,7 @@ class KernelTester(kernelModel: Model, compModel: ViterbiMarkovModel) {
       testToken(testNode, correctPrediction, cache, betaArr, inferer, labelKeys)
     })
 
-    val compResults = compModel.testSentence(testData(testIdx))
+    val compResults = compModel.viterbiTestSentence(testData(testIdx))
 
     (kernelResults, compResults)
   }

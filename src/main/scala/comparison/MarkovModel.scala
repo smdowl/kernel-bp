@@ -1,10 +1,16 @@
 package comparison
 
 import app.Constants
+import breeze.linalg.sum
 import input.ConllParser
 import pos.components.{SentenceBuilder, Token}
 
-abstract class MarkovModel {
+object MarkovModel extends App {
+  val model = new MarkovModel()
+  model.trainAndTestFromFiles(Constants.MINI_TEST_FILE, Constants.MINI_TEST_FILE)
+}
+
+class MarkovModel {
   type State = String
   type Observation = String
   type Probability = Double
@@ -31,10 +37,17 @@ abstract class MarkovModel {
 
     val testSentences = this.splitSentences(builder.buildSentenceFromFile(testFilepath))
 
-    val results = testSentences.flatMap(testSentence)
+    val viterbiResults = testSentences.flatMap(testSentence(viterbi, _))
+    val fbResults = testSentences.flatMap(testSentence(forwardBackward, _))
 
-    val accuracy = results.foldLeft(0.0)((sum, actual) => sum + (if (actual) 1.0 else 0.0)) / results.length
-    println(s"Accuracy: $accuracy")
+    val vitAccuracy = calcAccuracy(viterbiResults)
+    val fbAccuracy = calcAccuracy(fbResults)
+    println(s"Viterbi Accuracy: $vitAccuracy")
+    println(s"FB Accuracy: $fbAccuracy")
+  }
+
+  private def calcAccuracy(results: Seq[Boolean]) = {
+    results.foldLeft(0.0)((sum, actual) => sum + (if (actual) 1.0 else 0.0)) / results.length
   }
 
   private def splitSentences(sentences: Seq[Seq[Token]]) = sentences.map(sentence => {
@@ -43,11 +56,19 @@ abstract class MarkovModel {
     })
   })
 
-  def testSentence(pairs: Seq[(State, Observation)]) = {
+  def viterbiTestSentence(pairs: Seq[(State, Observation)]) = {
+    testSentence(viterbi, pairs)
+  }
+
+  def forwardBackwardTestSentence(pairs: Seq[(State, Observation)]) = {
+    testSentence(forwardBackward, pairs)
+  }
+
+  def testSentence(function: Seq[Observation] => ProbabilityPath, pairs: Seq[(State, Observation)]) = {
     val correct = pairs.map(_._1)
     val visible = pairs.map(_._2)
 
-    val path = inference(visible)
+    val path = function(visible)
     val results = (correct zip path._2).map { case (a, b) =>
       a.equals(b)
     }
@@ -130,5 +151,100 @@ abstract class MarkovModel {
     }
   }
 
-  def inference(observations: Seq[Observation]): ProbabilityPath
+  def viterbi(observations: Seq[Observation]): ProbabilityPath = {
+
+    def probability(p: ProbabilityPath) = p._1
+
+    val initial = states map { (state) =>
+      (initDist(state) * emissions((state, observations(0))), List(state))
+    } maxBy probability
+
+    val probPath = observations.tail.foldLeft(initial)((probPath: ProbabilityPath, observation: Observation) => {
+      states map { (state) =>
+        val prevState = probPath._2.head
+        val transition = (prevState, state)
+        val emission = (state, observation)
+
+        (probPath._1 * transitions(transition) * emissions(emission), state :: probPath._2)
+      } maxBy probability
+    })
+
+    (probPath._1, probPath._2.reverse)
+  }
+
+  type Probabilities = Map[String, Probability]
+
+  private var previousProbs: Probabilities = _
+
+  def forwardBackward(observations: Seq[Observation]): ProbabilityPath = {
+    val length = observations.length
+
+    var forward = Seq[Probabilities]()
+    previousProbs = Map[State, Probability]()
+
+    def calcForwardSumProb(state: State) = {
+      sum(states.map(prev => previousProbs(prev) * transitions((prev, state))))
+    }
+
+    for ((observation, idx) <- observations.zipWithIndex) {
+      var probabilities = Map[State, Probability]()
+
+      for (state <- states) {
+        val prevProbSum = if (idx == 0)
+          initDist(state)
+        else
+          calcForwardSumProb(state)
+
+        val newProb = emissions((state, observation)) * prevProbSum
+        probabilities += state -> newProb
+      }
+
+      forward :+= probabilities
+      previousProbs = probabilities
+    }
+
+    val endState = previousProbs.keys.maxBy(previousProbs(_))
+    val probForward = calcForwardSumProb(endState)
+
+    var backward = Seq[Probabilities]()
+    previousProbs = Map[State, Probability]()
+
+    def calcBackwardSumProb(state: State, obs: Observation) = {
+      sum(states.map(next => previousProbs(next) * transitions((state, next)) * emissions((next, obs))))
+    }
+
+    val reversedSeq = (observations.drop(1) :+ "_").reverse
+    for ((observation, idx) <- reversedSeq.zipWithIndex) {
+      var probabilities = Map[State, Probability]()
+
+      for (state <- states) {
+        val prevProbSum = if (idx == 0)
+          transitions(state, endState)
+        else
+          calcBackwardSumProb(state, observation)
+
+        val newProb = emissions((state, observation)) * prevProbSum
+        probabilities += state -> newProb
+      }
+
+      backward :+= probabilities
+      previousProbs = probabilities
+    }
+
+    val probBackward = sum(states.map(calcBackwardSumProb(_, observations(0))))
+
+    var posterior = Seq[Probabilities]()
+    for (i <- 0 until length) {
+      val probs = states.map(state => {
+        state -> forward(i)(state) * backward(i)(state) / probForward
+      }).toMap
+
+      posterior :+= probs
+    }
+
+    //    assert(probForward == probBackward)
+
+    val bestSequence = posterior.map(probs => probs.keys.maxBy(probs(_)))
+    (probBackward, bestSequence.toList)
+  }
 }
