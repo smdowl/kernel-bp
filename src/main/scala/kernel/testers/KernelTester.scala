@@ -5,35 +5,38 @@ import comparison.MarkovModel
 import kernel.caches.Cache
 import kernel.kernels.LinearKernel
 import kernel.models.components.{MessageParam, Inferer}
-import kernel.models.{NonDeterministicHMMModel, Model}
+import kernel.models._
 import kernel.parsing.HMMParser
 import kernel.propagation.MessagePasser
 
 object KernelTester extends App {
-  val model = new NonDeterministicHMMModel(50)
+  val model = new NonDeterministicHMMModel(50, 15)
   val viterbiModel = new MarkovModel()
   val tester = new KernelTester(model, viterbiModel)
 
   var kernelAccuracy = 0.0
-  var compAccuracy = 0.0
+  var viterbiAccuracy = 0.0
+  var forwardBackwardAccuracy = 0.0
   var total = 0
   for (i <- 0 until model.testObservations.length) {
     println(s"Starting test $i")
 
-    val (kernelResults, compResults) = tester.testSentence(i)
-    assert(kernelResults.length == compResults.length, "Should be exactly the same length")
+    val (kernelResults, viterbiResults, fbResults) = tester.testSentence(i)
+    assert(kernelResults.length == viterbiResults.length, "Should be exactly the same length")
+    assert(kernelResults.length == fbResults.length, "Should be exactly the same length")
 
     kernelAccuracy += kernelResults.count(_ == true)
-    compAccuracy += compResults.count(_ == true)
+    viterbiAccuracy += viterbiResults.count(_ == true)
+    forwardBackwardAccuracy += fbResults.count(_ == true)
     total += kernelResults.length
   }
 
-  println(s"Kernel Accuracy: ${kernelAccuracy / total}\nComparision Accuracy: ${compAccuracy / total}")
+  println(s"Kernel Accuracy: ${kernelAccuracy / total}\nViterbi Accuracy: ${viterbiAccuracy / total}\nForward-Backward Accuracy: ${viterbiAccuracy / total}")
 }
 
 class KernelTester(kernelModel: Model, compModel: MarkovModel) {
   val kernel = new LinearKernel()
-  val msgParam: MessageParam = MessageParam(1.0, 1.0)
+  val msgParam: MessageParam = MessageParam(1.0, 3.0)
   val parser = new HMMParser(msgParam, kernel)
   val trainingData = reconstructTrainingData()
   val testData = reconstructTestData()
@@ -116,9 +119,10 @@ class KernelTester(kernelModel: Model, compModel: MarkovModel) {
       testToken(testNode, correctPrediction, cache, betaArr, inferer, labelKeys)
     })
 
-    val compResults = compModel.viterbiTestSentence(testData(testIdx))
+    val viterbiResults = compModel.viterbiTestSentence(testData(testIdx))
+    val fbResults = compModel.forwardBackwardTestSentence(testData(testIdx))
 
-    (kernelResults, compResults)
+    (kernelResults, viterbiResults, fbResults)
   }
 
   private def buildPasser(cache: Cache, observedNodes: Set[Int]) = new MessagePasser(cache, observedNodes)
