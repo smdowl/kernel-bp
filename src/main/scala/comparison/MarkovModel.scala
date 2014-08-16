@@ -39,7 +39,7 @@ abstract class MarkovModel {
 
   private def splitSentences(sentences: Seq[Seq[Token]]) = sentences.map(sentence => {
     sentence.map(token => {
-      (token.form, token.POS)
+      (token.POS, token.form)
     })
   })
 
