@@ -2,7 +2,7 @@ package kernel.models
 
 import breeze.linalg.{DenseMatrix, DenseVector}
 import breeze.stats.distributions.Multinomial
-import kernel.models.toyextractors.{SimpleToyFeatureExtractor, ToyFeatureExtractor}
+import kernel.models.toyextractors.{UnigramFeatureExtractor, ToyFeatureExtractor}
 
 class TrigramModel(n: Int) extends ProbabalisticHMMModel(n) {
   protected def hiddenStates = Seq("A", "B")
@@ -32,7 +32,7 @@ class TrigramModel(n: Int) extends ProbabalisticHMMModel(n) {
     })
   }
 
-  protected def extractor: ToyFeatureExtractor = new SimpleToyFeatureExtractor()
+  protected def extractor: ToyFeatureExtractor = new UnigramFeatureExtractor()
 
   override protected def makeSequence(): (Seq[Int], Seq[Int]) = {
 

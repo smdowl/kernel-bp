@@ -2,7 +2,7 @@ package kernel.models.toyextractors
 
 import computation.FeatureVector
 
-class SimpleToyFeatureExtractor extends ToyFeatureExtractor {
+class UnigramFeatureExtractor extends ToyFeatureExtractor {
   /**
    * Convert each set of samples into an array of feature
    */

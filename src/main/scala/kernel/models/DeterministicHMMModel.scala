@@ -1,7 +1,7 @@
 package kernel.models
 
 import breeze.linalg.DenseMatrix
-import kernel.models.toyextractors.{SimpleToyFeatureExtractor, ToyFeatureExtractor}
+import kernel.models.toyextractors.{BigramFeatureExtractor, UnigramFeatureExtractor, ToyFeatureExtractor}
 
 object DeterministicHMMModel extends App {
   val model = new DeterministicHMMModel(1)
@@ -28,7 +28,7 @@ class DeterministicHMMModel(n: Int, numTest: Int = 10) extends ProbabalisticHMMM
     )
   }
 
-  protected def extractor: ToyFeatureExtractor = new SimpleToyFeatureExtractor()
+  protected def extractor: ToyFeatureExtractor = new BigramFeatureExtractor()
 
   /**
    * Draw a single sample of hidden and visible states
