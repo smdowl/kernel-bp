@@ -31,7 +31,7 @@ object KernelTester extends App {
     total += kernelResults.length
   }
 
-  println(s"Kernel Accuracy: ${kernelAccuracy / total}\nViterbi Accuracy: ${viterbiAccuracy / total}\nForward-Backward Accuracy: ${viterbiAccuracy / total}")
+  println(s"Kernel Accuracy: ${kernelAccuracy / total}\nViterbi Accuracy: ${viterbiAccuracy / total}\nForward-Backward Accuracy: ${forwardBackwardAccuracy / total}")
 }
 
 class KernelTester(kernelModel: Model, compModel: MarkovModel) {
