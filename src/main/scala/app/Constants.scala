@@ -7,6 +7,7 @@ object Constants {
 
   private final val BASE_DIR = "/Users/Shaun/dev/kernel-bp/data/" + SUBDIR
 
+  final val MICRO_TRAIN_FILE = BASE_DIR + "micro.conll"
   final val MINI_TRAIN_FILE = BASE_DIR + "mini.conll"
   final val MINI_TEST_FILE = BASE_DIR + "mini-test.conll"
 
