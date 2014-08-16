@@ -3,7 +3,7 @@ package kernel.models
 import breeze.linalg.DenseMatrix
 import kernel.models.toyextractors.{SimpleToyFeatureExtractor, ToyFeatureExtractor}
 
-class NonDeterministicHMMModel(n: Int) extends DeterministicHMMModel(n) {
+class NonDeterministicHMMModel(n: Int, numTest: Int = 10) extends DeterministicHMMModel(n) {
   override protected def hiddenStates = Seq("A", "B")
 
   override protected def visibleStates = Seq("X", "Y")

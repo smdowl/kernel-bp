@@ -8,8 +8,8 @@ import pos.features.extractors.FeatureArrayBuilder
 
 import scala.util.Random
 
-abstract class ProbabalisticHMMModel(n: Int) extends HMMModel {
-  protected def minLength = 5
+abstract class ProbabalisticHMMModel(n: Int, numTest: Int = 10) extends HMMModel {
+  protected def minLength = 15
   protected def maxLength = minLength
 
   protected def hiddenStates: Seq[String]
@@ -46,7 +46,7 @@ abstract class ProbabalisticHMMModel(n: Int) extends HMMModel {
   }
 
   protected def sampleSequences: Seq[Seq[FeatureVector]] = for (i <- 0 until n) yield drawSample()
-  protected def testSequences: Seq[Seq[FeatureVector]] = sampleSequences
+  protected def testSequences: Seq[Seq[FeatureVector]] = sampleSequences.slice(0, numTest)
 
   /**
    * Draw a single sample of hidden and visible states
