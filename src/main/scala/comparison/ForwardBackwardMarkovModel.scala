@@ -20,7 +20,7 @@ class ForwardBackwardMarkovModel extends MarkovModel {
     var forward = Seq[Probabilities]()
     previousProbs = Map[State, Probability]()
 
-    def calcSumProb(state: State) = {
+    def calcForwardSumProb(state: State) = {
       sum(states.map(prev => previousProbs(prev) * transitions((prev, state))))
     }
 
@@ -31,7 +31,7 @@ class ForwardBackwardMarkovModel extends MarkovModel {
         val prevProbSum = if (idx == 0)
           initDist(state)
         else
-          calcSumProb(state)
+          calcForwardSumProb(state)
 
         val newProb = emissions((state, observation)) * prevProbSum
         probabilities += state -> newProb
@@ -42,11 +42,49 @@ class ForwardBackwardMarkovModel extends MarkovModel {
     }
 
     println(previousProbs)
+    val endState = previousProbs.keys.maxBy(previousProbs(_))
+    val probForward = calcForwardSumProb(endState)
+
+    var backward = Seq[Probabilities]()
+    previousProbs = Map[State, Probability]()
+
+    def calcBackwardSumProb(state: State, obs: Observation) = {
+      sum(states.map(next => previousProbs(next) * transitions((state, next)) * emissions((next, obs))))
+    }
+
+    val reversedSeq = (observations.drop(1) :+ "_").reverse
+    for ((observation, idx) <- reversedSeq.zipWithIndex) {
+      var probabilities = Map[State, Probability]()
+
+      for (state <- states) {
+        val prevProbSum = if (idx == 0)
+          transitions(state, endState)
+        else
+          calcBackwardSumProb(state, observation)
+
+        val newProb = emissions((state, observation)) * prevProbSum
+        probabilities += state -> newProb
+      }
+
+      backward :+= probabilities
+      previousProbs = probabilities
+    }
+
+    val probBackward = sum(states.map(calcBackwardSumProb(_, observations(0))))
+
+    var posterior = Seq[Probabilities]()
+    for (i <- 0 until length) {
+      val probs = states.map(state => {
+        state -> forward(i)(state) * backward(i)(state) / probForward
+      }).toMap
+
+      posterior :+= probs
+    }
+
+//    assert(probForward == probBackward)
+
+    val bestSequence = posterior.map(probs => probs.keys.maxBy(probs(_)))
 
     null
-  }
-
-  private def getProbabilitiesForIndex(observation: Observation, idx: Int) = {
-
   }
 }
