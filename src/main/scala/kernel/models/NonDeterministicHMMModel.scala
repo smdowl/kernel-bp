@@ -2,7 +2,7 @@ package kernel.models
 
 import breeze.linalg.DenseMatrix
 
-class NonDeterministicHMMModel(n: Int, numTest: Int = 10) extends DeterministicHMMModel(n) {
+class NonDeterministicHMMModel(n: Int, numTest: Int = 10) extends DeterministicHMMModel(n, numTest) {
   override protected def hiddenStates = Seq("A", "B")
 
   override protected def visibleStates = Seq("X", "Y")
