@@ -6,11 +6,15 @@ import kernel.caches.Cache
 import kernel.kernels.LinearKernel
 import kernel.models.components.{MessageParam, Inferer}
 import kernel.models._
+import kernel.models.toyextractors._
 import kernel.parsing.HMMParser
 import kernel.propagation.MessagePasser
 
 object KernelTester extends App {
-  val model = new NonDeterministicHMMModel(50, 15)
+  val model = new ThreeStateNonDetHMMModel(30, 10)
+  model.setExtractor(new UnigramFeatureExtractor)
+//  val model = new RealPOSModel()
+  model.initialise()
   val viterbiModel = new MarkovModel()
   val tester = new KernelTester(model, viterbiModel)
 
@@ -36,7 +40,7 @@ object KernelTester extends App {
 
 class KernelTester(kernelModel: Model, compModel: MarkovModel) {
   val kernel = new LinearKernel()
-  val msgParam: MessageParam = MessageParam(1.0, 3.0)
+  val msgParam: MessageParam = MessageParam(1.0, 1.0)
   val parser = new HMMParser(msgParam, kernel)
   val trainingData = reconstructTrainingData()
   val testData = reconstructTestData()

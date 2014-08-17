@@ -1,7 +1,6 @@
 package kernel.models
 
 import breeze.linalg.DenseMatrix
-import kernel.models.toyextractors.{UnigramFeatureExtractor, ToyFeatureExtractor}
 
 class NonDeterministicHMMModel(n: Int, numTest: Int = 10) extends DeterministicHMMModel(n) {
   override protected def hiddenStates = Seq("A", "B")
@@ -10,7 +9,7 @@ class NonDeterministicHMMModel(n: Int, numTest: Int = 10) extends DeterministicH
 
   override protected def transitionMatrix: DenseMatrix[Double] = {
     val xx = 0.0
-    val yy = 0.1
+    val yy = 0.0
     DenseMatrix(
       (xx, 1 - xx),
       (1-yy, yy)
@@ -18,13 +17,11 @@ class NonDeterministicHMMModel(n: Int, numTest: Int = 10) extends DeterministicH
   }
 
   override protected def emissionMatrix: DenseMatrix[Double] = {
-    val ax = 1.0
-    val bx = 0.0
+    val ax = 0.8
+    val bx = 0.2
     DenseMatrix(
       (ax, 1-ax),
       (bx, 1-bx)
     )
   }
-
-  override protected def extractor: ToyFeatureExtractor = new UnigramFeatureExtractor()
 }

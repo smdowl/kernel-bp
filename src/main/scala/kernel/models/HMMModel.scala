@@ -4,13 +4,11 @@ import breeze.linalg.{CSCMatrix, DenseMatrix, SparseVector}
 import kernel.models.components.Edge
 
 abstract class HMMModel extends Model {
-  initialise()
-
   /**
    * Generate data for the model. The output format is an array where each position is the training data
    * relevant to a given node and each row of those matrices is a single sample.
    */
-  protected def initialise() = {
+  def initialise() = {
     val (keyArray, trainData, testData) = generateFeatureVectors()
     this.trainData = trainData
     _keyArray = keyArray

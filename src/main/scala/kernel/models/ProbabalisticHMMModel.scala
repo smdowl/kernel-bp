@@ -3,18 +3,23 @@ package kernel.models
 import breeze.linalg.{DenseMatrix, DenseVector, SparseVector}
 import breeze.stats.distributions.Multinomial
 import computation.FeatureVector
-import kernel.models.toyextractors.ToyFeatureExtractor
+import kernel.models.toyextractors.{UnigramFeatureExtractor, ToyFeatureExtractor}
 import pos.features.extractors.FeatureArrayBuilder
 
 import scala.util.Random
 
 abstract class ProbabalisticHMMModel(n: Int, numTest: Int = 10) extends HMMModel {
-  protected def minLength = 15
+  protected def minLength = 10
   protected def maxLength = minLength
 
   protected def hiddenStates: Seq[String]
   protected def visibleStates: Seq[String]
-  protected def extractor: ToyFeatureExtractor
+
+  protected var _extractor: ToyFeatureExtractor = new UnigramFeatureExtractor()
+  final protected def extractor: ToyFeatureExtractor = _extractor
+  def setExtractor(extractor: ToyFeatureExtractor) = {
+    _extractor = extractor
+  }
 
   protected def initDist = new Multinomial(DenseVector.ones[Double](hiddenStates.length) * (1.0 / hiddenStates.length))
 
@@ -33,7 +38,7 @@ abstract class ProbabalisticHMMModel(n: Int, numTest: Int = 10) extends HMMModel
     })
   }
 
-  override protected def initialise() = {
+  override def initialise() = {
     assert(transitionMatrix.rows == hiddenStates.length)
     assert(emissionMatrix.rows == visibleStates.length)
 
@@ -42,7 +47,9 @@ abstract class ProbabalisticHMMModel(n: Int, numTest: Int = 10) extends HMMModel
 
 
   override protected def generateFeatureVectors(): (Array[String], Array[Array[SparseVector[Double]]], Array[Array[SparseVector[Double]]]) = {
-    FeatureArrayBuilder.buildFeatureArray(sampleSequences, testSequences)
+    val training = sampleSequences
+    val test = testSequences
+    FeatureArrayBuilder.buildFeatureArray(training, test)
   }
 
   protected def sampleSequences: Seq[Seq[FeatureVector]] = for (i <- 0 until n) yield drawSample()

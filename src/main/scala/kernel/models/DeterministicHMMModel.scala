@@ -28,8 +28,6 @@ class DeterministicHMMModel(n: Int, numTest: Int = 10) extends ProbabalisticHMMM
     )
   }
 
-  protected def extractor: ToyFeatureExtractor = new BigramFeatureExtractor()
-
   /**
    * Draw a single sample of hidden and visible states
    */

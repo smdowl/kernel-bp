@@ -18,11 +18,11 @@ class TrigramModel(n: Int) extends ProbabalisticHMMModel(n) {
   )
 
   protected def emissionMatrix: DenseMatrix[Double] = {
+    val ax = 0.9
+    val bx = 0.1
     DenseMatrix(
-//      (0.95, 0.05),
-//      (0.05, 0.95)
-      (1.0, 0.0),
-      (0.0, 1.0)
+      (ax, 1-ax),
+      (bx, 1-bx)
     )
   }
 
@@ -31,8 +31,6 @@ class TrigramModel(n: Int) extends ProbabalisticHMMModel(n) {
       new Multinomial(emissionMatrix(i, ::).t)
     })
   }
-
-  protected def extractor: ToyFeatureExtractor = new UnigramFeatureExtractor()
 
   override protected def makeSequence(): (Seq[Int], Seq[Int]) = {
 
