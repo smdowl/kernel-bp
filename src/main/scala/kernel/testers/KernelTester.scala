@@ -3,43 +3,90 @@ package kernel.testers
 import breeze.linalg.{any, BitVector, DenseVector, DenseMatrix}
 import comparison.MarkovModel
 import kernel.caches.Cache
-import kernel.kernels.LinearKernel
+import kernel.kernels._
 import kernel.models.components.{MessageParam, Inferer}
 import kernel.models._
 import kernel.models.toyextractors._
 import kernel.parsing.HMMParser
 import kernel.propagation.MessagePasser
 
-object KernelTester extends App {
-  val model = new ThreeStateNonDetHMMModel(30, 10)
-  model.setExtractor(new UnigramFeatureExtractor)
-//  val model = new RealPOSModel()
-  model.initialise()
-  val viterbiModel = new MarkovModel()
-  val tester = new KernelTester(model, viterbiModel)
-
-  var kernelAccuracy = 0.0
-  var viterbiAccuracy = 0.0
-  var forwardBackwardAccuracy = 0.0
-  var total = 0
-  for (i <- 0 until model.testObservations.length) {
-    println(s"Starting test $i")
-
-    val (kernelResults, viterbiResults, fbResults) = tester.testSentence(i)
-    assert(kernelResults.length == viterbiResults.length, "Should be exactly the same length")
-    assert(kernelResults.length == fbResults.length, "Should be exactly the same length")
-
-    kernelAccuracy += kernelResults.count(_ == true)
-    viterbiAccuracy += viterbiResults.count(_ == true)
-    forwardBackwardAccuracy += fbResults.count(_ == true)
-    total += kernelResults.length
-  }
-
-  println(s"Kernel Accuracy: ${kernelAccuracy / total}\nViterbi Accuracy: ${viterbiAccuracy / total}\nForward-Backward Accuracy: ${forwardBackwardAccuracy / total}")
+object ToyConfig {
+  val NUM_SAMPLES = 30
+  val NUM_TEST = 10
+  val NUM_REPEATS = 2
+  
+  val models = Seq(new NonDeterministicHMMModel(NUM_SAMPLES, NUM_TEST))
+  val extractors = Seq(new BigramFeatureExtractor)
+  val kernels = Seq(new LinearKernel, new RBFKernel)
 }
 
-class KernelTester(kernelModel: Model, compModel: MarkovModel) {
-  val kernel = new LinearKernel()
+object KernelTester extends App {
+
+  runExperiments()
+
+  def runExperiments() = {
+    for (model <- ToyConfig.models) {
+      for (extractor <- ToyConfig.extractors) {
+        model.setExtractor(extractor)
+
+        var kernelAccuracy, viterbiAccuracy, forwardBackwardAccuracy = 0.0
+
+        for (kernel <- ToyConfig.kernels) {
+          for (i <- 0 until ToyConfig.NUM_REPEATS) {
+            model.initialise()
+
+            println(s"${getName(model)} with ${getName(extractor)} and ${getName(kernel)}")
+            val results = runTest(model, kernel)
+
+            kernelAccuracy += results._1
+            viterbiAccuracy += results._2
+            forwardBackwardAccuracy += results._3
+          }
+
+          kernelAccuracy /= ToyConfig.NUM_REPEATS
+          viterbiAccuracy /= ToyConfig.NUM_REPEATS
+          forwardBackwardAccuracy /= ToyConfig.NUM_REPEATS
+
+          println(s"Kernel Accuracy: $kernelAccuracy\nViterbi Accuracy: $viterbiAccuracy\nForward-Backward Accuracy: $forwardBackwardAccuracy")
+        }
+      }
+    }
+  }
+
+  def getName(obj: Object): String = {
+    obj.getClass.getSimpleName
+  }
+
+  protected def runTest(model: Model, kernel: Kernel) = {
+    val viterbiModel = new MarkovModel()
+    val tester = new KernelTester(model, viterbiModel, kernel)
+
+    var kernelAccuracy = 0.0
+    var viterbiAccuracy = 0.0
+    var forwardBackwardAccuracy = 0.0
+    var total = 0
+    for (i <- 0 until model.testObservations.length) {
+      val (kernelResults, viterbiResults, fbResults) = tester.testSentence(i)
+      assert(kernelResults.length == viterbiResults.length, "Should be exactly the same length")
+      assert(kernelResults.length == fbResults.length, "Should be exactly the same length")
+
+      kernelAccuracy += kernelResults.count(_ == true)
+      viterbiAccuracy += viterbiResults.count(_ == true)
+      forwardBackwardAccuracy += fbResults.count(_ == true)
+      total += kernelResults.length
+    }
+
+    kernelAccuracy /= total
+    viterbiAccuracy /= total
+    forwardBackwardAccuracy /= total
+
+    (kernelAccuracy, viterbiAccuracy, forwardBackwardAccuracy)
+  }
+
+
+}
+
+class KernelTester(kernelModel: Model, compModel: MarkovModel, kernel: Kernel) {
   val msgParam: MessageParam = MessageParam(1.0, 1.0)
   val parser = new HMMParser(msgParam, kernel)
   val trainingData = reconstructTrainingData()
