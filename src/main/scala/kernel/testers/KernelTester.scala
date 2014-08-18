@@ -16,8 +16,8 @@ object ToyConfig {
   val NUM_REPEATS = 2
   
   val models = Seq(new NonDeterministicHMMModel(NUM_SAMPLES, NUM_TEST))
-  val extractors = Seq(new BigramFeatureExtractor)
-  val kernels = Seq(new LinearKernel, new RBFKernel)
+  val extractors = Seq(new BigramFeatureExtractor, new NonFormBigramFeatureExtractor)
+  val kernels = Seq(new LinearKernel)
 }
 
 object KernelTester extends App {
@@ -28,14 +28,15 @@ object KernelTester extends App {
     for (model <- ToyConfig.models) {
       for (extractor <- ToyConfig.extractors) {
         model.setExtractor(extractor)
-
-        var kernelAccuracy, viterbiAccuracy, forwardBackwardAccuracy = 0.0
-
         for (kernel <- ToyConfig.kernels) {
+
+          println(s"${getName(model)} with ${getName(extractor)} and ${getName(kernel)}")
+
+          var kernelAccuracy, viterbiAccuracy, forwardBackwardAccuracy = 0.0
+
           for (i <- 0 until ToyConfig.NUM_REPEATS) {
             model.initialise()
 
-            println(s"${getName(model)} with ${getName(extractor)} and ${getName(kernel)}")
             val results = runTest(model, kernel)
 
             kernelAccuracy += results._1
