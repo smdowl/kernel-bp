@@ -2,20 +2,20 @@ package kernel.models
 
 import breeze.linalg.DenseMatrix
 
-class ThreeStateNonDetHMMModel(n: Int, numTest: Int = 10) extends DeterministicHMMModel(n, numTest) {
+class ThreeStateNonDeterministicHMMModel(n: Int, numTest: Int = 10) extends DeterministicHMMModel(n, numTest) {
   override protected def hiddenStates = Seq("A", "B", "C")
 
   override protected def visibleStates = Seq("X", "Y", "Z")
 
   override protected def transitionMatrix: DenseMatrix[Double] = {
     val aa = 0.0
-    val ab = 1.0
+    val ab = 0.9
 
-    val ba = 0.0
+    val ba = 0.1
     val bb = 0.0
 
-    val ca = 1.0
-    val cb = 0.0
+    val ca = 0.899999
+    val cb = 0.1
 
     DenseMatrix(
       (aa, ab, 1 - aa - ab),
@@ -25,14 +25,14 @@ class ThreeStateNonDetHMMModel(n: Int, numTest: Int = 10) extends DeterministicH
   }
 
   override protected def emissionMatrix: DenseMatrix[Double] = {
-    val ax = 0.8
+    val ax = 1.0
     val ay = 0.0
 
     val bx = 0.0
-    val by = 0.8
+    val by = 1.0
 
     val cx = 0.0
-    val cy = 0.05
+    val cy = 0.0
 
     DenseMatrix(
       (ax, ay, 1-ax-ay),

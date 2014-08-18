@@ -15,9 +15,10 @@ object ToyConfig {
   val NUM_TEST = 10
   val NUM_REPEATS = 2
   
-  val models = Seq(new NonDeterministicHMMModel(NUM_SAMPLES, NUM_TEST))
+  val models = Seq(new ThreeStateNonDeterministicHMMModel(NUM_SAMPLES, NUM_TEST))
   val extractors = Seq(new BigramFeatureExtractor, new NonFormBigramFeatureExtractor)
   val kernels = Seq(new LinearKernel)
+  val smooth = Seq(true, false)
 }
 
 object KernelTester extends App {
@@ -29,26 +30,31 @@ object KernelTester extends App {
       for (extractor <- ToyConfig.extractors) {
         model.setExtractor(extractor)
         for (kernel <- ToyConfig.kernels) {
+          for (smooth <- ToyConfig.smooth) {
 
-          println(s"${getName(model)} with ${getName(extractor)} and ${getName(kernel)}")
+            val smoothString = if (smooth) " (smoothed)" else ""
 
-          var kernelAccuracy, viterbiAccuracy, forwardBackwardAccuracy = 0.0
+            println(s"${getName(model)} with ${getName(extractor)} and ${getName(kernel)}" + smoothString)
 
-          for (i <- 0 until ToyConfig.NUM_REPEATS) {
-            model.initialise()
+            var kernelAccuracy, viterbiAccuracy, forwardBackwardAccuracy = 0.0
 
-            val results = runTest(model, kernel)
+            for (i <- 0 until ToyConfig.NUM_REPEATS) {
+              model.initialise()
 
-            kernelAccuracy += results._1
-            viterbiAccuracy += results._2
-            forwardBackwardAccuracy += results._3
+              val results = runTest(model, kernel, smooth)
+
+              kernelAccuracy += results._1
+              viterbiAccuracy += results._2
+              forwardBackwardAccuracy += results._3
+            }
+
+            kernelAccuracy /= ToyConfig.NUM_REPEATS
+            viterbiAccuracy /= ToyConfig.NUM_REPEATS
+            forwardBackwardAccuracy /= ToyConfig.NUM_REPEATS
+
+            println(s"Kernel Accuracy: $kernelAccuracy\nViterbi Accuracy: $viterbiAccuracy\nForward-Backward Accuracy: $forwardBackwardAccuracy")
+
           }
-
-          kernelAccuracy /= ToyConfig.NUM_REPEATS
-          viterbiAccuracy /= ToyConfig.NUM_REPEATS
-          forwardBackwardAccuracy /= ToyConfig.NUM_REPEATS
-
-          println(s"Kernel Accuracy: $kernelAccuracy\nViterbi Accuracy: $viterbiAccuracy\nForward-Backward Accuracy: $forwardBackwardAccuracy")
         }
       }
     }
@@ -58,9 +64,9 @@ object KernelTester extends App {
     obj.getClass.getSimpleName
   }
 
-  protected def runTest(model: Model, kernel: Kernel) = {
+  protected def runTest(model: Model, kernel: Kernel, smooth: Boolean) = {
     val viterbiModel = new MarkovModel()
-    val tester = new KernelTester(model, viterbiModel, kernel)
+    val tester = new KernelTester(model, viterbiModel, kernel, smooth)
 
     var kernelAccuracy = 0.0
     var viterbiAccuracy = 0.0
@@ -87,12 +93,67 @@ object KernelTester extends App {
 
 }
 
-class KernelTester(kernelModel: Model, compModel: MarkovModel, kernel: Kernel) {
+class KernelTester(kernelModel: Model, compModel: MarkovModel, kernel: Kernel, smooth: Boolean) {
   val msgParam: MessageParam = MessageParam(1.0, 1.0)
   val parser = new HMMParser(msgParam, kernel)
   val trainingData = reconstructTrainingData()
   val testData = reconstructTestData()
   compModel.train(trainingData)
+
+  def testSentence(testIdx: Int) = {
+    val edges = kernelModel.edges
+    val obsArr = kernelModel.testObservations
+    val testArr = kernelModel.testLabels
+    val (labelKeys, testMatrix) = kernelModel.testMatrix
+
+    val observations = obsArr(testIdx).map{ case (key, sparse) => key -> sparse.toDenseMatrix}
+    val testSet = testArr(testIdx).map{ case (key, sparse) => key -> sparse.toDenseMatrix}
+
+    val cache = parser.buildCache(edges, observations.size, smooth=smooth)
+
+    val passer = buildPasser(cache, observations.keySet)
+    val betaArr = passer.passMessages(observations)
+
+    val inferer = new Inferer(testMatrix)
+
+    val kernelResults = (0 until cache.numNodes / 2).map(testNode => {
+      val correctPrediction = testSet(testNode)
+      testToken(testNode, correctPrediction, cache, betaArr, inferer, labelKeys)
+    })
+
+    val viterbiResults = compModel.viterbiTestSentence(testData(testIdx))
+    val fbResults = compModel.forwardBackwardTestSentence(testData(testIdx))
+
+    (kernelResults, viterbiResults, fbResults)
+  }
+
+  private def buildPasser(cache: Cache, observedNodes: Set[Int]) = new MessagePasser(cache, observedNodes)
+
+  private def testToken(testNode: Int,
+                correctPrediction: DenseMatrix[Double],
+                cache: Cache,
+                betaArr: Array[Array[DenseMatrix[Double]]],
+                inferer: Inferer,
+                labelKeys: Array[String]) = {
+    val probs = inferer.calculateKernelCondRootMarginal(testNode, cache, betaArr)
+    isPredictionCorrect(labelKeys, probs, kernelModel.keyIndex, correctPrediction)
+  }
+
+  private def isPredictionCorrect(labelKeys: Array[String], probs: DenseVector[Double], keyIndex: Map[String, Int], correct: DenseMatrix[Double]) = {
+    if (containsNaN(probs))
+      false
+    else {
+      val predictedLabel = labelKeys(probs.argmax)
+//      println(s"predicted: $predictedLabel")
+      val predictedFeature = keyIndex(predictedLabel)
+      correct(0, predictedFeature) != 0
+    }
+  }
+
+  private def containsNaN(vec: DenseVector[Double]) = {
+    val test: BitVector = vec :== Double.NaN
+    any(test)
+  }
 
   def reconstructTrainingData() = {
     val keys = kernelModel.keyArray
@@ -148,60 +209,5 @@ class KernelTester(kernelModel: Model, compModel: MarkovModel, kernel: Kernel) {
     }
 
     output
-  }
-
-  def testSentence(testIdx: Int) = {
-    val edges = kernelModel.edges
-    val obsArr = kernelModel.testObservations
-    val testArr = kernelModel.testLabels
-    val (labelKeys, testMatrix) = kernelModel.testMatrix
-
-    val observations = obsArr(testIdx).map{ case (key, sparse) => key -> sparse.toDenseMatrix}
-    val testSet = testArr(testIdx).map{ case (key, sparse) => key -> sparse.toDenseMatrix}
-
-    val cache = parser.buildCache(edges, observations.size)
-
-    val passer = buildPasser(cache, observations.keySet)
-    val betaArr = passer.passMessages(observations)
-
-    val inferer = new Inferer(testMatrix)
-
-    val kernelResults = (0 until cache.numNodes / 2).map(testNode => {
-      val correctPrediction = testSet(testNode)
-      testToken(testNode, correctPrediction, cache, betaArr, inferer, labelKeys)
-    })
-
-    val viterbiResults = compModel.viterbiTestSentence(testData(testIdx))
-    val fbResults = compModel.forwardBackwardTestSentence(testData(testIdx))
-
-    (kernelResults, viterbiResults, fbResults)
-  }
-
-  private def buildPasser(cache: Cache, observedNodes: Set[Int]) = new MessagePasser(cache, observedNodes)
-
-  private def testToken(testNode: Int,
-                correctPrediction: DenseMatrix[Double],
-                cache: Cache,
-                betaArr: Array[Array[DenseMatrix[Double]]],
-                inferer: Inferer,
-                labelKeys: Array[String]) = {
-    val probs = inferer.calculateKernelCondRootMarginal(testNode, cache, betaArr)
-    isPredictionCorrect(labelKeys, probs, kernelModel.keyIndex, correctPrediction)
-  }
-
-  private def isPredictionCorrect(labelKeys: Array[String], probs: DenseVector[Double], keyIndex: Map[String, Int], correct: DenseMatrix[Double]) = {
-    if (containsNaN(probs))
-      false
-    else {
-      val predictedLabel = labelKeys(probs.argmax)
-//      println(s"predicted: $predictedLabel")
-      val predictedFeature = keyIndex(predictedLabel)
-      correct(0, predictedFeature) != 0
-    }
-  }
-
-  private def containsNaN(vec: DenseVector[Double]) = {
-    val test: BitVector = vec :== Double.NaN
-    any(test)
   }
 }

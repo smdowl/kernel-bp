@@ -12,7 +12,7 @@ class HMMParser(msgParam: MessageParam, kernel: Kernel) extends EdgeParser(kerne
   private var kArr: Array[Array[DenseMatrix[Double]]] = _
   private val REQUIRED_KEYS = Set("hidden", "visible")
 
-  override def buildCache(edges: Map[String, Edge], length: Int): Cache = {
+  override def buildCache(edges: Map[String, Edge], length: Int, smooth: Boolean = false): Cache = {
 
     assert(edges.keySet.equals(REQUIRED_KEYS), "Should have exactly the right edges defined")
 
@@ -24,6 +24,9 @@ class HMMParser(msgParam: MessageParam, kernel: Kernel) extends EdgeParser(kerne
 
     fillHidden(edges)
     fillVisible(edges)
+
+    if (smooth)
+      smoothKArr()
 
     Cache(dataArr, kArr, kernel, msgParam)
   }
@@ -49,6 +52,15 @@ class HMMParser(msgParam: MessageParam, kernel: Kernel) extends EdgeParser(kerne
 
       dataArr(i+length)(i) = edge.endData
       kArr(i+length)(i) = kernel(edge.endData, edge.endData, msgParam.sig)
+    }
+  }
+
+  private def smoothKArr() = {
+    for (i <- 0 until kArr.length) {
+      for (j <- 0 until kArr(i).length) {
+        if (kArr(i)(j) != null)
+          kArr(i)(j) :+= 1e-16
+      }
     }
   }
 }
