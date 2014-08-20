@@ -242,8 +242,6 @@ class MarkovModel {
       posterior :+= probs
     }
 
-    //    assert(probForward == probBackward)
-
     val bestSequence = posterior.map(probs => probs.keys.maxBy(probs(_)))
     (probBackward, bestSequence.toList)
   }

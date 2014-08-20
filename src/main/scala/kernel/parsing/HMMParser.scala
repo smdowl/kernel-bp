@@ -10,6 +10,7 @@ class HMMParser(msgParam: MessageParam, kernel: Kernel) extends EdgeParser(kerne
 
   private var dataArr: Array[Array[CSCMatrix[Double]]] = _
   private var kArr: Array[Array[DenseMatrix[Double]]] = _
+  var translatedKArr: Array[Array[Map[String, DenseMatrix[Double]]]] = _
   private val REQUIRED_KEYS = Set("hidden", "visible")
 
   override def buildCache(edges: Map[String, Edge], length: Int, smooth: Boolean = false): Cache = {
@@ -20,6 +21,7 @@ class HMMParser(msgParam: MessageParam, kernel: Kernel) extends EdgeParser(kerne
 
     this.length = length
     dataArr = Array.ofDim[CSCMatrix[Double]](numNodes, numNodes)
+    translatedKArr = Array.ofDim[Map[String, DenseMatrix[Double]]](numNodes, numNodes)
     kArr = Array.ofDim[DenseMatrix[Double]](numNodes, numNodes)
 
     fillHidden(edges)
@@ -28,7 +30,7 @@ class HMMParser(msgParam: MessageParam, kernel: Kernel) extends EdgeParser(kerne
     if (smooth)
       smoothKArr()
 
-    Cache(dataArr, kArr, kernel, msgParam)
+    Cache(dataArr, kArr, kernel, translatedKArr, msgParam)
   }
 
   private def fillHidden(edges: Map[String, Edge]) = {
@@ -45,6 +47,7 @@ class HMMParser(msgParam: MessageParam, kernel: Kernel) extends EdgeParser(kerne
 
   private def fillVisible(edges: Map[String, Edge]) = {
     val edge = edges("visible")
+    val hiddenEdge = edges("hidden")
 
     for (i <- 0 until length) {
       dataArr(i)(i+length) = edge.startData
@@ -52,6 +55,11 @@ class HMMParser(msgParam: MessageParam, kernel: Kernel) extends EdgeParser(kerne
 
       dataArr(i+length)(i) = edge.endData
       kArr(i+length)(i) = kernel(edge.endData, edge.endData, msgParam.sig)
+
+      // TODO: Work out the right direction and set the correct values.
+      translatedKArr(i+length)(i) = Map[String, DenseMatrix[Double]]()
+      translatedKArr(i+length)(i) += "forward" -> kernel(hiddenEdge.startData, edge.startData, msgParam.sig)
+      translatedKArr(i+length)(i) += "backward" -> kernel(hiddenEdge.endData, edge.startData, msgParam.sig)
     }
   }
 

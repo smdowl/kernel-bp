@@ -7,6 +7,7 @@ import kernel.models.components.MessageParam
 case class Cache(dataArr: Array[Array[CSCMatrix[Double]]],
                           kArr: Array[Array[DenseMatrix[Double]]],
                           kernel: Kernel,
+                          translatedKArr: Array[Array[Map[String, DenseMatrix[Double]]]],
                           msgParam: MessageParam ) {
   def numSamples(i: Int, j: Int) = kArr(i)(j).rows
 

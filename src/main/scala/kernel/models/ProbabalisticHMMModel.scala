@@ -9,7 +9,7 @@ import pos.features.extractors.FeatureArrayBuilder
 import scala.util.Random
 
 abstract class ProbabalisticHMMModel(n: Int, numTest: Int = 10) extends HMMModel {
-  protected def minLength = 10
+  var minLength = 20
   protected def maxLength = minLength
 
   protected def hiddenStates: Seq[String]
@@ -22,6 +22,9 @@ abstract class ProbabalisticHMMModel(n: Int, numTest: Int = 10) extends HMMModel
   }
 
   protected def initDist = new Multinomial(DenseVector.ones[Double](hiddenStates.length) * (1.0 / hiddenStates.length))
+
+  def getTransitionMatrix: DenseMatrix[Double] = transitionMatrix
+  def getEmissionMatrix: DenseMatrix[Double] = emissionMatrix
 
   protected def transitionMatrix: DenseMatrix[Double]
   protected def emissionMatrix: DenseMatrix[Double]

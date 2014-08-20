@@ -4,9 +4,8 @@ import breeze.linalg.{inv, max, norm, DenseMatrix}
 import breeze.numerics.{abs, sqrt}
 import kernel.caches.Cache
 
-class MessagePasser(cache: Cache, observedNodes: Set[Int]) {
+class MessagePasser(cache: Cache, observedNodes: Set[Int], numIter: Int = 50) {
 
-  private val numIter = 50
 
   protected var betaArr: Array[Array[DenseMatrix[Double]]] = Array.ofDim[DenseMatrix[Double]](cache.numNodes, cache.numNodes)
   protected var KarrInv: Array[Array[DenseMatrix[Double]]] = calculateInverses()
@@ -108,7 +107,15 @@ class MessagePasser(cache: Cache, observedNodes: Set[Int]) {
       val Ktu_beta = DenseMatrix.ones[Double](cache.numSamples(nodeId, outMessageIdx), 1)
 
       for (inMessageIdx <- (neighbours.toSet - outMessageIdx).toSeq.sorted) {
-        val multFactor = cache.kArr(nodeId)(inMessageIdx) * betaArr(nodeId)(inMessageIdx)
+        val multFactor = if (inMessageIdx < cache.numNodes / 2)
+          cache.kArr(nodeId)(inMessageIdx) * betaArr(nodeId)(inMessageIdx)
+        else if (outMessageIdx > nodeId)
+          cache.translatedKArr(inMessageIdx)(nodeId)("forward") * betaArr(nodeId)(inMessageIdx)
+        else
+          cache.translatedKArr(inMessageIdx)(nodeId)("backward") * betaArr(nodeId)(inMessageIdx)
+
+        assert(multFactor.cols == 1, "Should be a vector.")
+        assert(Ktu_beta.rows == multFactor.rows, "Should be same dimension.")
         Ktu_beta :*= multFactor
       }
 

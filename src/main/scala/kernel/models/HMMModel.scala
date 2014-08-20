@@ -52,7 +52,7 @@ abstract class HMMModel extends Model {
 
     data.foreach(sample => {
       val sentenceLength = sample.length / 2
-      for (i <- 0 until sentenceLength) {
+      for (i <- 0 until sentenceLength - 1) {
         leftData :+= sample(i).toDenseVector.toDenseMatrix
         rightData :+= sample(i+1).toDenseVector.toDenseMatrix
       }

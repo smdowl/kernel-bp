@@ -9,13 +9,13 @@ class ThreeStateNonDeterministicHMMModel(n: Int, numTest: Int = 10) extends Dete
 
   override protected def transitionMatrix: DenseMatrix[Double] = {
     val aa = 0.0
-    val ab = 0.9
+    val ab = 0.9999
 
-    val ba = 0.1
+    val ba = 0.0000001
     val bb = 0.0
 
-    val ca = 0.899999
-    val cb = 0.1
+    val ca = 0.999999
+    val cb = 0.0
 
     DenseMatrix(
       (aa, ab, 1 - aa - ab),
@@ -25,11 +25,11 @@ class ThreeStateNonDeterministicHMMModel(n: Int, numTest: Int = 10) extends Dete
   }
 
   override protected def emissionMatrix: DenseMatrix[Double] = {
-    val ax = 1.0
+    val ax = 0.99999
     val ay = 0.0
 
     val bx = 0.0
-    val by = 1.0
+    val by = 0.99999
 
     val cx = 0.0
     val cy = 0.0

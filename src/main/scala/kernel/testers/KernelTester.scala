@@ -11,14 +11,16 @@ import kernel.parsing.HMMParser
 import kernel.propagation.MessagePasser
 
 object ToyConfig {
-  val NUM_SAMPLES = 30
-  val NUM_TEST = 10
-  val NUM_REPEATS = 2
+  val NUM_SAMPLES = 10
+  val NUM_TEST = 5
+  val NUM_REPEATS = 5
+  val SENTENCE_LENGTH = 10
   
-  val models = Seq(new ThreeStateNonDeterministicHMMModel(NUM_SAMPLES, NUM_TEST))
-  val extractors = Seq(new BigramFeatureExtractor, new NonFormBigramFeatureExtractor)
+  val models = Seq(new NonDeterministicHMMModel(NUM_SAMPLES, NUM_TEST))
+  val extractors = Seq(new NonFormBigramFeatureExtractor)
   val kernels = Seq(new LinearKernel)
-  val smooth = Seq(true, false)
+  val smooth = Seq(false)
+  val numIter = Seq(10, 50, 100, 1000)
 }
 
 object KernelTester extends App {
@@ -27,35 +29,47 @@ object KernelTester extends App {
 
   def runExperiments() = {
     for (model <- ToyConfig.models) {
-      for (extractor <- ToyConfig.extractors) {
-        model.setExtractor(extractor)
-        for (kernel <- ToyConfig.kernels) {
-          for (smooth <- ToyConfig.smooth) {
+      model.minLength = ToyConfig.SENTENCE_LENGTH
 
-            val smoothString = if (smooth) " (smoothed)" else ""
+      println(s"${getName(model)}")
+      println(s"transition matrix:\n${model.getTransitionMatrix}")
+      println(s"emission matrix:\n${model.getEmissionMatrix}")
+      println()
 
-            println(s"${getName(model)} with ${getName(extractor)} and ${getName(kernel)}" + smoothString)
+      for (numIter <- ToyConfig.numIter) {
 
-            var kernelAccuracy, viterbiAccuracy, forwardBackwardAccuracy = 0.0
+        for (extractor <- ToyConfig.extractors) {
+          model.setExtractor(extractor)
+          for (kernel <- ToyConfig.kernels) {
+            for (smooth <- ToyConfig.smooth) {
 
-            for (i <- 0 until ToyConfig.NUM_REPEATS) {
-              model.initialise()
+              val smoothString = if (smooth) " (smoothed)" else ""
 
-              val results = runTest(model, kernel, smooth)
+              println(s"${getName(extractor)} and ${getName(kernel)}$smoothString with $numIter iterations")
 
-              kernelAccuracy += results._1
-              viterbiAccuracy += results._2
-              forwardBackwardAccuracy += results._3
+              var kernelAccuracy, viterbiAccuracy, forwardBackwardAccuracy = 0.0
+
+              for (i <- 0 until ToyConfig.NUM_REPEATS) {
+                model.initialise()
+
+                val results = runTest(model, kernel, smooth, numIter)
+
+                kernelAccuracy += results._1
+                viterbiAccuracy += results._2
+                forwardBackwardAccuracy += results._3
+              }
+
+              kernelAccuracy /= ToyConfig.NUM_REPEATS
+              viterbiAccuracy /= ToyConfig.NUM_REPEATS
+              forwardBackwardAccuracy /= ToyConfig.NUM_REPEATS
+
+              println(s"Kernel Accuracy: $kernelAccuracy\nViterbi Accuracy: $viterbiAccuracy\nForward-Backward Accuracy: $forwardBackwardAccuracy")
+              println()
             }
-
-            kernelAccuracy /= ToyConfig.NUM_REPEATS
-            viterbiAccuracy /= ToyConfig.NUM_REPEATS
-            forwardBackwardAccuracy /= ToyConfig.NUM_REPEATS
-
-            println(s"Kernel Accuracy: $kernelAccuracy\nViterbi Accuracy: $viterbiAccuracy\nForward-Backward Accuracy: $forwardBackwardAccuracy")
-
           }
         }
+
+        println()
       }
     }
   }
@@ -64,9 +78,9 @@ object KernelTester extends App {
     obj.getClass.getSimpleName
   }
 
-  protected def runTest(model: Model, kernel: Kernel, smooth: Boolean) = {
+  protected def runTest(model: Model, kernel: Kernel, smooth: Boolean, numIter: Int) = {
     val viterbiModel = new MarkovModel()
-    val tester = new KernelTester(model, viterbiModel, kernel, smooth)
+    val tester = new KernelTester(model, viterbiModel, kernel, smooth, numIter)
 
     var kernelAccuracy = 0.0
     var viterbiAccuracy = 0.0
@@ -93,8 +107,8 @@ object KernelTester extends App {
 
 }
 
-class KernelTester(kernelModel: Model, compModel: MarkovModel, kernel: Kernel, smooth: Boolean) {
-  val msgParam: MessageParam = MessageParam(1.0, 1.0)
+class KernelTester(kernelModel: Model, compModel: MarkovModel, kernel: Kernel, smooth: Boolean, numIter: Int) {
+  val msgParam: MessageParam = MessageParam(0.01, 1.0)
   val parser = new HMMParser(msgParam, kernel)
   val trainingData = reconstructTrainingData()
   val testData = reconstructTestData()
@@ -127,7 +141,7 @@ class KernelTester(kernelModel: Model, compModel: MarkovModel, kernel: Kernel, s
     (kernelResults, viterbiResults, fbResults)
   }
 
-  private def buildPasser(cache: Cache, observedNodes: Set[Int]) = new MessagePasser(cache, observedNodes)
+  private def buildPasser(cache: Cache, observedNodes: Set[Int]) = new MessagePasser(cache, observedNodes, numIter)
 
   private def testToken(testNode: Int,
                 correctPrediction: DenseMatrix[Double],

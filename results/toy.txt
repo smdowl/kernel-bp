@@ -1,0 +1,80 @@
+NonDeterministicHMMModel with TrigramFeatureExtractor and LinearKernel
+Kernel Accuracy: 0.5700000000000001
+Viterbi Accuracy: 0.8500000000000001
+Forward-Backward Accuracy: 0.975
+
+NonDeterministicHMMModel with NonFormTrigramFeatureExtractor and LinearKernel
+Kernel Accuracy: 0.445
+Viterbi Accuracy: 0.9
+Forward-Backward Accuracy: 0.925
+
+ThreeStateNonDeterministicHMMModel with TrigramFeatureExtractor and LinearKernel
+Kernel Accuracy: 0.565
+Viterbi Accuracy: 0.98
+Forward-Backward Accuracy: 0.585
+
+ThreeStateNonDeterministicHMMModel with NonFormTrigramFeatureExtractor and LinearKernel
+Kernel Accuracy: 0.47000000000000003
+Viterbi Accuracy: 0.94
+Forward-Backward Accuracy: 0.5549999999999999
+
+
+
+NonDeterministicHMMModel
+transition matrix:
+1.0E-8       0.99999999  
+0.999999999  1.0E-9      
+emission matrix:
+0.8  0.19999999999999996  
+0.2  0.8                  
+
+TrigramFeatureExtractor and LinearKernel
+Kernel Accuracy: 0.6000000000000001
+Viterbi Accuracy: 0.75
+Forward-Backward Accuracy: 0.9450000000000001
+
+TrigramFeatureExtractor and RBFKernel
+Kernel Accuracy: 0.325
+Viterbi Accuracy: 0.75
+Forward-Backward Accuracy: 0.965
+
+NonFormTrigramFeatureExtractor and LinearKernel
+Kernel Accuracy: 0.45999999999999996
+Viterbi Accuracy: 0.9
+Forward-Backward Accuracy: 0.995
+
+NonFormTrigramFeatureExtractor and RBFKernel
+Kernel Accuracy: 0.325
+Viterbi Accuracy: 0.55
+Forward-Backward Accuracy: 0.95
+
+
+ThreeStateNonDeterministicHMMModel
+transition matrix:
+0.0       0.9999  9.999999999998899E-5   
+1.0E-7    0.0     0.9999999              
+0.999999  0.0     1.0000000000287557E-6  
+emission matrix:
+0.9         0.0999999  9.999999997511999E-8  
+0.0         0.899999   0.100001              
+0.09999999  0.0        0.90000001            
+
+TrigramFeatureExtractor and LinearKernel
+Kernel Accuracy: 0.3
+Viterbi Accuracy: 1.0
+Forward-Backward Accuracy: 0.5800000000000001
+
+TrigramFeatureExtractor and RBFKernel
+Kernel Accuracy: 0.215
+Viterbi Accuracy: 0.995
+Forward-Backward Accuracy: 0.5800000000000001
+
+NonFormTrigramFeatureExtractor and LinearKernel
+Kernel Accuracy: 0.54
+Viterbi Accuracy: 0.985
+Forward-Backward Accuracy: 0.605
+
+NonFormTrigramFeatureExtractor and RBFKernel
+Kernel Accuracy: 0.185
+Viterbi Accuracy: 0.995
+Forward-Backward Accuracy: 0.62
