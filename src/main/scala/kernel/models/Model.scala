@@ -23,6 +23,25 @@ trait Model {
 
   def labelKeys = keyArray.filter(_.startsWith("label:"))
 
+  def printEdgeFeatures() = {
+    for ((key, edge) <- _edges) {
+      println(key)
+
+      val n = edge.endData.rows
+
+      val start = edge.startData.toDenseMatrix
+      val end = edge.endData.toDenseMatrix
+
+      for (i <- 0 until n) {
+        val startFeatures = start(i, ::).t.findAll(_ == 1.0)
+        val endFeatures = end(i, ::).t.findAll(_ == 1.0)
+
+        println(s"(${startFeatures.map(keyArray.apply).mkString(",")}) => (${endFeatures.map(keyArray.apply).mkString(",")})")
+        println()
+      }
+    }
+  }
+
   /**
    * The matrix of all possible label assignments.
    * i.e. each row is a vector of one possible labelling of a test node
