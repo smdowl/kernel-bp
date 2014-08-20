@@ -106,7 +106,8 @@ class MessagePasser(cache: Cache, observedNodes: Set[Int], numIter: Int = 50) {
     for (outMessageIdx <- nodesToUpdate) {
       val Ktu_beta = DenseMatrix.ones[Double](cache.numSamples(nodeId, outMessageIdx), 1)
 
-      for (inMessageIdx <- (neighbours.toSet - outMessageIdx).toSeq.sorted) {
+      val incomingMessageIdices = (neighbours.toSet - outMessageIdx).toSeq.sorted
+      for (inMessageIdx <- incomingMessageIdices) {
         val multFactor = if (inMessageIdx < cache.numNodes / 2)
           cache.kArr(nodeId)(inMessageIdx) * betaArr(nodeId)(inMessageIdx)
         else if (outMessageIdx > nodeId)

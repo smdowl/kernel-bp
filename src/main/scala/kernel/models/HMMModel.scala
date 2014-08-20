@@ -9,9 +9,13 @@ abstract class HMMModel extends Model {
    * relevant to a given node and each row of those matrices is a single sample.
    */
   def initialise() = {
-    val (keyArray, trainData, testData) = generateFeatureVectors()
+    var (keyArray, trainData, testData) = generateFeatureVectors()
     this.trainData = trainData
     _keyArray = keyArray
+
+    if (testData.length == 0)
+      testData = trainData
+
     _testObservations = getObservations(testData)
     _testLabels = getTestLabels(testData)
 
