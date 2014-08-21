@@ -43,8 +43,9 @@ class MessagePasser(cache: Cache, observedNodes: Set[Int], numIter: Int = 50) {
       val neighbours = cache.getNeighbours(i)
       val filtered = neighbours.filter(unobservedNodes.contains)
       for (j <- filtered) {
-        val invMatrix = cache.kArr(i)(j) + DenseMatrix.eye[Double](cache.numSamples(i, j)) * cache.msgParam.lambda
-        out(i)(j) = inv(invMatrix)
+        val invMatrix = cache.kArr(j)(i) + DenseMatrix.eye[Double](cache.numSamples(j, i)) * cache.msgParam.lambda
+        val inverse = inv(invMatrix)
+        out(i)(j) = inverse
       }
     }
 
@@ -64,7 +65,8 @@ class MessagePasser(cache: Cache, observedNodes: Set[Int], numIter: Int = 50) {
 
         val kt = cache.kernel(cache.dataArr(leafId)(neighbourId), observations(leafId), cache.msgParam.sig)
 
-        betaArr(leafId)(neighbourId) = observedMessage(Kt, Ks, kt, I, cache.msgParam.lambda)
+        val observed = observedMessage(Kt, Ks, kt, I, cache.msgParam.lambda)
+        betaArr(leafId)(neighbourId) = observed
         normMessage(leafId, neighbourId)
       })
     }
@@ -102,26 +104,36 @@ class MessagePasser(cache: Cache, observedNodes: Set[Int], numIter: Int = 50) {
   private def updateMessageForNode(nodeId: Int) = {
     val neighbours = cache.getNeighbours(nodeId)
     val nodesToUpdate = neighbours.filterNot(observations.keySet.contains)
+    var non = null
 
-    for (outMessageIdx <- nodesToUpdate) {
-      val Ktu_beta = DenseMatrix.ones[Double](cache.numSamples(nodeId, outMessageIdx), 1)
+    for (updatedNodeId <- nodesToUpdate) {
+      val Ktu_beta = DenseMatrix.ones[Double](cache.numSamples(nodeId, updatedNodeId), 1)
 
-      val incomingMessageIdices = (neighbours.toSet - outMessageIdx).toSeq.sorted
-      for (inMessageIdx <- incomingMessageIdices) {
-        val multFactor = if (inMessageIdx < cache.numNodes / 2)
-          cache.kArr(nodeId)(inMessageIdx) * betaArr(nodeId)(inMessageIdx)
-        else if (outMessageIdx > nodeId)
-          cache.translatedKArr(inMessageIdx)(nodeId)("forward") * betaArr(nodeId)(inMessageIdx)
+      val incomingMessageIdices = (neighbours.toSet - updatedNodeId).toSeq.sorted
+      for (incomingNodeId <- incomingMessageIdices) {
+
+        val beta = betaArr(incomingNodeId)(nodeId)
+
+        val grammMatrix = if (incomingNodeId < cache.numNodes / 2)
+          cache.kArr(incomingNodeId)(nodeId)
+        else if (updatedNodeId > nodeId)
+          cache.translatedKArr(incomingNodeId)(nodeId)("backward")
         else
-          cache.translatedKArr(inMessageIdx)(nodeId)("backward") * betaArr(nodeId)(inMessageIdx)
+          cache.translatedKArr(incomingNodeId)(nodeId)("forward")
+
+        val multFactor = grammMatrix * beta
 
         assert(multFactor.cols == 1, "Should be a vector.")
         assert(Ktu_beta.rows == multFactor.rows, "Should be same dimension.")
         Ktu_beta :*= multFactor
       }
 
-      betaArr(nodeId)(outMessageIdx) = KarrInv(outMessageIdx)(nodeId) * Ktu_beta
-      normMessage(nodeId, outMessageIdx)
+      if (updatedNodeId == 0)
+        non = null
+
+      val newBeta = KarrInv(nodeId)(updatedNodeId) * Ktu_beta
+      betaArr(nodeId)(updatedNodeId) = newBeta
+      normMessage(nodeId, updatedNodeId)
     }
   }
 }

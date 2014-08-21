@@ -38,10 +38,10 @@ class HMMParser(msgParam: MessageParam, kernel: Kernel) extends EdgeParser(kerne
 
     for (i <- 0 until length - 1) {
       dataArr(i)(i+1) = edge.startData
-      kArr(i)(i+1) = kernel(edge.startData, edge.startData, msgParam.sig)
+      kArr(i)(i+1) = kernel(edge.startData, edge.endData, msgParam.sig)
 
       dataArr(i+1)(i) = edge.endData
-      kArr(i+1)(i) = kernel(edge.endData, edge.endData, msgParam.sig)
+      kArr(i+1)(i) = kernel(edge.endData, edge.startData, msgParam.sig)
     }
   }
 

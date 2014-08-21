@@ -1,6 +1,7 @@
 package kernel.models.components
 
 import breeze.linalg.{Axis, DenseMatrix, DenseVector, sum}
+import breeze.numerics.abs
 import kernel.caches.Cache
 
 class Inferer(testMatrix: DenseMatrix[Double]) {
@@ -17,12 +18,14 @@ class Inferer(testMatrix: DenseMatrix[Double]) {
     for (neighbour <- cache.getNeighbours(nodeId)) {
 
       val dotLeft = testMatrix
-      val dotRight = cache.dataArr(nodeId)(neighbour)
+      val dotRight = cache.dataArr(nodeId)(neighbour).toDenseMatrix
       val multFactor: DenseMatrix[Double] = cache.kernel(dotLeft, dotRight, cache.msgParam.sig) * betaArr(neighbour)(nodeId)
 
       condRootMarginal :*= multFactor.toDenseVector
     }
 
-    condRootMarginal
+    // TODO: This makes it work...
+    val absolute = abs(condRootMarginal)
+    absolute
   }
 }

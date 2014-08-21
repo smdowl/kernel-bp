@@ -36,7 +36,7 @@ trait Model {
         val startFeatures = start(i, ::).t.findAll(_ == 1.0)
         val endFeatures = end(i, ::).t.findAll(_ == 1.0)
 
-        println(s"(${startFeatures.map(keyArray.apply).mkString(",")}) => (${endFeatures.map(keyArray.apply).mkString(",")})")
+        println(s"(${startFeatures.map(keyArray.apply).mkString(", ")}) => (${endFeatures.map(keyArray.apply).mkString(", ")})")
         println()
       }
     }

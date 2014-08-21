@@ -1,6 +1,7 @@
 package kernel.models
 
-import breeze.linalg.DenseMatrix
+import breeze.linalg.{DenseVector, DenseMatrix}
+import breeze.stats.distributions.Multinomial
 import kernel.models.toyextractors.{BigramFeatureExtractor, UnigramFeatureExtractor, ToyFeatureExtractor}
 
 object DeterministicHMMModel extends App {
@@ -11,6 +12,8 @@ object DeterministicHMMModel extends App {
 class DeterministicHMMModel(n: Int, numTest: Int = 10) extends ProbabalisticHMMModel(n, numTest) {
   protected def hiddenStates = Seq("A", "B", "C")
   protected def visibleStates = Seq("X", "Y", "Z")
+
+  override protected def initDist = new Multinomial(DenseVector.ones[Double](hiddenStates.length) :* DenseVector(1.0, 0.0, 0.0))
 
   protected def transitionMatrix: DenseMatrix[Double] = {
     DenseMatrix(
