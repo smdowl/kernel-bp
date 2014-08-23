@@ -117,9 +117,9 @@ class MessagePasser(cache: Cache, observedNodes: Set[Int], numIter: Int = 50) {
         val grammMatrix = if (incomingNodeId < cache.numNodes / 2)
           cache.kArr(incomingNodeId)(nodeId)
         else if (updatedNodeId > nodeId)
-          cache.translatedKArr(incomingNodeId)(nodeId)("backward")
-        else
           cache.translatedKArr(incomingNodeId)(nodeId)("forward")
+        else
+          cache.translatedKArr(incomingNodeId)(nodeId)("backward")
 
         val multFactor = grammMatrix * beta
 
@@ -131,7 +131,8 @@ class MessagePasser(cache: Cache, observedNodes: Set[Int], numIter: Int = 50) {
       if (updatedNodeId == 0)
         non = null
 
-      val newBeta = KarrInv(nodeId)(updatedNodeId) * Ktu_beta
+      var newBeta = KarrInv(nodeId)(updatedNodeId) * Ktu_beta
+      newBeta = abs(newBeta)
       betaArr(nodeId)(updatedNodeId) = newBeta
       normMessage(nodeId, updatedNodeId)
     }
