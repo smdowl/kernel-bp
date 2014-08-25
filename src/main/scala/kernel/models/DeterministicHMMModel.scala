@@ -2,7 +2,7 @@ package kernel.models
 
 import breeze.linalg.{DenseVector, DenseMatrix}
 import breeze.stats.distributions.Multinomial
-import kernel.models.toyextractors.{BigramFeatureExtractor, UnigramFeatureExtractor, ToyFeatureExtractor}
+import kernel.models.toyextractors.{UnigramFeatureExtractor, ToyFeatureExtractor}
 
 object DeterministicHMMModel extends App {
   val model = new DeterministicHMMModel(1)

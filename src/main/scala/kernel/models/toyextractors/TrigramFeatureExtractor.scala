@@ -12,8 +12,6 @@ class TrigramFeatureExtractor extends ToyFeatureExtractor {
 
     var prev: String = null
     var prevPrev: String = null
-    var prevForm: String = null
-    var prevPrevForm: String = null
 
 
     hidden.map(node => {
@@ -33,16 +31,6 @@ class TrigramFeatureExtractor extends ToyFeatureExtractor {
     }) ++ visible.map(node => {
       val vector = new FeatureVector()
       vector.add(s"form:$node")
-
-      if (prevPrevForm != null)
-        vector.add(s"prev-prev-form:$prev")
-
-      if (prevForm != null) {
-        vector.add(s"prev-form:$prevForm")
-        prevPrevForm = prevForm
-      }
-
-      prevForm = node
       vector
     })
   }

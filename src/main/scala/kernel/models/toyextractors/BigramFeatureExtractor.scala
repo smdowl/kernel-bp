@@ -11,7 +11,6 @@ class BigramFeatureExtractor extends ToyFeatureExtractor {
     val visible = sampleData.slice(sampleData.length / 2, sampleData.length)
 
     var prev: String = null
-    var prevForm: String = null
 
     hidden.map(node => {
       val vector = new FeatureVector()
@@ -23,9 +22,6 @@ class BigramFeatureExtractor extends ToyFeatureExtractor {
     }) ++ visible.map(node => {
       val vector = new FeatureVector()
       vector.add(s"form:$node")
-      if (prevForm != null)
-        vector.add(s"prev-form:$prevForm")
-      prevForm = node
       vector
     })
   }
