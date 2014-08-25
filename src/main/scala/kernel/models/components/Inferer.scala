@@ -13,13 +13,16 @@ class Inferer(testMatrix: DenseMatrix[Double]) {
   }
 
   def calculateKernelCondRootMarginal(nodeId: Int, cache: Cache, betaArr: Array[Array[DenseMatrix[Double]]]): DenseVector[Double] = {
-    var condRootMarginal: DenseVector[Double] = calculateKernelMarginal(nodeId, cache)
+    var condRootMarginal: DenseVector[Double] = DenseVector.ones[Double](testMatrix.rows)
 
     for (neighbour <- cache.getNeighbours(nodeId)) {
 
-      val dotLeft = testMatrix
-      val dotRight = cache.dataArr(nodeId)(neighbour).toDenseMatrix
-      val multFactor: DenseMatrix[Double] = cache.kernel(dotLeft, dotRight, cache.msgParam.sig) * betaArr(neighbour)(nodeId)
+      val data = cache.dataArr(nodeId)(neighbour).toDenseMatrix
+
+      val kernelDot = cache.kernel(testMatrix, data, cache.msgParam.sig)
+      val beta = betaArr(neighbour)(nodeId)
+
+      val multFactor: DenseMatrix[Double] = kernelDot * beta
 
       condRootMarginal :*= multFactor.toDenseVector
     }
