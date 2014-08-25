@@ -2,7 +2,7 @@ package kernel.models
 
 import breeze.linalg.DenseMatrix
 
-class ThreeStateDeterministicEmissionHMMModel(n: Int, numTest: Int = 10) extends DeterministicHMMModel(n, numTest) {
+class DeterministicEmissionHMMModel(n: Int, numTest: Int = 10) extends DeterministicHMMModel(n, numTest) {
   override protected def hiddenStates = Seq("A", "B", "C")
 
   override protected def visibleStates = Seq("X", "Y", "Z")

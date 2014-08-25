@@ -3,7 +3,7 @@ package kernel.models
 import breeze.linalg.{DenseVector, DenseMatrix}
 import breeze.stats.distributions.Dirichlet
 
-class RandomThreeStateNonDeterministicHMMModel(n: Int, numTest: Int = 10) extends DeterministicHMMModel(n, numTest) {
+class RandomNonDeterministicHMMModel(n: Int, numTest: Int = 10) extends DeterministicHMMModel(n, numTest) {
 
   val diric = new Dirichlet(DenseVector.ones[Double](3) * 0.5)
   var _transMatrix: DenseMatrix[Double] = _
