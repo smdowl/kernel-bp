@@ -33,8 +33,8 @@ trait Model {
       val end = edge.endData.toDenseMatrix
 
       for (i <- 0 until n) {
-        val startFeatures = start(i, ::).t.findAll(_ == 1.0)
-        val endFeatures = end(i, ::).t.findAll(_ == 1.0)
+        val startFeatures = start(i, ::).t.findAll(_ != 0.0)
+        val endFeatures = end(i, ::).t.findAll(_ != 0.0)
 
         println(s"(${startFeatures.map(keyArray.apply).mkString(", ")}) => (${endFeatures.map(keyArray.apply).mkString(", ")})")
         println()
