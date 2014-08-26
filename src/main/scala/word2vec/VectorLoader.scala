@@ -42,8 +42,8 @@ class VectorLoader {
 
   private def parseVector(vecString: String) = {
     val vec: Seq[String] = vecString.substring(1, vecString.length-1).split(',')
-    val doubleVec = vec.map(parseDouble)
-    DenseVector(doubleVec:_*)
+    val doubleSeq: Seq[Double] = vec.map(parseDouble)
+    DenseVector(doubleSeq:_*) * 100.0
   }
 
   private def parseDouble(string: String) = try { string.toDouble } catch { case _: Throwable => 0.0 }
