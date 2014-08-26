@@ -79,4 +79,6 @@ abstract class HMMModel extends Model {
 
     Edge(mergeData(leftData), mergeData(rightData))
   }
+
+  def refresh() = {}
 }

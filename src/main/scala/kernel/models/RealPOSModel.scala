@@ -3,14 +3,12 @@ package kernel.models
 import app.Constants
 import breeze.linalg.SparseVector
 import input.ConllParser
-import pos.features.extractors.{WordVecUnigramFeatureExtractor, UnigramPOSFeatureExtractor}
+import pos.features.extractors.{POSFeatureExtractor, WordVecUnigramFeatureExtractor, UnigramPOSFeatureExtractor}
 import pos.output.ParsedFeaturesOutput
 
-class RealPOSModel extends HMMModel {
+class RealPOSModel(extractor: POSFeatureExtractor = new WordVecUnigramFeatureExtractor) extends HMMModel {
   override protected def generateFeatureVectors(): (Array[String], Array[Array[SparseVector[Double]]], Array[Array[SparseVector[Double]]]) = {
     val parser = new ConllParser()
-    val extractor = new WordVecUnigramFeatureExtractor
-
-    ParsedFeaturesOutput(parser, extractor, -1, Constants.MICRO_TRAIN_FILE, Constants.MINI_TEST_FILE)
+    ParsedFeaturesOutput(parser, extractor, -1, Constants.MICRO_TRAIN_FILE, Constants.MICRO_TRAIN_FILE)
   }
 }

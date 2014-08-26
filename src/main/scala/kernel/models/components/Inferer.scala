@@ -27,6 +27,6 @@ class Inferer(testMatrix: DenseMatrix[Double]) {
       condRootMarginal :*= multFactor.toDenseVector
     }
 
-    condRootMarginal
+    abs(condRootMarginal).toDenseVector
   }
 }

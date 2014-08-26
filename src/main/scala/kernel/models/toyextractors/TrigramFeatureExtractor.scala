@@ -19,7 +19,7 @@ class TrigramFeatureExtractor extends ToyFeatureExtractor {
       vector.add(s"label:$node")
 
       if (prevPrev != null)
-        vector.add(s"prev-prev-label:$prev")
+        vector.add(s"prev-prev-label:$prevPrev")
 
       if (prev != null) {
         vector.add(s"prev-label:$prev")

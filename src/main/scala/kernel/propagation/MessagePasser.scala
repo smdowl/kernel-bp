@@ -86,7 +86,12 @@ class MessagePasser(cache: Cache, observedNodes: Set[Int], numIter: Int = 50) {
     // TODO: Make sure this doesn't do something too crazy in higher dimensions
     val matNorm = norm(betaArr(i)(j).toDenseVector)
     val maxNorm = abs(max(betaArr(i)(j)))
-    betaArr(i)(j) /= matNorm
+
+    val normVal = matNorm
+
+    if (normVal > 0.0)
+      betaArr(i)(j) /= normVal
+
   }
 
   protected def calculateInternalMessages(): Unit = {
@@ -123,6 +128,9 @@ class MessagePasser(cache: Cache, observedNodes: Set[Int], numIter: Int = 50) {
 
         val multFactor = grammMatrix * beta
 
+        if (multFactor.findAll(_.isNaN).length > 0)
+          non = null
+
         assert(multFactor.cols == 1, "Should be a vector.")
         assert(Ktu_beta.rows == multFactor.rows, "Should be same dimension.")
         Ktu_beta :*= multFactor
@@ -132,6 +140,7 @@ class MessagePasser(cache: Cache, observedNodes: Set[Int], numIter: Int = 50) {
         non = null
 
       var newBeta = KarrInv(nodeId)(updatedNodeId) * Ktu_beta
+
       newBeta = abs(newBeta)
       betaArr(nodeId)(updatedNodeId) = newBeta
       normMessage(nodeId, updatedNodeId)

@@ -4,7 +4,7 @@ import breeze.linalg.{DenseMatrix, DenseVector}
 import breeze.stats.distributions.Multinomial
 import kernel.models.toyextractors.{UnigramFeatureExtractor, ToyFeatureExtractor}
 
-class TrigramModel(n: Int) extends ProbabalisticHMMModel(n) {
+class TrigramModel(n: Int, numTest: Int = 10) extends ProbabalisticHMMModel(n, numTest) {
   protected def hiddenStates = Seq("A", "B")
   protected def visibleStates = Seq("X", "Y")
 
