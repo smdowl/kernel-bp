@@ -35,7 +35,7 @@ object FeatureArrayBuilder {
 
     featureVectors.foreach(sentence => {
       val featureSeq: Seq[SparseVector[Double]] = sentence.map(vec => parseFeatureVector(vec, index))
-      assert(featureSeq.slice(1, sentence.length).forall(vec => any(vec)), "Should have at least one non-zero entry")
+//      assert(featureSeq.slice(1, sentence.length).forall(vec => any(vec)), "Should have at least one non-zero entry")
       output :+= featureSeq.toArray
     })
 
