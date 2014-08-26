@@ -9,6 +9,7 @@ object Constants {
 
   final val MICRO_TRAIN_FILE = BASE_DIR + "micro.conll"
   final val MINI_TRAIN_FILE = BASE_DIR + "mini.conll"
+  final val MICRO_TEST_FILE = BASE_DIR + "micro-test.conll"
   final val MINI_TEST_FILE = BASE_DIR + "mini-test.conll"
 
   final val DEP_TEST = BASE_DIR + "dep-test.conll"
