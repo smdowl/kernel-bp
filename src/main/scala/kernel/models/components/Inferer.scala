@@ -1,6 +1,6 @@
 package kernel.models.components
 
-import breeze.linalg.{Axis, DenseMatrix, DenseVector, sum}
+import breeze.linalg._
 import breeze.numerics.abs
 import kernel.caches.Cache
 
@@ -22,7 +22,7 @@ class Inferer(testMatrix: DenseMatrix[Double]) {
       val kernelDot = cache.kernel(testMatrix, data, cache.msgParam.sig)
       val beta = betaArr(neighbour)(nodeId)
 
-      val multFactor: DenseMatrix[Double] = kernelDot * beta
+      val multFactor: DenseMatrix[Double] = kernelDot * beta + 1e-9
 
       condRootMarginal :*= multFactor.toDenseVector
     }

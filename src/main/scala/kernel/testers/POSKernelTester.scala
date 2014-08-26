@@ -12,13 +12,14 @@ import pos.features.extractors._
 
 object RealConfig {
 
-  val extractors = Seq(new BigramPOSFeatureExtractor)
+//  val extractors = Seq(new UnigramChainOnlyPOSFeatureExtractor, new UnigramPOSFeatureExtractor, new UnigramWordVecFeatureExtractor, new BigramChainOnlyPOSFeatureExtractor, new BigramPOSFeatureExtractor, new BigramWordVecFeatureExtractor)
+  val extractors = Seq(new TrigramChainOnlyPOSFeatureExtractor, new TrigramPOSFeatureExtractor, new TrigramWordVecFeatureExtractor)
 
   val models = extractors.map(new RealPOSModel(_))
   val kernels = Seq(new LinearKernel)
   val smooth = Seq(false)
   val numIter = Seq(10)
-  val lambda: Seq[Double] = Seq(1e-3, 1e6)
+  val lambda: Seq[Double] = Seq(1e3)
 }
 
 object POSKernelTester extends App {
@@ -26,13 +27,19 @@ object POSKernelTester extends App {
   runExperiments()
 
   def runExperiments() = {
-    var model: HMMModel = null
+    var model: RealPOSModel = null
+    var first = true
 
     for (nextModel <- RealConfig.models) {
       model = nextModel
       model.initialise()
 
-      println(s"${getName(model)}")
+      if (first) {
+        println(s"${model.getNumberOfSamples} training samples")
+        first = false
+      }
+
+      println(s"${getName(model)} with ${getName(model.getExtractor)}")
       println()
 
       for (numIter <- RealConfig.numIter) {
@@ -94,15 +101,22 @@ object POSKernelTester extends App {
 
 }
 
-class POSKernelTester(kernelModel: Model, compModel: MarkovModel, kernel: Kernel, smooth: Boolean, numIter: Int, lambda: Double) {
+class POSKernelTester(kernelModel: Model, compModel: MarkovModel, kernel: Kernel, smooth: Boolean, numIter: Int, lambda: Double, 
+                      shouldCompare: Boolean = false) {
   val msgParam: MessageParam = MessageParam(lambda, 1.0)
   val parser = new HMMParser(msgParam, kernel)
-  val trainingData = Reconstructor.reconstructTrainingData(kernelModel)
-  val testData = Reconstructor.reconstructTestData(kernelModel)
-  compModel.train(trainingData)
 
-  //  println(s"Training: $trainingData")
-  //  println(s"Test: $testData")
+  var trainingData: Seq[Seq[(String, String)]] = _
+  var testData: Seq[Seq[(String, String)]] = _
+
+  if (shouldCompare) {
+    trainingData = Reconstructor.reconstructTrainingData(kernelModel)
+    testData = Reconstructor.reconstructTestData(kernelModel)
+    compModel.train(trainingData)
+  }
+
+//    println(s"Training: $trainingData")
+//    println(s"Test: $testData")
 
   def testSentence(testIdx: Int) = {
     val edges = kernelModel.edges
@@ -110,8 +124,10 @@ class POSKernelTester(kernelModel: Model, compModel: MarkovModel, kernel: Kernel
     val testArr = kernelModel.testLabels
     val (labelKeys, testMatrix) = kernelModel.testMatrix
 
-//    if (trainingData.length == 1)
-//      kernelModel.printEdgeFeatures()
+//    println(labelKeys.mkString(","))
+
+    if (trainingData != null && trainingData.length == 1)
+      kernelModel.printEdgeFeatures()
 
     val observations = obsArr(testIdx).map{ case (key, sparse) => key -> sparse.toDenseMatrix}
     val testSet = testArr(testIdx).map{ case (key, sparse) => key -> sparse.toDenseMatrix}
@@ -128,11 +144,14 @@ class POSKernelTester(kernelModel: Model, compModel: MarkovModel, kernel: Kernel
       testToken(testNode, correctPrediction, cache, betaArr, inferer, labelKeys)
     })
 
-    val viterbiResults = compModel.viterbiTestSentence(testData(testIdx))
-    val fbResults = compModel.forwardBackwardTestSentence(testData(testIdx))
+    val (viterbiResults, fbResults) = if (shouldCompare) {
+      (compModel.viterbiTestSentence(testData(testIdx)), compModel.forwardBackwardTestSentence(testData(testIdx)))
+    } else {
+      val n = kernelResults.length
+      (Seq.fill(n)(false), Seq.fill(n)(false))
+    }
 
     (kernelResults, viterbiResults, fbResults)
-//    (kernelResults, Seq[Boolean](), Seq[Boolean]())
   }
 
   private def buildPasser(cache: Cache, observedNodes: Set[Int]) = new MessagePasser(cache, observedNodes, numIter)

@@ -14,17 +14,17 @@ object ToyConfig {
   val TEST = false
 
   def NUM_SAMPLES = if (TEST) 1 else 10
-  def NUM_TEST = if (TEST) 0 else 3
+  def NUM_TEST = if (TEST) 0 else 10
   def NUM_REPEATS = if (TEST) 1 else 10
-  def SENTENCE_LENGTH = if (TEST) 3 else 20
-  def model = if (TEST) new DeterministicHMMModel(NUM_SAMPLES, NUM_TEST) else new TrigramModel(NUM_SAMPLES, NUM_TEST)
+  def SENTENCE_LENGTH = if (TEST) 3 else 10
+  def model = if (TEST) new DeterministicHMMModel(NUM_SAMPLES, NUM_TEST) else new NonDeterministicHMMModel(NUM_SAMPLES, NUM_TEST)
 
   val models = Seq(model)
-  val extractors = Seq(new BigramFeatureExtractor, new TrigramFeatureExtractor) // new UnigramFeatureExtractor, new BigramFeatureExtractor,
-  val kernels = Seq(new LinearKernel)
+  val extractors = Seq(new BigramFeatureExtractor) // new UnigramFeatureExtractor, new BigramFeatureExtractor,
+  val kernels = Seq(new LinearKernel(0.0))
   val smooth = Seq(false)
   val numIter = Seq(50)
-  val lambda: Seq[Double] = Seq(1e-3, 1e6)
+  val lambda: Seq[Double] = Seq(1e3)
 }
 
 object KernelTester extends App {
@@ -100,6 +100,9 @@ object KernelTester extends App {
     var total = 0
     for (i <- 0 until model.testObservations.length) {
       val (kernelResults, viterbiResults, fbResults) = tester.testSentence(i)
+
+//      println(kernelResults)
+
       assert(kernelResults.length == viterbiResults.length, "Should be exactly the same length")
       assert(kernelResults.length == fbResults.length, "Should be exactly the same length")
 
@@ -135,8 +138,10 @@ class KernelTester(kernelModel: Model, compModel: MarkovModel, kernel: Kernel, s
     val testArr = kernelModel.testLabels
     val (labelKeys, testMatrix) = kernelModel.testMatrix
 
-    if (trainingData.length == 1)
+    if (trainingData.length == 1) {
+      println(labelKeys.mkString(","))
       kernelModel.printEdgeFeatures()
+    }
 
     val observations = obsArr(testIdx).map{ case (key, sparse) => key -> sparse.toDenseMatrix}
     val testSet = testArr(testIdx).map{ case (key, sparse) => key -> sparse.toDenseMatrix}

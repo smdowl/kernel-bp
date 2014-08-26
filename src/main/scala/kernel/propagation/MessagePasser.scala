@@ -1,6 +1,6 @@
 package kernel.propagation
 
-import breeze.linalg.{inv, max, norm, DenseMatrix}
+import breeze.linalg._
 import breeze.numerics.{abs, sqrt}
 import kernel.caches.Cache
 
@@ -91,7 +91,8 @@ class MessagePasser(cache: Cache, observedNodes: Set[Int], numIter: Int = 50) {
 
     if (normVal > 0.0)
       betaArr(i)(j) /= normVal
-
+    else
+      betaArr(i)(j) := 1.0
   }
 
   protected def calculateInternalMessages(): Unit = {
@@ -139,9 +140,9 @@ class MessagePasser(cache: Cache, observedNodes: Set[Int], numIter: Int = 50) {
       if (updatedNodeId == 0)
         non = null
 
-      var newBeta = KarrInv(nodeId)(updatedNodeId) * Ktu_beta
+      var newBeta = KarrInv(updatedNodeId)(nodeId) * Ktu_beta
 
-      newBeta = abs(newBeta)
+//      newBeta = abs(newBeta)
       betaArr(nodeId)(updatedNodeId) = newBeta
       normMessage(nodeId, updatedNodeId)
     }

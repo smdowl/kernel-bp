@@ -25,11 +25,17 @@ object Reconstructor {
 
       for (node <- visible) {
         val featureIdxs = node.findAll(_.equals(1.0))
+
+        var added = false
         for (featureIdx <- featureIdxs) {
           val key = keys(featureIdx).split(":")(0)
-          if (key.equals("form"))
+          if (key.equals("form")) {
             visibleSeq :+= keys(featureIdx).split(":")(1)
+            added = true
+          }
         }
+        if (!added)
+          visibleSeq :+= "NONE"
       }
 
       output :+= (hiddenSeq zip visibleSeq)
@@ -61,11 +67,16 @@ object Reconstructor {
       for (nodeIdx <- visible.size until 2 * visible.size) {
         val node = visible(nodeIdx).toDenseMatrix
         val featureIdxs = node.findAll(_.equals(1.0)).map(_._2)
+        var added = false
         for (featureIdx <- featureIdxs) {
           val key = keys(featureIdx).split(":")(0)
-          if (key.equals("form"))
+          if (key.equals("form")) {
             visibleSeq :+= keys(featureIdx).split(":")(1)
+            added = true
+          }
         }
+        if (!added)
+          visibleSeq :+= "NONE"
       }
 
       output :+= (hiddenSeq zip visibleSeq)
