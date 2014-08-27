@@ -130,3 +130,53 @@ Viterbi Accuracy: 0.6918918918918919
 Forward-Backward Accuracy: 0.5351351351351351
 
 
+
+========================================================================
+Random, alpha=0.5
+========================================================================
+
+UnigramFeatureExtractor and LinearKernel with 50 iterations lambda=1000000.0
+Kernel Accuracy: 0.49799999999999994
+Viterbi Accuracy: 0.55
+Forward-Backward Accuracy: 0.524
+
+BigramFeatureExtractor and LinearKernel with 50 iterations lambda=1000000.0
+Kernel Accuracy: 0.5090000000000001
+Viterbi Accuracy: 0.537
+Forward-Backward Accuracy: 0.518
+
+TrigramFeatureExtractor and LinearKernel with 50 iterations lambda=1000000.0
+Kernel Accuracy: 0.5229999999999999
+Viterbi Accuracy: 0.542
+Forward-Backward Accuracy: 0.541
+
+
+========================================================================
+Random, alpha=0.5
+========================================================================
+
+
+RandomNonDeterministicHMMModel
+transition matrix:
+2.43004975086037E-7  2.5681710565474695E-4  0.9997429398893702     
+0.20919739930699358  0.7704452996077826     0.02035730108522376    
+0.9895958058486214   0.008745045252577388   0.0016591488988010783  
+emission matrix:
+0.045154521242723365  0.009724755927565344  0.9451207228297113    
+0.48873675275105777   0.3038772376268284    0.20738600962211384   
+0.990566858889373     0.008964504251000899  4.686368596259847E-4  
+
+UnigramFeatureExtractor and LinearKernel with 50 iterations lambda=1000000.0
+Kernel Accuracy: 0.9883333333333333
+Viterbi Accuracy: 0.9896666666666667
+Forward-Backward Accuracy: 0.45466666666666666
+
+BigramFeatureExtractor and LinearKernel with 50 iterations lambda=1000000.0
+Kernel Accuracy: 0.9836666666666665
+Viterbi Accuracy: 0.9819999999999999
+Forward-Backward Accuracy: 0.5096666666666667
+
+TrigramFeatureExtractor and LinearKernel with 50 iterations lambda=1000000.0
+Kernel Accuracy: 0.9830000000000002
+Viterbi Accuracy: 0.9833333333333334
+Forward-Backward Accuracy: 0.3976666666666666
