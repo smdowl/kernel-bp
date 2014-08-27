@@ -22,6 +22,7 @@ class BigramChainOnlyPOSFeatureExtractor extends POSFeatureExtractor {
 
     for (i <- 0 until history.length) {
       val vec = new FeatureVector()
+      vec add "None"
       seqOut :+= vec
     }
 

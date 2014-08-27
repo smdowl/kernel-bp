@@ -1,9 +1,9 @@
+189 samples
+
+
 RealPOSModel with UnigramChainOnlyPOSFeatureExtractor
 
-approx 200 samples
-
 LinearKernel with 10 iterations lambda=1000.0
-
 Kernel Accuracy: 0.14054054054054055
 Viterbi Accuracy: 0.16216216216216217
 Forward-Backward Accuracy: 0.14054054054054055
@@ -23,6 +23,7 @@ LinearKernel with 10 iterations lambda=1000.0
 Kernel Accuracy: 0.44324324324324327
 Viterbi Accuracy: 0.40540540540540543
 Forward-Backward Accuracy: 0.33513513513513515
+
 
 
 RealPOSModel with BigramChainOnlyPOSFeatureExtractor
@@ -47,3 +48,85 @@ LinearKernel with 10 iterations lambda=1000.0
 Kernel Accuracy: 0.3567567567567568
 Viterbi Accuracy: 0.40540540540540543
 Forward-Backward Accuracy: 0.33513513513513515
+
+
+
+
+
+463 training samples
+
+
+RealPOSModel with UnigramChainOnlyPOSFeatureExtractor
+
+LinearKernel with 10 iterations lambda=1000.0
+Kernel Accuracy: 0.14054054054054055
+Viterbi Accuracy: 0.14054054054054055
+Forward-Backward Accuracy: 0.14054054054054055
+
+
+RealPOSModel with UnigramPOSFeatureExtractor
+
+LinearKernel with 10 iterations lambda=1000.0
+Kernel Accuracy: 0.7027027027027027
+Viterbi Accuracy: 0.6918918918918919
+Forward-Backward Accuracy: 0.5351351351351351
+
+
+RealPOSModel with UnigramWordVecFeatureExtractor
+
+LinearKernel with 10 iterations lambda=1000.0
+Kernel Accuracy: 0.3945945945945946
+Viterbi Accuracy: 0.6918918918918919
+Forward-Backward Accuracy: 0.5351351351351351
+
+
+
+RealPOSModel with BigramChainOnlyPOSFeatureExtractor
+
+LinearKernel with 10 iterations lambda=1000.0
+Kernel Accuracy: 0.14054054054054055
+Viterbi Accuracy: 0.14054054054054055
+Forward-Backward Accuracy: 0.14054054054054055
+
+
+RealPOSModel with BigramPOSFeatureExtractor
+
+LinearKernel with 10 iterations lambda=1000.0
+Kernel Accuracy: 0.5675675675675675
+Viterbi Accuracy: 0.6918918918918919
+Forward-Backward Accuracy: 0.5351351351351351
+
+
+RealPOSModel with BigramWordVecFeatureExtractor
+
+LinearKernel with 10 iterations lambda=1000.0
+Kernel Accuracy: 0.32432432432432434
+Viterbi Accuracy: 0.6918918918918919
+Forward-Backward Accuracy: 0.5351351351351351
+
+
+
+RealPOSModel with TrigramChainOnlyPOSFeatureExtractor
+
+LinearKernel with 10 iterations lambda=1000.0
+Kernel Accuracy: 0.14054054054054055
+Viterbi Accuracy: 0.14054054054054055
+Forward-Backward Accuracy: 0.14054054054054055
+
+
+RealPOSModel with TrigramPOSFeatureExtractor
+
+LinearKernel with 10 iterations lambda=1000.0
+Kernel Accuracy: 0.5297297297297298
+Viterbi Accuracy: 0.6918918918918919
+Forward-Backward Accuracy: 0.5351351351351351
+
+
+RealPOSModel with TrigramWordVecFeatureExtractor
+
+LinearKernel with 10 iterations lambda=1000.0
+Kernel Accuracy: 0.2810810810810811
+Viterbi Accuracy: 0.6918918918918919
+Forward-Backward Accuracy: 0.5351351351351351
+
+
