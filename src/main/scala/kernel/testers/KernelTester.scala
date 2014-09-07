@@ -15,16 +15,19 @@ object ToyConfig {
 
   def NUM_SAMPLES = if (TEST) 1 else 10
   def NUM_TEST = if (TEST) 0 else 10
-  def NUM_REPEATS = if (TEST) 1 else 10
-  def SENTENCE_LENGTH = if (TEST) 3 else 10
-  def model = if (TEST) new DeterministicHMMModel(NUM_SAMPLES, NUM_TEST) else new NonDeterministicHMMModel(NUM_SAMPLES, NUM_TEST)
+  def NUM_REPEATS = if (TEST) 1 else 20
+  def SENTENCE_LENGTH = if (TEST) 3 else 15
+  def model = if (TEST) new DeterministicHMMModel(NUM_SAMPLES, NUM_TEST) else new TrigramModel(NUM_SAMPLES, NUM_TEST)
 
   val models = Seq(model)
-  val extractors = Seq(new BigramFeatureExtractor) // new UnigramFeatureExtractor, new BigramFeatureExtractor,
-  val kernels = Seq(new LinearKernel(0.0))
+//  val extractors = Seq(new UnigramFeatureExtractor, new BigramFeatureExtractor, new TrigramFeatureExtractor)
+//  val extractors = Seq(new UnigramChainOnlyFeatureExtractor, new BigramChainOnlyFeatureExtractor, new TrigramChainOnlyFeatureExtractor)
+
+  val extractors = Seq(new JointTrigramFeatureExtractor)
+  val kernels = Seq(new LinearKernel)
   val smooth = Seq(false)
   val numIter = Seq(50)
-  val lambda: Seq[Double] = Seq(1e3)
+  val lambda: Seq[Double] = Seq(1e6)
 }
 
 object KernelTester extends App {

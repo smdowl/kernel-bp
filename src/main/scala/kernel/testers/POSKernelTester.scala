@@ -11,11 +11,15 @@ import kernel.propagation.MessagePasser
 import pos.features.extractors._
 
 object RealConfig {
+  val COMPARE = true
+//  val extractors = Seq(new UnigramChainOnlyPOSFeatureExtractor, new UnigramPOSFeatureExtractor, new UnigramWordVecFeatureExtractor, new BigramChainOnlyPOSFeatureExtractor, new BigramPOSFeatureExtractor, new BigramWordVecFeatureExtractor, new TrigramChainOnlyPOSFeatureExtractor, new TrigramPOSFeatureExtractor, new TrigramWordVecFeatureExtractor)
 
-//  val extractors = Seq(new UnigramChainOnlyPOSFeatureExtractor, new UnigramPOSFeatureExtractor, new UnigramWordVecFeatureExtractor, new BigramChainOnlyPOSFeatureExtractor, new BigramPOSFeatureExtractor, new BigramWordVecFeatureExtractor)
+//  val extractors = Seq(new UnigramChainOnlyPOSFeatureExtractor, new UnigramPOSFeatureExtractor, new UnigramWordVecFeatureExtractor)
+//  val extractors = Seq(new BigramChainOnlyPOSFeatureExtractor, new BigramPOSFeatureExtractor, new BigramWordVecFeatureExtractor, new TrigramChainOnlyPOSFeatureExtractor, new TrigramPOSFeatureExtractor, new TrigramWordVecFeatureExtractor)
+//  val extractors = Seq(new UnigramChainOnlyPOSFeatureExtractor, new UnigramWordVecFeatureExtractor, new UnigramWordVecFeatureExtractor)
   val extractors = Seq(new TrigramChainOnlyPOSFeatureExtractor, new TrigramPOSFeatureExtractor, new TrigramWordVecFeatureExtractor)
 
-  val models = extractors.map(new RealPOSModel(_))
+  val models = extractors.map(new RealPOSModel(_, same=false))
   val kernels = Seq(new LinearKernel)
   val smooth = Seq(false)
   val numIter = Seq(10)
@@ -35,6 +39,7 @@ object POSKernelTester extends App {
       model.initialise()
 
       if (first) {
+        println(s"${model.trainData.length} training sentences")
         println(s"${model.getNumberOfSamples} training samples")
         first = false
       }
@@ -76,7 +81,7 @@ object POSKernelTester extends App {
 
   protected def runTest(model: Model, kernel: Kernel, smooth: Boolean, numIter: Int, lambda: Double) = {
     val viterbiModel = new MarkovModel()
-    val tester = new POSKernelTester(model, viterbiModel, kernel, smooth, numIter, lambda)
+    val tester = new POSKernelTester(model, viterbiModel, kernel, smooth, numIter, lambda, RealConfig.COMPARE)
 
     var kernelAccuracy = 0.0
     var viterbiAccuracy = 0.0
@@ -126,8 +131,8 @@ class POSKernelTester(kernelModel: Model, compModel: MarkovModel, kernel: Kernel
 
 //    println(labelKeys.mkString(","))
 
-    if (trainingData != null && trainingData.length == 1)
-      kernelModel.printEdgeFeatures()
+//    if (trainingData != null && trainingData.length == 1)
+//      kernelModel.printEdgeFeatures()
 
     val observations = obsArr(testIdx).map{ case (key, sparse) => key -> sparse.toDenseMatrix}
     val testSet = testArr(testIdx).map{ case (key, sparse) => key -> sparse.toDenseMatrix}

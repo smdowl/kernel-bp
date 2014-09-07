@@ -6,10 +6,13 @@ import input.ConllParser
 import pos.features.extractors.{POSFeatureExtractor, UnigramWordVecFeatureExtractor, UnigramPOSFeatureExtractor}
 import pos.output.ParsedFeaturesOutput
 
-class RealPOSModel(extractor: POSFeatureExtractor = new UnigramWordVecFeatureExtractor) extends HMMModel {
+class RealPOSModel(extractor: POSFeatureExtractor = new UnigramWordVecFeatureExtractor, same: Boolean=false) extends HMMModel {
   override protected def generateFeatureVectors(): (Array[String], Array[Array[SparseVector[Double]]], Array[Array[SparseVector[Double]]]) = {
     val parser = new ConllParser()
-    ParsedFeaturesOutput(parser, extractor, -1, Constants.MINI_TRAIN_FILE, Constants.MINI_TEST_FILE)
+
+    val trainfile = Constants.MINI_TRAIN_FILE
+    val testfile = if (same) trainfile else Constants.MINI_TEST_FILE
+    ParsedFeaturesOutput(parser, extractor, -1, trainfile, testfile)
   }
 
   def getExtractor = extractor

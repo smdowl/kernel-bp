@@ -1,5 +1,5 @@
 ========================================================================
-Real POS - 189 training samples
+Real POS - 189 training samples - 10 sentences
 ========================================================================
 
 RealPOSModel with UnigramChainOnlyPOSFeatureExtractor
@@ -51,9 +51,33 @@ Viterbi Accuracy: 0.40540540540540543
 Forward-Backward Accuracy: 0.33513513513513515
 
 
+RealPOSModel with TrigramChainOnlyPOSFeatureExtractor
+
+LinearKernel with 10 iterations lambda=1000.0
+Kernel Accuracy: 0.14054054054054055
+Viterbi Accuracy: 0.16216216216216217
+Forward-Backward Accuracy: 0.14054054054054055
+
+
+RealPOSModel with TrigramPOSFeatureExtractor
+
+LinearKernel with 10 iterations lambda=1000.0
+Kernel Accuracy: 0.40540540540540543
+Viterbi Accuracy: 0.40540540540540543
+Forward-Backward Accuracy: 0.33513513513513515
+
+
+RealPOSModel with TrigramWordVecFeatureExtractor
+
+LinearKernel with 10 iterations lambda=1000.0
+Kernel Accuracy: 0.32972972972972975
+Viterbi Accuracy: 0.40540540540540543
+Forward-Backward Accuracy: 0.33513513513513515
+
+
 
 ========================================================================
-Real POS - 463 training samples
+Real POS - 463 training samples - 20 sentences
 ========================================================================
 
 RealPOSModel with UnigramChainOnlyPOSFeatureExtractor
@@ -349,3 +373,31 @@ LinearKernel with 10 iterations lambda=1000.0
 Kernel Accuracy: 0.98
 Viterbi Accuracy: 1.0
 Forward-Backward Accuracy: 0.92
+
+
+
+20 training sentences
+489 training samples
+
+RealPOSModel with BigramChainOnlyPOSFeatureExtractor
+
+LinearKernel with 10 iterations lambda=1000.0
+Kernel Accuracy: 0.17791411042944785
+Viterbi Accuracy: 0.17791411042944785
+Forward-Backward Accuracy: 0.17791411042944785
+
+
+RealPOSModel with BigramPOSFeatureExtractor
+
+LinearKernel with 10 iterations lambda=1000.0
+Kernel Accuracy: 0.9918200408997955
+Viterbi Accuracy: 0.9979550102249489
+Forward-Backward Accuracy: 0.6850715746421268
+
+
+RealPOSModel with BigramWordVecFeatureExtractor
+
+LinearKernel with 10 iterations lambda=1000.0
+\Kernel Accuracy: 0.4703476482617587
+Viterbi Accuracy: 0.9979550102249489
+Forward-Backward Accuracy: 0.6850715746421268

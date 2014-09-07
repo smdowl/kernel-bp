@@ -18,8 +18,8 @@ class TrigramModel(n: Int, numTest: Int = 10) extends ProbabalisticHMMModel(n, n
   )
 
   protected def emissionMatrix: DenseMatrix[Double] = {
-    val ax = 0.9
-    val bx = 0.1
+    val ax = 0.5
+    val bx = 0.5
     DenseMatrix(
       (ax, 1-ax),
       (bx, 1-bx)

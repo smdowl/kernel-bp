@@ -5,7 +5,7 @@ import breeze.stats.distributions.Dirichlet
 
 class RandomNonDeterministicHMMModel(n: Int, numTest: Int = 10) extends DeterministicHMMModel(n, numTest) {
 
-  val diric = new Dirichlet(DenseVector.ones[Double](3) * 0.5)
+  val diric = new Dirichlet(DenseVector.ones[Double](3) * 0.25)
   var _transMatrix: DenseMatrix[Double] = _
   var _emMatrix: DenseMatrix[Double] = _
 
